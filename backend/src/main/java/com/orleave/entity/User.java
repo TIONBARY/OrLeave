@@ -23,28 +23,28 @@ import javax.persistence.Id;
 public class User {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long no;
+    private Long no;
 	@Column(name = "email", nullable = false, unique = true, length = 80)
-    String email;
+	private String email;
 	@Column(nullable = false, name = "pw")
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    String password;
+	private String password;
 	@Column(name = "user_type", nullable = false, length = 16)
-	String userType;
+	private String userType;
 	@Column(name = "gender", nullable = false, length = 1)
-	String gender;
+	private String gender;
 	@Column(name = "birth_day", nullable = false)
-	LocalDate birthDay;
+	private LocalDate birthDay;
 	@Column(name = "nickname", nullable = false, unique = true, length = 20)
-	String nickname;
+	private String nickname;
 	@Column(name = "mbti", nullable = false, length = 4)
-	String mbti;
+	private String mbti;
 	@Column(name = "religion", nullable = false, columnDefinition = "INT UNSIGNED")
-	int religion;
+	private int religion;
 	@Column(name = "smoke", nullable = false, columnDefinition = "INT UNSIGNED")
-	int smoke;
+	private int smoke;
 	@Column(name = "drink", nullable = false, columnDefinition = "INT UNSIGNED")
-	int drink;
+	private int drink;
 	
 }
