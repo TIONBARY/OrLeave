@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,12 +34,8 @@ public class User {
 	String userType;
 	@Column(name = "gender", nullable = false, length = 1)
 	String gender;
-	@Column(name = "birth_year", nullable = false, columnDefinition = "INT UNSIGNED")
-	int birthYear;
-	@Column(name = "birth_month", nullable = false, columnDefinition = "INT UNSIGNED")
-	int birthMonth;
-	@Column(name = "birth_day", nullable = false, columnDefinition = "INT UNSIGNED")
-	int birthDay;
+	@Column(name = "birth_day", nullable = false)
+	LocalDate birthDay;
 	@Column(name = "nickname", nullable = false, unique = true, length = 20)
 	String nickname;
 	@Column(name = "mbti", nullable = false, length = 4)
