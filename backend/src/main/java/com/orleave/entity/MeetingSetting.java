@@ -12,14 +12,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "meeting_setting")
+@Table(name = "MEETING_SETTING")
 @Getter
 @Setter
 public class MeetingSetting {
 	
 	@Id
-	@Column(name = "user_no", nullable = false)
-	private Long userNo;
+	@Column(name = "user_no", nullable = false, columnDefinition = "INT UNSIGNED")
+	private int userNo;
 	
 	@OneToOne
 	@MapsId

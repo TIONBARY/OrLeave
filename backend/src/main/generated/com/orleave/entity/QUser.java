@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -17,13 +18,11 @@ public class QUser extends EntityPathBase<User> {
 
     private static final long serialVersionUID = -1425234193L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QUser user = new QUser("user");
 
-    public final NumberPath<Integer> birthDay = createNumber("birthDay", Integer.class);
-
-    public final NumberPath<Integer> birthMonth = createNumber("birthMonth", Integer.class);
-
-    public final NumberPath<Integer> birthYear = createNumber("birthYear", Integer.class);
+    public final DatePath<java.time.LocalDate> birthDay = createDate("birthDay", java.time.LocalDate.class);
 
     public final NumberPath<Integer> drink = createNumber("drink", Integer.class);
 
@@ -31,11 +30,15 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath gender = createString("gender");
 
+    public final ListPath<UserInterest, QUserInterest> interests = this.<UserInterest, QUserInterest>createList("interests", UserInterest.class, QUserInterest.class, PathInits.DIRECT2);
+
     public final StringPath mbti = createString("mbti");
+
+    public final QMeetingSetting meetingSetting;
 
     public final StringPath nickname = createString("nickname");
 
-    public final NumberPath<Long> no = createNumber("no", Long.class);
+    public final NumberPath<Integer> no = createNumber("no", Integer.class);
 
     public final StringPath password = createString("password");
 
@@ -46,15 +49,24 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath userType = createString("userType");
 
     public QUser(String variable) {
-        super(User.class, forVariable(variable));
+        this(User.class, forVariable(variable), INITS);
     }
 
     public QUser(Path<? extends User> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QUser(PathMetadata metadata) {
-        super(User.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QUser(PathMetadata metadata, PathInits inits) {
+        this(User.class, metadata, inits);
+    }
+
+    public QUser(Class<? extends User> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.meetingSetting = inits.isInitialized("meetingSetting") ? new QMeetingSetting(forProperty("meetingSetting"), inits.get("meetingSetting")) : null;
     }
 
 }
