@@ -66,7 +66,7 @@ public class User {
 	private int imageNo;
 	
 	@OneToOne(mappedBy = "user")
-	private MeetingSetting meetingSetting;
+	private MeetingSetting meetingSetting; 
 	
 	@OneToMany(mappedBy = "user")
 	private List<UserInterest> interests = new ArrayList<UserInterest>();
