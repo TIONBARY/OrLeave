@@ -10,14 +10,21 @@ import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "login_trial")
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class LoginTrial {
+	
 	@Id
 	@Column(name = "user_no", nullable = false)
 	private int userNo;
