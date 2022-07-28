@@ -1,5 +1,7 @@
 package com.orleave.dto.request;
 
+import java.time.LocalDate;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -16,4 +18,14 @@ public class SignupRequestDto {
 	String email;
 	@ApiModelProperty(name="유저 Password", example="your_password")
 	String password;
+	String userType;
+	String gender;
+	LocalDate birthDay;
+	String nickname;
+	String mbti;
+	int religion;
+	int smoke;
+	int drink;
+	int imageNo;
+	
 }
