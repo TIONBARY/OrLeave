@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class UserInterestID implements Serializable{
+public class UserPersonalityID implements Serializable{
 	private int user;
-	private int interest;
+	private int personality;
 }
