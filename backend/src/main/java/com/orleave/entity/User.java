@@ -28,7 +28,7 @@ public class User {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long no;
+    private int no;
 	
 	@Column(name = "email", nullable = false, unique = true, length = 80)
 	private String email;
@@ -61,6 +61,9 @@ public class User {
 	
 	@Column(name = "drink", nullable = false, columnDefinition = "INT UNSIGNED")
 	private int drink;
+	
+	@Column(name = "image_no", nullable = false, columnDefinition = "INT UNSIGNED")
+	private int imageNo;
 	
 	@OneToOne(mappedBy = "user")
 	private MeetingSetting meetingSetting;
