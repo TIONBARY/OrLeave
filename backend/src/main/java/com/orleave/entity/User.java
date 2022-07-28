@@ -74,4 +74,11 @@ public class User {
 	public void addInterest(UserInterest interest) {
 		interests.add(interest);
 	}
+	
+	@OneToMany(mappedBy = "user")
+	private List<UserPersonality> personalities = new ArrayList<UserPersonality>();
+	
+	public void addPersonality(UserPersonality personality) {
+		personalities.add(personality);
+	}
 }
