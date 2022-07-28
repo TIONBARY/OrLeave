@@ -20,7 +20,7 @@ import lombok.Setter;
 public class LoginTrial {
 	@Id
 	@Column(name = "user_no", nullable = false)
-	private Long userNo;
+	private int userNo;
 	
 	@OneToOne
 	@MapsId
