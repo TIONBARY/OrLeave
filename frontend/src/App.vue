@@ -1,10 +1,5 @@
 <template>
-  <nav>
-    <router-link to="/user/login">LOGIN</router-link> |
-    <router-link to="/user/signup/account">SIGNUP1</router-link> |
-    <router-link to="/user/signup/profile">SIGNUP2</router-link>
-  </nav>
-  <router-view />
+  <router-view class="App" />
 </template>
 
 <style>
@@ -16,16 +11,25 @@
   color: #2c3e50;
 }
 
-nav {
-  padding: 30px;
+.basic-container {
+  background-color: #e5edb8;
+  border-radius: 10px;
+  padding: 20px;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.App {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'GowunDodum-Regular', sans-serif !important;
+  font-size: 130% !important;
+  background-color: #f3f1eb;
 }
-
-nav a.router-link-exact-active {
-  color: #42b983;
+/* FONT */
+@font-face {
+  font-family: 'GowunDodum-Regular';
+  src: url('assets/font/GowunDodum-Regular.ttf') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 </style>
