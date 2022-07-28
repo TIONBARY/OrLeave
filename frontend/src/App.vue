@@ -25,6 +25,23 @@
   font-size: 130% !important;
   background-color: #f3f1eb;
 }
+
+.w10 {
+  width: 10%;
+}
+
+.w20 {
+  width: 20%;
+}
+
+.w30 {
+  width: 30%;
+}
+
+.w40 {
+  width: 40%;
+}
+
 /* FONT */
 @font-face {
   font-family: 'GowunDodum-Regular';

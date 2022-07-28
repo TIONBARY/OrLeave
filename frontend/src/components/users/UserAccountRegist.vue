@@ -1,74 +1,66 @@
 <template>
-  <div style="background-color: #f3f1eb">
+  <div>
     <h1 style="font-size: 30pt">회원가입</h1>
-    <div class="fit row justify-center">
-      <div
-        class="basic-container"
-        style="width: 40%; background-color: #e5edb8; border-radius: 10pt"
-      >
-        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <div class="q-pa-md">
-            <div class="row q-pa-sm items-center">
-              <div class="col-3">이메일</div>
-              <div class="col-6">
-                <q-input
-                  outlined
-                  bg-color="white"
-                  type="email"
-                  v-model="email"
-                  dense="dense"
-                />
-              </div>
-              <div class="col-3">
-                <q-btn
-                  color="secondary"
-                  @click="codeTransfer"
-                  label="인증번호전송"
-                />
-              </div>
+    <router-link to="/user/login">로그인</router-link>
+    <router-link to="/user/signup/profile">프로필생성</router-link>
+    <div class="row justify-center">
+      <section class="basic-container">
+        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm">
+          <article class="row items-center q-gutter-sm">
+            <div class="col-3 text-right">이메일</div>
+            <div class="col-5">
+              <q-input
+                outlined
+                bg-color="white"
+                type="email"
+                v-model="email"
+                dense
+              />
             </div>
-            <div class="row q-pa-sm items-center">
-              <div class="col-3">인증번호</div>
-              <div class="col-6">
-                <q-input
-                  outlined
-                  bg-color="white"
-                  v-model="code"
-                  dense="dense"
-                />
-              </div>
-              <div class="col-2">
-                <q-btn color="secondary" @click="confirm" label="확인" />
-              </div>
-              <div class="col-1">{{ timer }}</div>
+            <div class="col-3">
+              <q-btn
+                color="secondary"
+                @click="codeTransfer"
+                label="인증번호전송"
+              />
             </div>
-            <div class="row q-pa-sm items-center">
-              <div class="col-3">비밀번호</div>
-              <div class="col-6">
-                <q-input
-                  outlined
-                  bg-color="white"
-                  type="password"
-                  v-model="password"
-                  placeholder="영문, 숫자, 특수문자 8~16"
-                  dense="dense"
-                />
-              </div>
+          </article>
+          <article class="row items-center q-gutter-sm">
+            <div class="col-3">인증번호</div>
+            <div class="col-5">
+              <q-input outlined bg-color="white" v-model="code" dense="dense" />
             </div>
-            <div class="row q-pa-sm items-center">
-              <div class="col-3">비밀번호확인</div>
-              <div class="col-6">
-                <q-input
-                  outlined
-                  bg-color="white"
-                  type="password"
-                  v-model="passwordCheck"
-                  dense="dense"
-                />
-              </div>
+            <div class="col-2">
+              <q-btn color="secondary" @click="confirm" label="확인" />
             </div>
-          </div>
-          <div>
+            <div class="col-1">{{ timer }}</div>
+          </article>
+          <article class="row items-center q-gutter-sm">
+            <div class="col-3">비밀번호</div>
+            <div class="col-5">
+              <q-input
+                outlined
+                bg-color="white"
+                type="password"
+                v-model="password"
+                placeholder="영문, 숫자, 특수문자 8~16"
+                dense="dense"
+              />
+            </div>
+          </article>
+          <article class="row items-center q-gutter-sm">
+            <div class="col-3">비밀번호확인</div>
+            <div class="col-5">
+              <q-input
+                outlined
+                bg-color="white"
+                type="password"
+                v-model="passwordCheck"
+                dense="dense"
+              />
+            </div>
+          </article>
+          <article>
             <q-btn label="다음" type="submit" color="primary" />
             <q-btn
               label="취소"
@@ -77,9 +69,9 @@
               flat
               class="q-ml-sm"
             />
-          </div>
+          </article>
         </q-form>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -137,3 +129,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.basic-container {
+  width: 550px;
+}
+</style>

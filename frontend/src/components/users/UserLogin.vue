@@ -4,9 +4,9 @@
     <!-- Content -->
     <!-- Login -->
     <div class="row justify-center">
-      <div class="basic-container">
+      <section class="basic-container">
         <q-form @submit="onSubmit" class="q-gutter-sm">
-          <div class="row items-center q-gutter-sm">
+          <article class="row items-center q-gutter-sm">
             <div class="col-3 text-right">이메일</div>
             <div class="col-8">
               <q-input
@@ -18,8 +18,8 @@
                 maxlength="30"
               />
             </div>
-          </div>
-          <div class="row items-center q-gutter-sm">
+          </article>
+          <article class="row items-center q-gutter-sm">
             <div class="col-3 text-right">비밀번호</div>
             <div class="col-8">
               <q-input
@@ -31,10 +31,10 @@
                 maxlength="20"
               />
             </div>
-          </div>
-          <div>
+          </article>
+          <article>
             <q-btn label="로그인" type="submit" color="primary" />
-          </div>
+          </article>
         </q-form>
 
         <!-- Signup & Find PW -->
@@ -72,7 +72,7 @@
             />
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
