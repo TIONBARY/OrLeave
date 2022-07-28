@@ -1,8 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/databinding/string">Test</router-link>
+    <router-link to="/user/login">LOGIN</router-link> |
+    <router-link to="/user/signup/account">SIGNUP1</router-link> |
+    <router-link to="/user/signup/profile">SIGNUP2</router-link>
   </nav>
   <router-view />
 </template>
