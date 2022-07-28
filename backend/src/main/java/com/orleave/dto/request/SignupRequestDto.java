@@ -1,6 +1,7 @@
 package com.orleave.dto.request;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,5 +28,6 @@ public class SignupRequestDto {
 	int smoke;
 	int drink;
 	int imageNo;
-	
+	ArrayList<Integer> interests;
+	ArrayList<Integer> personalities;
 }
