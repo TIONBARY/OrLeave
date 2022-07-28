@@ -19,7 +19,7 @@ public class MeetingSetting {
 	
 	@Id
 	@Column(name = "user_no", nullable = false, columnDefinition = "INT UNSIGNED")
-	private int userNo;
+	private Long userNo;
 	
 	@OneToOne
 	@MapsId
