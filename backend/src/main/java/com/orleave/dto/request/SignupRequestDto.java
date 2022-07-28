@@ -1,5 +1,8 @@
 package com.orleave.dto.request;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -12,8 +15,19 @@ import lombok.Setter;
 @Setter
 @ApiModel("UserRegisterPostRequest")
 public class SignupRequestDto {
-	@ApiModelProperty(name="유저 ID", example="ssafy_web")
-	String id;
+	@ApiModelProperty(name="유저 Email", example="ssafy_web@ssafy.com")
+	String email;
 	@ApiModelProperty(name="유저 Password", example="your_password")
 	String password;
+	String userType;
+	String gender;
+	LocalDate birthDay;
+	String nickname;
+	String mbti;
+	int religion;
+	int smoke;
+	int drink;
+	int imageNo;
+	ArrayList<Integer> interests;
+	ArrayList<Integer> personalities;
 }

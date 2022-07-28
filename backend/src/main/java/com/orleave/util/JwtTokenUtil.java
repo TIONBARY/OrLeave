@@ -27,7 +27,7 @@ public class JwtTokenUtil {
 
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
-    public static final String ISSUER = "ssafy.com";
+    public static final String ISSUER = "Orleave";
     
     @Autowired
 	public JwtTokenUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") Integer expirationTime) {
@@ -47,15 +47,28 @@ public class JwtTokenUtil {
                 .build();
     }
     
-    public static String getToken(String userId) {
+    public static String getToken(String userNo) {
     		Date expires = JwtTokenUtil.getTokenExpiration(expirationTime);
         return JWT.create()
-                .withSubject(userId)
+                .withSubject(userNo)
                 .withExpiresAt(expires)
                 .withIssuer(ISSUER)
                 .withIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
                 .sign(Algorithm.HMAC512(secretKey.getBytes()));
     }
+    
+    public static String getToken(String userNo,String userType,int imageNo,String nickname) {
+		Date expires = JwtTokenUtil.getTokenExpiration(expirationTime);
+    return JWT.create()
+            .withSubject(userNo)
+            .withClaim("userType", userType)
+            .withClaim("imageNo", imageNo)
+            .withClaim("NickName",nickname)
+            .withExpiresAt(expires)
+            .withIssuer(ISSUER)
+            .withIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
+            .sign(Algorithm.HMAC512(secretKey.getBytes()));
+}
 
     public static String getToken(Instant expires, String userId) {
         return JWT.create()
