@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
@@ -15,6 +16,7 @@ import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
+import com.orleave.service.EmailService;
 import com.orleave.service.UserService;
 
 import io.swagger.annotations.Api;
@@ -34,6 +36,9 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	EmailService mailService;
 	
 	@PostMapping("/signup")
 	@ApiOperation(value = "회원 가입", notes = "<strong>아이디와 패스워드</strong>를 통해 회원가입 한다.") 
@@ -71,4 +76,20 @@ public class UserController {
 		
 		return ResponseEntity.status(200).body(UserResponseDto.of(user));
 	}
+	
+	@PostMapping("/emailConfirm")
+    @ApiOperation(value = "회원 가입시 이메일 인증", notes = "기존 사용하고 있는 이메일을 통해 인증")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증 실패"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> emailConfirm(
+            @RequestParam @ApiParam(value="이메일정보 정보", required = true) String email) throws Exception {
+ 
+        String confirm = mailService.sendSimpleMessage(email);
+ 
+        return ResponseEntity.status(200).body(new BaseResponseDto(200, confirm));
+    }
 }

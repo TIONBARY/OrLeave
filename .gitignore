@@ -19,6 +19,7 @@ bin/
 
 application-db.properties
 application-jwt.properties
+email.properties
 
 ### IntelliJ IDEA ###
 .idea
