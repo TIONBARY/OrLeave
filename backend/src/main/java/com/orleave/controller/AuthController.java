@@ -45,9 +45,10 @@ public class AuthController {
 	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) {
 		String email = loginInfo.getEmail();
 		String password = loginInfo.getPassword();
-		
-		
 		User user = userService.getUserByEmail(email);
+		if (user == null) {
+			return ResponseEntity.status(404).body(LoginResponseDto.of(404, "Invalid Email", null));
+		}
 		String userNo = Integer.toString(user.getNo());
 		String userType = user.getUserType();
 		int imageNo = user.getImageNo();

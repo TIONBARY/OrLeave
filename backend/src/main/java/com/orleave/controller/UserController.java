@@ -1,6 +1,9 @@
 package com.orleave.controller;
 
+import javax.mail.SendFailedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.request.EmailConfirmRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.UserResponseDto;
@@ -40,11 +44,11 @@ public class UserController {
 	@Autowired
 	EmailService mailService;
 	
-	@PostMapping("/signup")
-	@ApiOperation(value = "회원 가입", notes = "<strong>아이디와 패스워드</strong>를 통해 회원가입 한다.") 
+	@PostMapping("")
+	@ApiOperation(value = "회원 가입", notes = "사용자의 개인 정보를 통해 회원가입 한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "인증 실패"),
+        @ApiResponse(code = 400, message = "부적절한 요청"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
@@ -52,16 +56,19 @@ public class UserController {
 			@RequestBody @ApiParam(value="회원가입 정보", required = true) SignupRequestDto signupInfo) {
 		
 		//임의로 리턴된 User 인스턴스. 현재 코드는 회원 가입 성공 여부만 판단하기 때문에 굳이 Insert 된 유저 정보를 응답하지 않음.
-		User user = userService.createUser(signupInfo);
-		
-		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		try {
+			User user = userService.createUser(signupInfo);
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} catch (DataIntegrityViolationException e) {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
+		}
 	}
 	
 	@GetMapping("/info")
 	@ApiOperation(value = "회원 본인 정보 조회", notes = "로그인한 회원 본인의 정보를 응답한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "인증 실패"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
@@ -77,19 +84,21 @@ public class UserController {
 		return ResponseEntity.status(200).body(UserResponseDto.of(user));
 	}
 	
-	@PostMapping("/emailConfirm")
+	@PostMapping("/email")
     @ApiOperation(value = "회원 가입시 이메일 인증", notes = "기존 사용하고 있는 이메일을 통해 인증")
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "인증 실패"),
+        @ApiResponse(code = 400, message = "부적절한 요청"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> emailConfirm(
-            @RequestParam @ApiParam(value="이메일정보 정보", required = true) String email) throws Exception {
- 
-        String confirm = mailService.sendSimpleMessage(email);
- 
-        return ResponseEntity.status(200).body(new BaseResponseDto(200, "Success"));
+            @RequestBody @ApiParam(value="이메일정보 정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
+		try {
+			String confirm = mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
+		}
     }
 }
