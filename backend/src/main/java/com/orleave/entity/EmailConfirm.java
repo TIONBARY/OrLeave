@@ -25,8 +25,8 @@ public class EmailConfirm {
 	@Column(name = "email", nullable = false, unique = true, length = 80)
 	private String email;
 	
-	@Column(name = "key", nullable = false)
-	private String key;
+	@Column(name = "confirm_key", nullable = false)
+	private String confirmKey;
 	
 	
 }

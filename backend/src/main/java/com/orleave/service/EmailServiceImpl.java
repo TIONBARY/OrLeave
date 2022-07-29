@@ -1,5 +1,6 @@
 package com.orleave.service;
 
+import java.util.Optional;
 import java.util.Random;
  
 import javax.mail.Message.RecipientType;
@@ -12,11 +13,17 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import com.orleave.entity.EmailConfirm;
+import com.orleave.repository.EmailConfirmRepository;
  
 @Service
 @PropertySource("classpath:email.properties")
 public class EmailServiceImpl implements EmailService{
- 
+	
+	@Autowired
+	EmailConfirmRepository emailConfirmRepository;
+	
     @Autowired
     JavaMailSender emailSender;
     
@@ -84,6 +91,18 @@ public class EmailServiceImpl implements EmailService{
         MimeMessage message = createMessage(to);
         try{//예외처리
             emailSender.send(message);
+            Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(to);
+            EmailConfirm ec = null;
+            if (!emailConfirm.isPresent()) {
+            	ec = EmailConfirm.builder()
+            			.email(to)
+            			.confirmKey(ePw)
+            			.build();
+            } else {
+            	ec = emailConfirm.get();
+            	ec.setConfirmKey(ePw);
+            }
+            emailConfirmRepository.save(ec);
         }catch(MailException es){
             es.printStackTrace();
             throw new IllegalArgumentException();

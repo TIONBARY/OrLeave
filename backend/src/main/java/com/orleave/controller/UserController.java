@@ -90,6 +90,6 @@ public class UserController {
  
         String confirm = mailService.sendSimpleMessage(email);
  
-        return ResponseEntity.status(200).body(new BaseResponseDto(200, confirm));
+        return ResponseEntity.status(200).body(new BaseResponseDto(200, "Success"));
     }
 }
