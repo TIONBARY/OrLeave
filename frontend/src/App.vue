@@ -10,11 +10,17 @@
   text-align: center;
   color: #2c3e50;
 }
-
+h1 {
+  font-size: 200% !important;
+}
+h2 {
+  font-size: 175% !important;
+}
 .basic-container {
   background-color: #e5edb8;
   border-radius: 10px;
-  padding: 20px;
+  padding: 30px;
+  margin: auto;
 }
 
 .App {
@@ -25,11 +31,26 @@
   font-size: 130% !important;
   background-color: #f3f1eb;
 }
+
 /* FONT */
 @font-face {
   font-family: 'GowunDodum-Regular';
   src: url('assets/font/GowunDodum-Regular.ttf') format('woff');
   font-weight: normal;
   font-style: normal;
+}
+
+.primary {
+  background: #6b7a16 !important;
+  color: white !important;
+}
+.secondary {
+  background: white !important;
+  color: #6b7a16 !important;
+}
+
+a {
+  text-decoration: none;
+  font-size: 80%;
 }
 </style>
