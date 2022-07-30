@@ -1,5 +1,7 @@
 package com.orleave.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
  
@@ -15,6 +17,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.orleave.entity.EmailConfirm;
+import com.orleave.exception.EmailTimeoutException;
 import com.orleave.repository.EmailConfirmRepository;
  
 @Service
@@ -30,10 +33,11 @@ public class EmailServiceImpl implements EmailService{
     @Value("${AdminMail.id}")
     private String id;
  
-    public static final String ePw = createKey();
+    public static String ePw;
  
     private MimeMessage createMessage(String to) throws Exception{
-        System.out.println("보내는 대상 : "+ to);
+        ePw = createKey();
+    	System.out.println("보내는 대상 : "+ to);
         System.out.println("인증 번호 : "+ ePw);
         MimeMessage message = emailSender.createMimeMessage();
  
@@ -96,11 +100,13 @@ public class EmailServiceImpl implements EmailService{
             if (!emailConfirm.isPresent()) {
             	ec = EmailConfirm.builder()
             			.email(to)
-            			.confirmKey(ePw)
+            			.code(ePw)
+            			.time(LocalDateTime.now())
             			.build();
             } else {
             	ec = emailConfirm.get();
-            	ec.setConfirmKey(ePw);
+            	ec.setCode(ePw);
+            	ec.setTime(LocalDateTime.now());
             }
             emailConfirmRepository.save(ec);
         }catch(MailException es){
@@ -109,5 +115,23 @@ public class EmailServiceImpl implements EmailService{
         }
         return ePw;
     }
+
+	@Override
+	public boolean checkCode(String email, String code) throws Exception {
+		Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(email);
+		if (!emailConfirm.isPresent()) throw new IllegalArgumentException();
+		EmailConfirm ec = emailConfirm.get();
+		if (Duration.between(ec.getTime(), LocalDateTime.now()).getSeconds() > 60 * 3) {
+			emailConfirmRepository.delete(ec);
+			throw new EmailTimeoutException();
+		}
+		if (ec.getCode().equals(code)) {
+			emailConfirmRepository.delete(ec);
+			return true;
+		}
+		return false;
+	}
+    
+    
  
 }

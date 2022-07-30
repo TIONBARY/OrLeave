@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.request.EmailCheckCodeRequestDto;
 import com.orleave.dto.request.EmailConfirmRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
+import com.orleave.exception.EmailTimeoutException;
 import com.orleave.service.EmailService;
 import com.orleave.service.UserService;
 
@@ -93,12 +95,35 @@ public class UserController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> emailConfirm(
-            @RequestBody @ApiParam(value="이메일정보 정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
+            @RequestBody @ApiParam(value="이메일정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
 		try {
 			String confirm = mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
+		}
+    }
+	
+	@PostMapping("/code")
+    @ApiOperation(value = "이메일 인증코드 확인", notes = "사용 중인 이메일로 보낸 인증 코드 확인")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "부적절한 요청"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> emailCheckCode(
+            @RequestBody @ApiParam(value="이메일과 인증코드", required = true) EmailCheckCodeRequestDto emailCheckCodeRequestDto) throws Exception {
+		try {
+			String email = emailCheckCodeRequestDto.getEmail();
+			String code = emailCheckCodeRequestDto.getCode();
+			boolean success = mailService.checkCode(email, code);
+			if (success) return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+			else return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Wrong Code"));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
+		} catch (EmailTimeoutException e) {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Timeout"));
 		}
     }
 }
