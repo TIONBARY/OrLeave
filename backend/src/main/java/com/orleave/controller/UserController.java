@@ -1,5 +1,7 @@
 package com.orleave.controller;
 
+import java.util.NoSuchElementException;
+
 import javax.mail.SendFailedException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +126,42 @@ public class UserController {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
 		} catch (EmailTimeoutException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Timeout"));
+		}
+    }
+	
+	@GetMapping("/email")
+    @ApiOperation(value = "이메일 중복여부 확인", notes = "해당 이메일이 현재 사용 중인 이메일인지 확인")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "중복되는 이메일"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> emailCheck(
+            @RequestParam @ApiParam(value="이메일", required = true) String email) throws Exception {
+		try {
+			User user = userService.getUserByEmail(email);
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Email"));
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		}
+    }
+	
+	@GetMapping("/nickname")
+    @ApiOperation(value = "닉네임 중복여부 확인", notes = "해당 닉네임이 현재 사용 중인 닉네임인지 확인")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "중복되는 닉네임"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> nicknameCheck(
+            @RequestParam @ApiParam(value="닉네임", required = true) String nickname) throws Exception {
+		try {
+			User user = userService.getUserByNickname(nickname);
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}
     }
 }
