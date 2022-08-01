@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.request.PasswordRequestDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.LoginTrial;
@@ -164,5 +165,27 @@ public class UserServiceImpl implements UserService {
 		} catch (NoSuchElementException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean passwordcheck(int userNo, PasswordRequestDto dto) {
+		User user = userRepositorySupport.findUserByNo(userNo).get();		
+		if(user.getPassword().equals(passwordEncoder.encode(dto.getPassword()))){
+			return true;
+		}else
+			return false;
+		
+	}
+
+	@Override
+	public boolean modifypassword(int userNo, PasswordRequestDto dto) {
+		User user = userRepositorySupport.findUserByNo(userNo).get();
+		if(dto.getPassword()!=null && !user.getPassword().equals(passwordEncoder.encode(dto.getPassword()))) {
+			user.setPassword(passwordEncoder.encode(dto.getPassword()));
+			return true;
+		}else {
+			return false;
+		}
+			
 	}
 }

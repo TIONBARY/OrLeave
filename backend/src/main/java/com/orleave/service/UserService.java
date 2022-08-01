@@ -1,5 +1,6 @@
 package com.orleave.service;
 
+import com.orleave.dto.request.PasswordRequestDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.User;
@@ -13,4 +14,6 @@ public interface UserService {
 	User getUserByEmail(String email);
 	User getUserByNickname(String nickname);
 	boolean modifyProfile(int userNo, ProfileModifyRequestDto profileModifyRequestDto);
+	boolean passwordcheck(int userNo,PasswordRequestDto passwordCheckRequestDto);
+	boolean modifypassword(int userNo,PasswordRequestDto passwordCheckRequestDto);
 }
