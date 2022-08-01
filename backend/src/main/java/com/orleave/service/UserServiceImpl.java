@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
 				user.addPersonality(userPersonality);
 			}
 			return true;
-		} catch (NoSuchElementException e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}

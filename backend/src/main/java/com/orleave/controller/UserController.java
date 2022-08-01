@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.request.EmailCheckCodeRequestDto;
 import com.orleave.dto.request.EmailConfirmRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
+import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
@@ -199,5 +201,33 @@ public class UserController {
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}
+    }
+	
+	@PutMapping("/profile")
+    @ApiOperation(value = "프로필 수정", notes = "현재 로그인한 사용자의 프로필 수정")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "중복되는 닉네임"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> modifyProfile(
+            @RequestBody @ApiParam(value="프로필", required = true) ProfileModifyRequestDto profileModifyRequestDto,
+            @ApiIgnore Authentication authentication) throws Exception {
+		try {
+			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+			String email = userDetails.getUsername();
+			User user = userService.getUserByEmail(email);
+			if (userService.modifyProfile(user.getNo(), profileModifyRequestDto)) {
+				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+			} else {
+				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+			}
+			
+		} catch (NullPointerException e) {
+			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		}
+		
+		
     }
 }
