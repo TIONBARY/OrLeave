@@ -25,8 +25,8 @@ h2 {
 
 .App {
   position: absolute;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
+  min-height: 100vh;
   font-family: 'GowunDodum-Regular', sans-serif !important;
   font-size: 130% !important;
   background-color: #f3f1eb;
