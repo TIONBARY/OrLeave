@@ -5,8 +5,6 @@ import UserView from '../views/UserView.vue'
 import UserLogin from '../components/users/UserLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
 import userProfileRegist from '../components/users/UserProfileRegist.vue'
-import userProfileRegist1 from '../components/users/UserProfileRegist copy.vue'
-import userProfileRegist2 from '../components/users/UserProfileRegist copy 2.vue'
 
 const routes = [
   {
@@ -28,14 +26,6 @@ const routes = [
       {
         path: 'signup/profile',
         component: userProfileRegist
-      },
-      {
-        path: 'signup/profile1',
-        component: userProfileRegist1
-      },
-      {
-        path: 'signup/profile2',
-        component: userProfileRegist2
       }
     ]
   }

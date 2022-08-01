@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 style="font-size: 30pt">회원가입</h1>
+    <h1>회원가입</h1>
     <router-link to="/user/login">로그인</router-link>
     <router-link to="/user/signup/profile">프로필생성</router-link>
     <section class="basic-container">
