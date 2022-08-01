@@ -168,9 +168,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean passwordcheck(int userNo, PasswordRequestDto dto) {
-		User user = userRepositorySupport.findUserByNo(userNo).get();		
-		if(user.getPassword().equals(passwordEncoder.encode(dto.getPassword()))){
+	public boolean passwordcheck(int userNo, String password) {
+		User user = userRepositorySupport.findUserByNo(userNo).get();	
+		if(passwordEncoder.matches(password, user.getPassword())){
 			return true;
 		}else
 			return false;
@@ -178,10 +178,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean modifypassword(int userNo, PasswordRequestDto dto) {
+	public boolean modifypassword(int userNo, String password) {
 		User user = userRepositorySupport.findUserByNo(userNo).get();
-		if(dto.getPassword()!=null && !user.getPassword().equals(passwordEncoder.encode(dto.getPassword()))) {
-			user.setPassword(passwordEncoder.encode(dto.getPassword()));
+		if(password!=null && !passwordEncoder.matches(password, user.getPassword())) {
+			user.setPassword(passwordEncoder.encode(password));
+			userRepository.save(user);
 			return true;
 		}else {
 			return false;

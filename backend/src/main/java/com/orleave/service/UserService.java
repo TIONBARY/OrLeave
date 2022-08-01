@@ -14,6 +14,6 @@ public interface UserService {
 	User getUserByEmail(String email);
 	User getUserByNickname(String nickname);
 	boolean modifyProfile(int userNo, ProfileModifyRequestDto profileModifyRequestDto);
-	boolean passwordcheck(int userNo,PasswordRequestDto passwordCheckRequestDto);
-	boolean modifypassword(int userNo,PasswordRequestDto passwordCheckRequestDto);
+	boolean passwordcheck(int userNo,String password);
+	boolean modifypassword(int userNo,String password);
 }
