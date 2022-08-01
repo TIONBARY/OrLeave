@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel("PasswordCheckRequest")
-public class PasswordCheckRequestDto {
+@ApiModel("PasswordRequest")
+public class PasswordRequestDto {
 
 	@ApiModelProperty(name="유저 Password", example="your_password")
 	String password;
