@@ -1,5 +1,6 @@
 package com.orleave.service;
 
+import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.User;
 
@@ -11,4 +12,5 @@ public interface UserService {
 	User getUserByNo(int no);
 	User getUserByEmail(String email);
 	User getUserByNickname(String nickname);
+	boolean modifyProfile(int userNo, ProfileModifyRequestDto profileModifyRequestDto);
 }

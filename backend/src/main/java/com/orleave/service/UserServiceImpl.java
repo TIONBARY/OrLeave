@@ -2,6 +2,7 @@ package com.orleave.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
 
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.LoginTrial;
 import com.orleave.entity.MeetingSetting;
@@ -122,5 +124,45 @@ public class UserServiceImpl implements UserService {
 		// 디비에 유저 정보 조회 (nickname을 통한 조회).
 		User user = userRepositorySupport.findUserByNickname(nickname).get();
 		return user;
+	}
+	
+	@Override
+	public boolean modifyProfile(int userNo, ProfileModifyRequestDto dto) {
+		try {
+			User user = userRepositorySupport.findUserByNo(userNo).get();
+			user.setImageNo(dto.getImageNo());
+			user.setMbti(dto.getMbti());
+			user.setDrink(dto.getDrink());
+			user.setSmoke(dto.getSmoke());
+			user.setNickname(dto.getNickname());
+			user.setReligion(dto.getReligion());
+			for (UserInterest userInterest : user.getInterests()) {
+				userInterestRepository.delete(userInterest);
+			}
+			user.setInterests(new ArrayList<>());
+			for (Integer interest : dto.getInterests()) {
+				UserInterest userInterest = UserInterest.builder()
+						.user(user)
+						.interest(interest)
+						.build();
+				userInterestRepository.save(userInterest);
+				user.addInterest(userInterest);
+			}
+			for (UserPersonality userPersonality : user.getPersonalities()) {
+				userPersonalityRepository.delete(userPersonality);
+			}
+			user.setPersonalities(new ArrayList<>());
+			for (Integer personality : dto.getPersonalities()) {
+				UserPersonality userPersonality = UserPersonality.builder()
+						.user(user)
+						.personality(personality)
+						.build();
+				userPersonalityRepository.save(userPersonality);
+				user.addPersonality(userPersonality);
+			}
+			return true;
+		} catch (NoSuchElementException e) {
+			return false;
+		}
 	}
 }
