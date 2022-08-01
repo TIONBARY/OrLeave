@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.orleave.entity.MeetingSetting;
 
 @Repository
-public interface MeetingSettingRepository extends JpaRepository<MeetingSetting, Long> {
+public interface MeetingSettingRepository extends JpaRepository<MeetingSetting, Integer> {
 
 }

@@ -8,5 +8,5 @@ import com.orleave.entity.UserPersonalityID;
 
 @Repository
 public interface UserPersonalityRepository extends JpaRepository<UserPersonality, UserPersonalityID> {
-
+	Long deleteByUserNo(int userNo);
 }

@@ -16,4 +16,5 @@ public interface UserService {
 	boolean modifyProfile(int userNo, ProfileModifyRequestDto profileModifyRequestDto);
 	boolean passwordcheck(int userNo,String password);
 	boolean modifypassword(int userNo,String password);
+	boolean deleteUser(User user);
 }

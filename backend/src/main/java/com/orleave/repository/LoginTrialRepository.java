@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.orleave.entity.LoginTrial;
 
 @Repository
-public interface LoginTrialRepository extends JpaRepository<LoginTrial, Long> {
+public interface LoginTrialRepository extends JpaRepository<LoginTrial, Integer> {
 
 }

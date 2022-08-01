@@ -128,46 +128,44 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
+	@Transactional
 	public boolean modifyProfile(int userNo, ProfileModifyRequestDto dto) {
-		try {
-			User user = userRepositorySupport.findUserByNo(userNo).get();
-			user.setImageNo(dto.getImageNo());
-			user.setMbti(dto.getMbti());
-			user.setDrink(dto.getDrink());
-			user.setSmoke(dto.getSmoke());
-			user.setNickname(dto.getNickname());
-			user.setReligion(dto.getReligion());
-			for (UserInterest userInterest : user.getInterests()) {
-				userInterestRepository.delete(userInterest);
-			}
-			user.setInterests(new ArrayList<>());
-			for (Integer interest : dto.getInterests()) {
-				UserInterest userInterest = UserInterest.builder()
-						.user(user)
-						.interest(interest)
-						.build();
-				userInterestRepository.save(userInterest);
-				user.addInterest(userInterest);
-			}
-			for (UserPersonality userPersonality : user.getPersonalities()) {
-				userPersonalityRepository.delete(userPersonality);
-			}
-			user.setPersonalities(new ArrayList<>());
-			for (Integer personality : dto.getPersonalities()) {
-				UserPersonality userPersonality = UserPersonality.builder()
-						.user(user)
-						.personality(personality)
-						.build();
-				userPersonalityRepository.save(userPersonality);
-				user.addPersonality(userPersonality);
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
+		User user = userRepositorySupport.findUserByNo(userNo).get();
+		user.setImageNo(dto.getImageNo());
+		user.setMbti(dto.getMbti());
+		user.setDrink(dto.getDrink());
+		user.setSmoke(dto.getSmoke());
+		user.setNickname(dto.getNickname());
+		user.setReligion(dto.getReligion());
+		for (UserInterest userInterest : user.getInterests()) {
+			userInterestRepository.delete(userInterest);
 		}
+		user.setInterests(new ArrayList<>());
+		for (Integer interest : dto.getInterests()) {
+			UserInterest userInterest = UserInterest.builder()
+					.user(user)
+					.interest(interest)
+					.build();
+			userInterestRepository.save(userInterest);
+			user.addInterest(userInterest);
+		}
+		for (UserPersonality userPersonality : user.getPersonalities()) {
+			userPersonalityRepository.delete(userPersonality);
+		}
+		user.setPersonalities(new ArrayList<>());
+		for (Integer personality : dto.getPersonalities()) {
+			UserPersonality userPersonality = UserPersonality.builder()
+					.user(user)
+					.personality(personality)
+					.build();
+			userPersonalityRepository.save(userPersonality);
+			user.addPersonality(userPersonality);
+		}
+		return true;
 	}
 
 	@Override
+	@Transactional
 	public boolean passwordcheck(int userNo, String password) {
 		User user = userRepositorySupport.findUserByNo(userNo).get();	
 		if(passwordEncoder.matches(password, user.getPassword())){
@@ -178,6 +176,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public boolean modifypassword(int userNo, String password) {
 		User user = userRepositorySupport.findUserByNo(userNo).get();
 		if(password!=null && !passwordEncoder.matches(password, user.getPassword())) {
@@ -188,5 +187,16 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 			
+	}
+	
+	@Override
+	@Transactional
+	public boolean deleteUser(User user) {
+		loginTrialRepository.deleteById(user.getNo());
+		meetingSettingRepository.deleteById(user.getNo());
+		userInterestRepository.deleteByUserNo(user.getNo());
+		userPersonalityRepository.deleteByUserNo(user.getNo());
+		userRepository.delete(user);
+		return true;
 	}
 }

@@ -8,7 +8,8 @@ import java.util.Random;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
- 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -90,6 +91,7 @@ public class EmailServiceImpl implements EmailService{
         return key.toString();
     }
     @Override
+    @Transactional
     public String sendSimpleMessage(String to)throws Exception {
         // TODO Auto-generated method stub
         MimeMessage message = createMessage(to);
@@ -117,6 +119,7 @@ public class EmailServiceImpl implements EmailService{
     }
 
 	@Override
+	@Transactional
 	public boolean checkCode(String email, String code) throws Exception {
 		Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(email);
 		if (!emailConfirm.isPresent()) throw new IllegalArgumentException();
@@ -131,7 +134,4 @@ public class EmailServiceImpl implements EmailService{
 		}
 		return false;
 	}
-    
-    
- 
 }

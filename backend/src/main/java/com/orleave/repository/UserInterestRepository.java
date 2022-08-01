@@ -8,5 +8,5 @@ import com.orleave.entity.UserInterestID;
 
 @Repository
 public interface UserInterestRepository extends JpaRepository<UserInterest, UserInterestID> {
-
+	Long deleteByUserNo(int userNo);
 }
