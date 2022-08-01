@@ -3,10 +3,13 @@ package com.orleave.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Parameter;
 import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -15,6 +18,7 @@ import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -28,8 +32,13 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
+    	List<Parameter> global = new ArrayList<>();
+		global.add(new ParameterBuilder().name("Authorization").
+								  description("Access Token").parameterType("header").
+								  required(false).modelRef(new ModelRef("string")).build());
         return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false)
-                .select()
+        		.globalOperationParameters(global)
+        		.select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.ant("/api/**"))
                 .build()

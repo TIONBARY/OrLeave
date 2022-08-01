@@ -103,7 +103,13 @@ public class UserServiceImpl implements UserService {
 		}
 		return user;
 	}
-
+	
+	@Override
+	public User getUserByNo(int no) {
+		User user = userRepositorySupport.findUserByNo(no).get();
+		return user;
+	}
+	
 	@Override
 	public User getUserByEmail(String email) {
 		// 디비에 유저 정보 조회 (email을 통한 조회).

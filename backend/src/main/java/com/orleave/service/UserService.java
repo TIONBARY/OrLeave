@@ -8,6 +8,7 @@ import com.orleave.entity.User;
  */
 public interface UserService {
 	User createUser(SignupRequestDto signupRequestDto);
+	User getUserByNo(int no);
 	User getUserByEmail(String email);
 	User getUserByNickname(String nickname);
 }
