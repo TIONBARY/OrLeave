@@ -23,6 +23,12 @@
 
 "Xxx: Xxx xxx"(한글만, 태그와 제목 첫글자 대문자)
 
+## Git Flow
+
+1. 기능별 FE/BE 브랜치로 나눠 구현
+2. FE/BE 구분하여 구현한 내용을 Develop 브랜치로 머지 후 테스트
+3. Develop 브랜치에서 구동 확인 후 Master 브랜치로 머지
+
 # Jira Convention
 
 |Issue Type|설명|예시|
