@@ -64,6 +64,7 @@ public class UserController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공", response = LoginResponseDto.class),
         @ApiResponse(code = 401, message = "인증 실패", response = BaseResponseDto.class),
+        @ApiResponse(code = 403, message = "로그인 횟수 초과", response = BaseResponseDto.class),
         @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseDto.class),
         @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseDto.class)
     })
@@ -77,6 +78,9 @@ public class UserController {
 			return ResponseEntity.status(404).body(LoginResponseDto.of(404, "Invalid Email", null));
 		}
 		String userNo = Integer.toString(user.getNo());
+		if(!userService.logincheck(user.getNo())) {
+			return ResponseEntity.status(403).body(LoginResponseDto.of(403, "forbidden", null));
+		}
 		String userType = user.getUserType();
 		int imageNo = user.getImageNo();
 		String nickname=user.getNickname();
@@ -85,7 +89,7 @@ public class UserController {
 			// 유효한 패스워드가 맞는 경우, 로그인 성공으로 응답.(액세스 토큰을 포함하여 응답값 전달)
 			return ResponseEntity.ok(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(userNo,userType,imageNo,nickname)));
 		}
-		// 유효하지 않는 패스워드인 경우, 로그인 실패로 응답.
+		userService.loginfailed(user.getNo());
 		return ResponseEntity.status(401).body(LoginResponseDto.of(401, "Invalid Password", null));
 	}
 	

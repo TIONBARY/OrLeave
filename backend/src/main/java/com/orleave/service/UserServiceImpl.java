@@ -1,5 +1,6 @@
 package com.orleave.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -198,5 +199,31 @@ public class UserServiceImpl implements UserService {
 		userPersonalityRepository.deleteByUserNo(user.getNo());
 		userRepository.delete(user);
 		return true;
+	}
+
+	@Override
+	public void loginfailed(int no) {
+		LoginTrial logintrial=loginTrialRepository.findById(no).get();
+		if(logintrial.getCount()==4) {
+			logintrial.setCount(0);
+			logintrial.setTime(LocalDateTime.now());
+		}else {
+			
+			logintrial.setCount(logintrial.getCount()+1);
+		}
+		loginTrialRepository.save(logintrial);
+		
+		
+	}
+
+	@Override
+	public boolean logincheck(int no) {
+		LoginTrial logintrial=loginTrialRepository.findById(no).get();
+		
+		if(Duration.between(logintrial.getTime(), LocalDateTime.now()).getSeconds() > 60 * 5) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 }

@@ -17,4 +17,6 @@ public interface UserService {
 	boolean passwordcheck(int userNo,String password);
 	boolean modifypassword(int userNo,String password);
 	boolean deleteUser(User user);
+	void loginfailed(int no);
+	boolean logincheck(int no);
 }
