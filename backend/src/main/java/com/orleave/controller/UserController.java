@@ -25,6 +25,7 @@ import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
+import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
 import com.orleave.exception.EmailTimeoutException;
@@ -105,6 +106,27 @@ public class UserController {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
 		}
 	}
+	
+	@GetMapping("/profile")
+	@ApiOperation(value = "회원 프로필 정보 조회", notes = "로그인한 회원 본인의 프로필 정보를 응답한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<ProfileResponseDto> getProfile(@ApiIgnore Authentication authentication) {
+		/**
+		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
+		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
+		 */
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		User user = userService.getUserByEmail(email);
+		
+		return ResponseEntity.status(200).body(ProfileResponseDto.of(user));
+	}
+
 	
 	@GetMapping("/info")
 	@ApiOperation(value = "회원 본인 정보 조회", notes = "로그인한 회원 본인의 정보를 응답한다.") 
