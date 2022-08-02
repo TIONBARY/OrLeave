@@ -1,5 +1,7 @@
 package com.orleave.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,9 @@ public class NoticeServiceImpl implements NoticeService {
 
 	@Override
 	public NoticeDetailDto getNoticeDetail(int no) {
-		Notice notice = noticeRepository.findById(no).get();
+		Optional<Notice> noticeTemp = noticeRepository.findById(no);
+		if (!noticeTemp.isPresent()) return null;
+		Notice notice = noticeTemp.get();
 		NoticeDetailDto dto = NoticeDetailDto.builder()
 				.no(notice.getNo())
 				.title(notice.getTitle())

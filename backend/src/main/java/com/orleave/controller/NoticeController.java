@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.NoticeListDto;
+import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.NoticeDetailResponseDto;
 import com.orleave.dto.response.NoticeListResponseDto;
 import com.orleave.service.NoticeService;
@@ -34,8 +35,6 @@ public class NoticeController {
 	@ApiOperation(value = "공지사항 전체 조회", notes = "공지사항을 페이지 정보에 따라 전체 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 400, message = "공지사항 조회 실패"),
-        @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) {
@@ -44,15 +43,15 @@ public class NoticeController {
 	}
 	
 	@GetMapping("/{no}")
-	@ApiOperation(value = "공지사항 전체 조회", notes = "공지사항을 페이지 정보에 따라 전체 조회한다.") 
+	@ApiOperation(value = "공지사항 상세 조회", notes = "공지사항의 상세 정보를 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 400, message = "공지사항 조회 실패"),
-        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 404, message = "공지사항 조회 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<NoticeDetailResponseDto> getNoticeDetail(@PathVariable("no") int no) {
-		NoticeDetailDto notice = noticeService.getNoticeDetail(no);		
+	public ResponseEntity<? extends BaseResponseDto> getNoticeDetail(@PathVariable("no") int no) {
+		NoticeDetailDto notice = noticeService.getNoticeDetail(no);
+		if (notice == null) return ResponseEntity.status(404).body(BaseResponseDto.of(404, "Not Found"));
 		return ResponseEntity.status(200).body(NoticeDetailResponseDto.of(200, "Success", notice));
 	}
 }
