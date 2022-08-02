@@ -2,6 +2,7 @@ package com.orleave.service;
 
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -10,9 +11,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
+import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
+import com.orleave.entity.Notice;
 import com.orleave.entity.User;
 import com.orleave.repository.InquiryRepository;
 
@@ -46,6 +50,23 @@ public class InquiryServiceImpl implements InquiryService{
 		inquiryRepository.save(inquiry);
 		user.addInquiry(inquiry);
 		return true;
+	}
+
+	@Override
+	@Transactional
+	public InquiryDetailDto getInquiryDetail(int no, int userNo) {
+		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
+		if (!inquiryTemp.isPresent()) return null;
+		Inquiry inquiry = inquiryTemp.get();
+		if(inquiry.getUser().getNo()!=userNo) return null;
+		InquiryDetailDto dto = InquiryDetailDto.builder()
+				.no(inquiry.getNo())
+				.title(inquiry.getTitle())
+				.content(inquiry.getContent())
+				.answer(inquiry.getAnswer())
+				.createdTime(inquiry.getCreatedTime())
+				.build();
+		return dto;
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.orleave.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.User;
@@ -12,4 +13,5 @@ import com.orleave.entity.User;
 public interface InquiryService {
 	Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable);
 	boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto);
+	InquiryDetailDto getInquiryDetail(int no, int userNo);
 }
