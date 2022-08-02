@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -28,10 +30,11 @@ import lombok.Setter;
 public class Inquiry {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "inquiry_no", nullable = false, columnDefinition = "INT UNSIGNED")
 	private int no;
 	
-	@ManyToOne(targetEntity = User.class ,fetch = FetchType.LAZY)
+	@ManyToOne()
     @JoinColumn(name = "user_no")
 	private User user;
 	
