@@ -2,8 +2,6 @@ package com.orleave.controller;
 
 import java.util.NoSuchElementException;
 
-import javax.mail.SendFailedException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -106,7 +104,7 @@ public class UserController {
 		
 		//임의로 리턴된 User 인스턴스. 현재 코드는 회원 가입 성공 여부만 판단하기 때문에 굳이 Insert 된 유저 정보를 응답하지 않음.
 		try {
-			User user = userService.createUser(signupInfo);
+			userService.createUser(signupInfo);
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} catch (DataIntegrityViolationException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
@@ -165,7 +163,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> emailConfirm(
             @RequestBody @ApiParam(value="이메일정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
 		try {
-			String confirm = mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
+			mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
@@ -206,7 +204,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> emailCheck(
             @RequestParam @ApiParam(value="이메일", required = true) String email) throws Exception {
 		try {
-			User user = userService.getUserByEmail(email);
+			userService.getUserByEmail(email);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Email"));
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
@@ -224,7 +222,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> nicknameCheck(
             @RequestParam @ApiParam(value="닉네임", required = true) String nickname) throws Exception {
 		try {
-			User user = userService.getUserByNickname(nickname);
+			userService.getUserByNickname(nickname);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));

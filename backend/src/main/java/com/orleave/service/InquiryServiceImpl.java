@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
-import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
-import com.orleave.entity.Notice;
 import com.orleave.entity.User;
 import com.orleave.repository.InquiryRepository;
 

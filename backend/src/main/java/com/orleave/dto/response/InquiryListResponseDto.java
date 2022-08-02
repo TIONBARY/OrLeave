@@ -1,11 +1,8 @@
 package com.orleave.dto.response;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import com.orleave.dto.InquiryListDto;
-import com.orleave.entity.Inquiry;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

@@ -3,7 +3,6 @@ package com.orleave.dto;
 import java.time.LocalDateTime;
 
 import com.orleave.entity.Inquiry;
-import com.orleave.entity.Notice;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

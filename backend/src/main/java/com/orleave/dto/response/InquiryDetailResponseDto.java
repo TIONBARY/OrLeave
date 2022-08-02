@@ -1,7 +1,6 @@
 package com.orleave.dto.response;
 
 import com.orleave.dto.InquiryDetailDto;
-import com.orleave.dto.NoticeDetailDto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
