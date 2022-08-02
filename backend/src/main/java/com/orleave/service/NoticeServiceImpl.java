@@ -5,7 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.NoticeListDto;
+import com.orleave.entity.Notice;
 import com.orleave.repository.NoticeRepository;
 
 @Service
@@ -22,5 +24,17 @@ public class NoticeServiceImpl implements NoticeService {
 				.createdTime(notice.getCreatedTime())
 				.build());
 		return notices;
+	}
+
+	@Override
+	public NoticeDetailDto getNoticeDetail(int no) {
+		Notice notice = noticeRepository.findById(no).get();
+		NoticeDetailDto dto = NoticeDetailDto.builder()
+				.no(notice.getNo())
+				.title(notice.getTitle())
+				.content(notice.getContent())
+				.createdTime(notice.getCreatedTime())
+				.build();
+		return dto;
 	}
 }
