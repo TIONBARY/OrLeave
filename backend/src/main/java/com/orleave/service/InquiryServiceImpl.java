@@ -68,5 +68,17 @@ public class InquiryServiceImpl implements InquiryService{
 				.build();
 		return dto;
 	}
+
+	@Override
+	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) {
+		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
+		if (!inquiryTemp.isPresent()) return false;
+		Inquiry inquiry = inquiryTemp.get();
+		if(inquiry.getUser().getNo()!=userNo) return false;
+		inquiry.setTitle(inquiryRequestDto.getTitle());
+		inquiry.setContent(inquiryRequestDto.getContent());
+		inquiryRepository.save(inquiry);
+		return true;
+	}
 	
 }
