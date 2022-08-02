@@ -96,6 +96,7 @@ processResources {
                 }
         }
     }
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
 }
 
 //이클립스인 경우를 위한 QueryDSL 설정. IntelliJ는 불필요. [시작]
@@ -182,6 +183,8 @@ dependencies {
 
     implementation("org.projectlombok:lombok:1.18.20")
     annotationProcessor("org.projectlombok:lombok:1.18.20")
+
+	implementation('org.springframework.boot:spring-boot-starter-mail')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

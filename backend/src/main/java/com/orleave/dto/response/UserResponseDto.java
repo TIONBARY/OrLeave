@@ -16,12 +16,12 @@ import lombok.Setter;
 @Setter
 @ApiModel("UserResponse")
 public class UserResponseDto{
-	@ApiModelProperty(name="User ID")
-	String userId;
+	@ApiModelProperty(name="User Email")
+	String email;
 	
 	public static UserResponseDto of(User user) {
 		UserResponseDto res = new UserResponseDto();
-		res.setUserId(user.getUserId());
+		res.setEmail(user.getEmail());
 		return res;
 	}
 }
