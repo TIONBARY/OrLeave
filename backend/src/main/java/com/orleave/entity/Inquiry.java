@@ -41,10 +41,10 @@ public class Inquiry {
 	@Column(name = "title", nullable = false, length = 100)
 	private String title;
 	
-	@Column(name = "context", nullable = false, length = 500)
-	private String context;
+	@Column(name = "content", nullable = false, columnDefinition = "TEXT")
+	private String content;
 	
-	@Column(name = "answer", nullable = false, length = 500)
+	@Column(name = "answer", nullable = false, columnDefinition = "TEXT")
 	private String answer;
 	
 	@Column(name = "created_time", nullable = false)

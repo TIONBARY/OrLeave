@@ -2,24 +2,20 @@ package com.orleave.service;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.orleave.dto.InquiryListDto;
-import com.orleave.dto.NoticeListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
 import com.orleave.repository.InquiryRepository;
 
-import lombok.Builder;
 
 @Service
 public class InquiryServiceImpl implements InquiryService{
@@ -42,7 +38,7 @@ public class InquiryServiceImpl implements InquiryService{
 	public boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto) {
 		Inquiry inquiry = Inquiry.builder()
 				.title(inquiryRequestDto.getTitle())
-				.context(inquiryRequestDto.getContent())
+				.content(inquiryRequestDto.getContent())
 				.createdTime(LocalDateTime.now())
 				.answer("")
 				.user(user)
