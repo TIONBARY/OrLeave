@@ -12,10 +12,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.InquiryListDto;
+import com.orleave.dto.NoticeListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
 import com.orleave.repository.InquiryRepository;
+
+import lombok.Builder;
 
 @Service
 public class InquiryServiceImpl implements InquiryService{
@@ -23,12 +27,13 @@ public class InquiryServiceImpl implements InquiryService{
 	InquiryRepository inquiryRepository;
 
 	@Override
-	public Page<Inquiry> getInquiriesByUserNo(User user, Pageable pageable) {
-		Page<Inquiry> inquiryList = inquiryRepository.findByUser(user, pageable);
-//		List<Inquiry> inquiryList = user.getInquiries();
-//		int start = (int)pageable.getOffset();
-//		int end = (start + pageable.getPageSize()) > inquiryList.size() ? inquiryList.size() : (start + pageable.getPageSize());
-//		Page<Inquiry> page = new PageImpl<Inquiry>(inquiryList.subList(start, end), pageable,inquiryList.size());
+	public Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable) {
+		Page<InquiryListDto> inquiryList = inquiryRepository.findByUserNo(userNo, pageable)
+				.map(inquiry -> InquiryListDto.builder()
+						.no(inquiry.getNo())
+						.title(inquiry.getTitle())
+						.createdTime(inquiry.getCreatedTime())
+						.build());	
 		return inquiryList;
 	}
 

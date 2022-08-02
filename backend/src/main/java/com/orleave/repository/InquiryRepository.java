@@ -10,5 +10,5 @@ import com.orleave.entity.User;
 
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, Integer> {
-	Page<Inquiry> findByUser(User user, Pageable pageable);
+	Page<Inquiry> findByUserNo(int userNo, Pageable pageable);
 }

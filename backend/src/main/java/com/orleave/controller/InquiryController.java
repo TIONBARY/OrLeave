@@ -3,7 +3,6 @@ package com.orleave.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,13 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.InquiryListResponseDto;
-import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
 import com.orleave.service.InquiryService;
-import com.orleave.service.UserService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,9 +45,8 @@ public class InquiryController {
 	public ResponseEntity<InquiryListResponseDto> getInquiresByUserNo (
 			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		User user = userDetails.getUser();
-		//int userNo = userDetails.getUser().getNo();
-		Page<Inquiry> inquiryList = inquiryService.getInquiriesByUserNo(user, PageRequest.of(page, size, Sort.by("no").descending()));
+		int userNo = userDetails.getUser().getNo();
+		Page<InquiryListDto> inquiryList = inquiryService.getInquiriesByUserNo(userNo, PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
 	}
 	@PostMapping("")
