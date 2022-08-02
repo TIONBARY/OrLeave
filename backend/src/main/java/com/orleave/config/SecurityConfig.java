@@ -1,7 +1,7 @@
 package com.orleave.config;
 
 import com.orleave.auth.JwtAuthenticationFilter;
-import com.orleave.auth.CustomUserDetailService;
+import com.orleave.auth.SsafyUserDetailService;
 import com.orleave.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private CustomUserDetailService ssafyUserDetailService;
+    private SsafyUserDetailService ssafyUserDetailService;
     
     @Autowired
     private UserService userService;
