@@ -1,8 +1,7 @@
 <template>
-  <!-- secondary의 색 바꿔야함. 임시적으로 secondary 사용! -->
-  <!-- 배경 전체 되도록 조절 -->
-  <!-- 관심사나 성격  -->
   <div>
+    <br />
+    <br />
     <h1>회원가입</h1>
     <section class="basic-container">
       <q-form @submit="onSubmit">
