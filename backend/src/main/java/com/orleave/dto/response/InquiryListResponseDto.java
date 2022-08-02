@@ -14,7 +14,7 @@ import lombok.Setter;
 public class InquiryListResponseDto extends BaseResponseDto {
 	
 	@ApiModelProperty(name="Inquiry List")
-	Page<InquiryListDto> InquiryList;
+	Page<InquiryListDto> inquiryList;
 	
 	public static InquiryListResponseDto of(Integer statusCode, String message, Page<InquiryListDto> inquiryList) {
 		InquiryListResponseDto res = new InquiryListResponseDto();

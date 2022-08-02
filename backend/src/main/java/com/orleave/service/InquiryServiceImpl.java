@@ -4,6 +4,7 @@ package com.orleave.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.security.sasl.AuthenticationException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +53,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public InquiryDetailDto getInquiryDetail(int no, int userNo) {
+	public InquiryDetailDto getInquiryDetail(int no, int userNo) throws AuthenticationException {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return null;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) return null;
+		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
 		InquiryDetailDto dto = InquiryDetailDto.builder()
 				.no(inquiry.getNo())
 				.title(inquiry.getTitle())
@@ -68,11 +69,11 @@ public class InquiryServiceImpl implements InquiryService{
 	}
 
 	@Override
-	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) {
+	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws AuthenticationException{
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) return false;
+		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
 		inquiry.setTitle(inquiryRequestDto.getTitle());
 		inquiry.setContent(inquiryRequestDto.getContent());
 		inquiryRepository.save(inquiry);
@@ -80,11 +81,11 @@ public class InquiryServiceImpl implements InquiryService{
 	}
 
 	@Override
-	public boolean deleteInquiry(int no, int userNo) {
+	public boolean deleteInquiry(int no, int userNo) throws AuthenticationException {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) return false;
+		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
 		inquiryRepository.deleteById(no);
 		return true;
 	}

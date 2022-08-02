@@ -1,5 +1,7 @@
 package com.orleave.controller;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,12 +45,13 @@ public class InquiryController {
 	@ApiOperation(value = "내 1:1문의 조회", notes = "사용자의 1:1문의를 페이지 정보에 따라 전체 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 400, message = "1:1문의 조회 실패"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<InquiryListResponseDto> getInquiresByUserNo (
+	public ResponseEntity<? extends BaseResponseDto> getInquiresByUserNo (
 			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUser().getNo();
 		Page<InquiryListDto> inquiryList = inquiryService.getInquiriesByUserNo(userNo, PageRequest.of(page, size, Sort.by("no").descending()));
@@ -59,39 +62,39 @@ public class InquiryController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "1:1문의 생성 실패"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> createInquiry (
 			@ApiIgnore Authentication authentication, InquiryRequestDto inquiryRequestDto) {
-		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			User user = userDetails.getUser();
-			if (inquiryService.createInquiry(user, inquiryRequestDto)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Created"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-			
-		} catch (NullPointerException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		User user = userDetails.getUser();
+		if (inquiryService.createInquiry(user, inquiryRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Created"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 	}
 	@GetMapping("/{no}")
 	@ApiOperation(value = "1:1문의 상세 조회", notes = "1:1문의 상세 정보를 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 403, message = "접근 권한 없음"),
         @ApiResponse(code = 404, message = "1:1문의 조회 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getInquiryDetail(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int userNo = userDetails.getUser().getNo();
 		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			int userNo = userDetails.getUser().getNo();
 			InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
 			return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
-		} catch (NullPointerException e) {
+		} catch (AuthenticationException e) {
 			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
 		}
 	}
@@ -99,41 +102,48 @@ public class InquiryController {
 	@ApiOperation(value = "1:1문의 수정", notes = "1:1문의를 수정한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 403, message = "접근 권한 없음"),
         @ApiResponse(code = 404, message = "1:1문의 수정 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<? extends BaseResponseDto> ModifyInquiry(
+	public ResponseEntity<? extends BaseResponseDto> modifyInquiry(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no, InquiryRequestDto inquiryRequestDto) {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int userNo = userDetails.getUser().getNo();
 		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			int userNo = userDetails.getUser().getNo();
 			if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
 				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
 			} else {
 				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 			}
-		} catch (NullPointerException e) {
+		} catch (AuthenticationException e) {
 			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
 		}
+		
 	}
 	@DeleteMapping("/{no}")
 	@ApiOperation(value = "1:1문의 삭제", notes = "1:1문의를 삭제한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 403, message = "접근 권한 없음"),
         @ApiResponse(code = 404, message = "1:1문의 삭제 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> deleteInquiry(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int userNo = userDetails.getUser().getNo();
 		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			int userNo = userDetails.getUser().getNo();
 			if(inquiryService.deleteInquiry(no, userNo)) {
 				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
 			} else {
 				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 			}
-		} catch (NullPointerException e) {
+		} catch (AuthenticationException e) {
 			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
 		}
 	}
