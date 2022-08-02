@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orleave.auth.SsafyUserDetails;
+import com.orleave.auth.CustomUserDetails;
 import com.orleave.dto.request.EmailCheckCodeRequestDto;
 import com.orleave.dto.request.EmailConfirmRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
@@ -125,7 +125,7 @@ public class UserController {
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
 		 */
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		
@@ -146,7 +146,7 @@ public class UserController {
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
 		 */
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		return ResponseEntity.status(200).body(UserResponseDto.of(user));
@@ -242,7 +242,7 @@ public class UserController {
             @RequestBody @ApiParam(value="프로필", required = true) ProfileModifyRequestDto profileModifyRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		if (userService.modifyProfile(user.getNo(), profileModifyRequestDto)) {
@@ -265,7 +265,7 @@ public class UserController {
             @RequestBody @ApiParam(value="비밀번호", required = true) PasswordRequestDto passwordRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		if (userService.passwordcheck(user.getNo(), passwordRequestDto.getPassword())) {
@@ -288,7 +288,7 @@ public class UserController {
             @RequestBody @ApiParam(value="비밀번호", required = true) PasswordRequestDto passwordRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		if (userService.modifypassword(user.getNo(), passwordRequestDto.getPassword())) {
@@ -310,7 +310,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> withdrawal(
             @ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		if (userService.deleteUser(user)) {

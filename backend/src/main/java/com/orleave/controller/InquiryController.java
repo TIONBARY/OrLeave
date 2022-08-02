@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orleave.auth.SsafyUserDetails;
+import com.orleave.auth.CustomUserDetails;
 import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.request.InquiryRequestDto;
@@ -52,7 +52,7 @@ public class InquiryController {
 	public ResponseEntity<? extends BaseResponseDto> getInquiresByUserNo (
 			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUser().getNo();
 		Page<InquiryListDto> inquiryList = inquiryService.getInquiriesByUserNo(userNo, PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
@@ -69,7 +69,7 @@ public class InquiryController {
 	public ResponseEntity<? extends BaseResponseDto> createInquiry (
 			@ApiIgnore Authentication authentication, InquiryRequestDto inquiryRequestDto) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
 		if (inquiryService.createInquiry(user, inquiryRequestDto)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Created"));
@@ -89,7 +89,7 @@ public class InquiryController {
 	public ResponseEntity<? extends BaseResponseDto> getInquiryDetail(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUser().getNo();
 		try {
 			InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
@@ -110,7 +110,7 @@ public class InquiryController {
 	public ResponseEntity<? extends BaseResponseDto> modifyInquiry(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no, InquiryRequestDto inquiryRequestDto) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUser().getNo();
 		try {
 			if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
@@ -135,7 +135,7 @@ public class InquiryController {
 	public ResponseEntity<? extends BaseResponseDto> deleteInquiry(
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		CustomUserDetails userDetails = (CustomUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUser().getNo();
 		try {
 			if(inquiryService.deleteInquiry(no, userNo)) {
