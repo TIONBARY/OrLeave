@@ -115,20 +115,22 @@ public class UserController {
 	@ApiOperation(value = "회원 프로필 정보 조회", notes = "로그인한 회원 본인의 프로필 정보를 응답한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "유효하지 않은 토큰"),
         @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<ProfileResponseDto> getProfile(@ApiIgnore Authentication authentication) {
+	public ResponseEntity<? extends BaseResponseDto> getProfile(@ApiIgnore Authentication authentication) {
 		/**
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
 		 */
+		if (authentication == null) return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		
-		return ResponseEntity.status(200).body(ProfileResponseDto.of(user));
+		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
 	}
 
 	
