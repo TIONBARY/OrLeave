@@ -3,14 +3,18 @@ package com.orleave.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orleave.dto.NoticeDto;
 import com.orleave.dto.response.NoticeListResponseDto;
+import com.orleave.entity.Notice;
 import com.orleave.service.NoticeService;
 
 import io.swagger.annotations.Api;
@@ -34,8 +38,8 @@ public class NoticeController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<NoticeListResponseDto> getAllNotices(Pageable pageable) {
-		List<NoticeDto> noticeList = noticeService.getNotices(pageable);
+	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) {
+		Page<Notice> noticeList = noticeService.getNotices(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(NoticeListResponseDto.of(200, "Success", noticeList));
 	}
 }

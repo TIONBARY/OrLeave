@@ -1,9 +1,7 @@
 package com.orleave.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.domain.Page;
 
-import com.orleave.dto.NoticeDto;
 import com.orleave.entity.Notice;
 
 import io.swagger.annotations.ApiModel;
@@ -17,9 +15,9 @@ import lombok.Setter;
 public class NoticeListResponseDto extends BaseResponseDto {
 	
 	@ApiModelProperty(name="Notice List")
-	List<NoticeDto> noticeList;
+	Page<Notice> noticeList;
 	
-	public static NoticeListResponseDto of(Integer statusCode, String message, List<NoticeDto> noticeList) {
+	public static NoticeListResponseDto of(Integer statusCode, String message, Page<Notice> noticeList) {
 		NoticeListResponseDto res = new NoticeListResponseDto();
 		res.setStatusCode(statusCode);
 		res.setMessage(message);

@@ -1,11 +1,10 @@
 package com.orleave.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.orleave.dto.NoticeDto;
+import com.orleave.entity.Notice;
 
 public interface NoticeService {
-	List<NoticeDto> getNotices(Pageable pageable);
+	Page<Notice> getNotices(Pageable pageable);
 }
