@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -111,7 +112,28 @@ public class InquiryController {
 			} else {
 				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 			}
-					} catch (NullPointerException e) {
+		} catch (NullPointerException e) {
+			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		}
+	}
+	@DeleteMapping("/{no}")
+	@ApiOperation(value = "1:1문의 삭제", notes = "1:1문의를 삭제한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 404, message = "1:1문의 삭제 실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> deleteInquiry(
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+		try {
+			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+			int userNo = userDetails.getUser().getNo();
+			if(inquiryService.deleteInquiry(no, userNo)) {
+				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
+			} else {
+				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+			}
+		} catch (NullPointerException e) {
 			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
 		}
 	}

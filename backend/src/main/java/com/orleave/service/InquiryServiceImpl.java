@@ -80,5 +80,15 @@ public class InquiryServiceImpl implements InquiryService{
 		inquiryRepository.save(inquiry);
 		return true;
 	}
+
+	@Override
+	public boolean deleteInquiry(int no, int userNo) {
+		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
+		if (!inquiryTemp.isPresent()) return false;
+		Inquiry inquiry = inquiryTemp.get();
+		if(inquiry.getUser().getNo()!=userNo) return false;
+		inquiryRepository.deleteById(no);
+		return true;
+	}
 	
 }

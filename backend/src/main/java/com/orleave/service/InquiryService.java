@@ -15,4 +15,6 @@ public interface InquiryService {
 	boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto);
 	InquiryDetailDto getInquiryDetail(int no, int userNo);
 	boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto);
+	boolean deleteInquiry(int no, int userNo);
+	
 }
