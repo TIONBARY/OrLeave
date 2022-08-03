@@ -4,7 +4,7 @@
     <br />
     <h1>회원가입</h1>
     <section class="basic-container">
-      <q-form @submit="onSubmit">
+      <q-form @submit.prevent="onSubmit">
         <section class="row justify-center">
           <!-- 프로필 이미지들 넣어주기 -->
           <q-field
@@ -105,6 +105,8 @@
                   bg-color="white"
                   v-model="drinkSelected"
                   :options="drinkOptions"
+                  emit-value
+                  map-options
                   dense
                   :rules="[
                     () => drinkSelected !== null || '음주여부를 체크해주세요'
@@ -120,6 +122,8 @@
                   bg-color="white"
                   v-model="smokeSelected"
                   :options="smokeOptions"
+                  emit-value
+                  map-options
                   dense
                   :rules="[
                     () => smokeSelected !== null || '흡연여부를 체크해주세요'
@@ -152,6 +156,8 @@
                   bg-color="white"
                   v-model="religionSelected"
                   :options="religionOptions"
+                  emit-value
+                  map-options
                   dense
                   :rules="[
                     () => religionSelected !== null || '종교를 선택해주세요'
@@ -276,9 +282,6 @@ export default {
     const popupProfile = ref(false)
     const nickname = ref(null)
     const nicknameValid = ref(false)
-    // 2*2
-    const drinkOptions = ref(['안함', '가끔', '자주'])
-    const smokeOptions = ref(['비흡연', '흡연'])
     const mbtiOptions = ref([
       '모름',
       'INFP',
@@ -298,7 +301,6 @@ export default {
       'ESTP',
       'ENTJ'
     ])
-    const religionOptions = ref(['무교', '개신교', '불교', '천주교', '기타'])
     const drinkSelected = ref(null)
     const smokeSelected = ref(null)
     const mbtiSelected = ref(null)
@@ -337,10 +339,53 @@ export default {
       popupProfile,
       nickname,
       nicknameValid,
-      drinkOptions,
-      smokeOptions,
+      drinkOptions: [
+        {
+          label: '안함',
+          value: 0
+        },
+        {
+          label: '가끔',
+          value: 1
+        },
+        {
+          label: '자주',
+          value: 2
+        }
+      ],
+      smokeOptions: [
+        {
+          label: '비흡연',
+          value: 0
+        },
+        {
+          label: '흡연',
+          value: 1
+        }
+      ],
       mbtiOptions,
-      religionOptions,
+      religionOptions: [
+        {
+          label: '무교',
+          value: 0
+        },
+        {
+          label: '개신교',
+          value: 1
+        },
+        {
+          label: '불교',
+          value: 2
+        },
+        {
+          label: '천주교',
+          value: 3
+        },
+        {
+          label: '기타',
+          value: 4
+        }
+      ],
       drinkSelected,
       smokeSelected,
       mbtiSelected,
@@ -389,12 +434,12 @@ export default {
     async onSubmit() {
       await this.trySignup({
         ...this.accountInfo,
-        image_no: this.imageNo,
+        imageNo: this.imageNo,
         nickname: this.nickname,
-        drink: this.drink,
-        smoke: this.smoke,
-        mbti: this.mbti,
-        religion: this.religion,
+        drink: this.drinkSelected,
+        smoke: this.smokeSelected,
+        mbti: this.mbtiSelected,
+        religion: this.religionSelected,
         interests: this.interestSelected,
         personalities: this.personalitySelected
       })

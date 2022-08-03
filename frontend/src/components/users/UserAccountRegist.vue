@@ -178,7 +178,7 @@ export default {
         email: this.email,
         password: this.password,
         gender: this.gender,
-        birth_day: this.birthday
+        birthDay: this.birthday.replaceAll('/', '-')
       })
     }
   }

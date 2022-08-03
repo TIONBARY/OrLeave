@@ -25,10 +25,12 @@ const userStore = {
   },
   actions: {
     async tryLogin({ commit }, loginInfo) {
+      console.log('hello')
       await login(
         loginInfo,
         (response) => {
-          if (response.data.message === 'success') {
+          console.log('ssjasdhqwehiqwfhi')
+          if (response.data.message === 'Success') {
             const token = response.data['access-token']
             commit('SET_IS_LOGIN', true)
             commit('SET_IS_LOGIN_ERROR', false)
