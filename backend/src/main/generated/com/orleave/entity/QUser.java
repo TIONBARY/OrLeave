@@ -30,6 +30,10 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath gender = createString("gender");
 
+    public final NumberPath<Integer> imageNo = createNumber("imageNo", Integer.class);
+
+    public final ListPath<Inquiry, QInquiry> inquiries = this.<Inquiry, QInquiry>createList("inquiries", Inquiry.class, QInquiry.class, PathInits.DIRECT2);
+
     public final ListPath<UserInterest, QUserInterest> interests = this.<UserInterest, QUserInterest>createList("interests", UserInterest.class, QUserInterest.class, PathInits.DIRECT2);
 
     public final StringPath mbti = createString("mbti");
@@ -41,6 +45,8 @@ public class QUser extends EntityPathBase<User> {
     public final NumberPath<Integer> no = createNumber("no", Integer.class);
 
     public final StringPath password = createString("password");
+
+    public final ListPath<UserPersonality, QUserPersonality> personalities = this.<UserPersonality, QUserPersonality>createList("personalities", UserPersonality.class, QUserPersonality.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> religion = createNumber("religion", Integer.class);
 
