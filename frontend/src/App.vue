@@ -53,4 +53,8 @@ a {
   text-decoration: none;
   font-size: 80%;
 }
+
+table {
+  font-family: 'GowunDodum-Regular';
+}
 </style>
