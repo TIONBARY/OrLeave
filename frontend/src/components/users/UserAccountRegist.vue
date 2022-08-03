@@ -13,7 +13,6 @@
             type="email"
             v-model="email"
             dense
-            required
           >
             <template v-slot:append>
               <q-btn
@@ -32,7 +31,6 @@
             v-model="code"
             dense
             :hint="timer"
-            required
           >
             <template v-slot:append>
               <q-btn
@@ -52,7 +50,6 @@
             v-model="password"
             placeholder="영문, 숫자, 특수문자 8~16"
             dense
-            required
           >
           </q-input>
           <q-input
@@ -62,24 +59,12 @@
             type="password"
             v-model="passwordCheck"
             dense
-            :rules="[
-              () => password === passwordCheck || '비밀번호가 일치하지 않습니다'
-            ]"
-            lazy-rules="ondemand"
-            required
+            :hint="pwMsg[pwState]"
           />
-          <q-field
-            label="성별"
-            stack-label
-            outlined
-            bg-color="white"
-            :rules="[() => gender !== null || '성별을 선택해주세요']"
-            lazy-rules="ondemand"
-            hide-bottom-space
-          >
+          <q-field label="성별" stack-label outlined bg-color="white">
             <div class="row justify-center q-gutter-md">
-              <q-radio dense v-model="gender" val="M" label="남" />
-              <q-radio dense v-model="gender" val="F" label="여" />
+              <q-radio dense v-model="gender" val="m" label="남" />
+              <q-radio dense v-model="gender" val="fm" label="여" />
             </div>
           </q-field>
 
@@ -89,13 +74,6 @@
             v-model="birthday"
             bg-color="white"
             mask="date"
-            :rules="[
-              () =>
-                parseInt(birthday.substring(0, 4)) <
-                  new Date().getFullYear() - 18 || '생년월일을 확인해주세요'
-            ]"
-            lazy-rules="ondemand"
-            hide-bottom-space
           >
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
@@ -123,9 +101,6 @@
 <script>
 import { ref, reactive, computed } from 'vue'
 
-import { mapActions } from 'vuex'
-const userStore = 'userStore'
-
 export default {
   setup() {
     const email = ref(null)
@@ -147,8 +122,8 @@ export default {
       '비밀번호가 일치하지 않습니다.',
       '비밀번호가 일치합니다.'
     ])
-    const gender = ref(null)
-    const birthday = ref('2022/01/01')
+    const gender = ref('')
+    const birthday = ref('2000/01/01')
 
     return {
       email,
@@ -161,6 +136,10 @@ export default {
       gender,
       birthday,
 
+      onSubmit() {
+        console.log(email)
+      },
+
       codeTransfer() {
         console.log('인증번호 전송')
       },
@@ -168,18 +147,6 @@ export default {
       confirm() {
         console.log('인증번호 확인')
       }
-    }
-  },
-  methods: {
-    ...mapActions(userStore, ['saveAccountInfo']),
-
-    async onSubmit() {
-      await this.saveAccountInfo({
-        email: this.email,
-        password: this.password,
-        gender: this.gender,
-        birthDay: this.birthday.replaceAll('/', '-')
-      })
     }
   }
 }
