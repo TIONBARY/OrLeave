@@ -4,62 +4,71 @@
     <br />
     <h1>회원가입</h1>
     <section class="basic-container">
-      <q-form @submit="onSubmit">
+      <q-form @submit.prevent="onSubmit">
         <section class="row justify-center">
           <!-- 프로필 이미지들 넣어주기 -->
-          <article class="profile-div" style="margin: 5px">
-            <q-img
-              class="profile-img"
-              :src="url"
-              spinner-color="white"
-              style="height: 100px; width: 100px"
-            />
-            <q-btn
-              class="profile-select-btn"
-              color="secondary"
-              round
-              @click="popupProfile = true"
-              icon="collections"
-            />
+          <q-field
+            borderless
+            :rules="[() => imageNo > 0 || '프로필 이미지를 선택하세요']"
+            lazy-rules="ondemand"
+            hide-bottom-space
+          >
+            <article class="profile-div" style="margin: 5px">
+              <q-img
+                class="profile-img"
+                :src="imageUrl"
+                spinner-color="white"
+                style="height: 100px; width: 100px"
+              />
+              <q-btn
+                class="profile-select-btn"
+                color="secondary"
+                round
+                @click="popupProfile = true"
+                icon="collections"
+              />
 
-            <q-dialog
-              v-model="popupProfile"
-              style="text-align: center"
-              persistent
-            >
-              <q-card style="background-color: #c7d36f; color: white">
-                <q-btn
-                  icon="close"
-                  class="q-mt-sm"
-                  flat
-                  round
-                  dense
-                  v-close-popup
-                />
-                <q-card-section class="row items-center">
-                  <div>
-                    <span
-                      v-for="index in 25"
-                      :key="index"
-                      @click="imgSelect(index)"
-                    >
-                      <q-avatar size="90px">
-                        <q-btn round v-close-popup style="margin: 2px">
-                          <img
-                            :src="
-                              require('../../assets/profile/' + index + '.png')
-                            "
-                            alt="image"
-                            style="width: 100%; height: 100%"
-                          />
-                        </q-btn>
-                      </q-avatar>
-                    </span>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </q-dialog>
-          </article>
+              <q-dialog
+                v-model="popupProfile"
+                style="text-align: center"
+                persistent
+              >
+                <q-card style="background-color: #c7d36f; color: white">
+                  <q-btn
+                    icon="close"
+                    class="q-mt-sm"
+                    flat
+                    round
+                    dense
+                    v-close-popup
+                  />
+                  <q-card-section class="row items-center">
+                    <div>
+                      <span
+                        v-for="index in 25"
+                        :key="index"
+                        @click="imgSelect(index)"
+                      >
+                        <q-avatar size="90px">
+                          <q-btn round v-close-popup style="margin: 2px">
+                            <img
+                              :src="
+                                require('../../assets/profile/' +
+                                  index +
+                                  '.png')
+                              "
+                              alt="image"
+                              style="width: 100%; height: 100%"
+                            />
+                          </q-btn>
+                        </q-avatar>
+                      </span>
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </q-dialog>
+            </article>
+          </q-field>
           <!-- 닉네임 -->
           <table width="85%">
             <tr>
@@ -71,11 +80,15 @@
                   type="text"
                   v-model="nickname"
                   dense
+                  :rules="[() => nicknameValid || '중복 검사를 해주세요']"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                  required
                 >
                   <template v-slot:append>
                     <q-btn
                       color="secondary"
-                      @click="codeTransfer(nickname)"
+                      @click="checkNickname(nickname)"
                       label="중복 검사"
                       size="10px"
                     />
@@ -92,7 +105,14 @@
                   bg-color="white"
                   v-model="drinkSelected"
                   :options="drinkOptions"
+                  emit-value
+                  map-options
                   dense
+                  :rules="[
+                    () => drinkSelected !== null || '음주여부를 체크해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
                 />
               </td>
               <td class="q-pa-xs" style="width: 50%">
@@ -102,7 +122,14 @@
                   bg-color="white"
                   v-model="smokeSelected"
                   :options="smokeOptions"
+                  emit-value
+                  map-options
                   dense
+                  :rules="[
+                    () => smokeSelected !== null || '흡연여부를 체크해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
                 />
               </td>
             </tr>
@@ -115,6 +142,11 @@
                   v-model="mbtiSelected"
                   :options="mbtiOptions"
                   dense
+                  :rules="[
+                    () => mbtiSelected !== null || 'MBTI를 선택해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
                 />
               </td>
               <td class="q-pa-xs" style="width: 50%">
@@ -124,14 +156,34 @@
                   bg-color="white"
                   v-model="religionSelected"
                   :options="religionOptions"
+                  emit-value
+                  map-options
                   dense
+                  :rules="[
+                    () => religionSelected !== null || '종교를 선택해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
                 />
               </td>
             </tr>
 
             <tr>
               <td class="q-pa-xs" style="width: 100%" colspan="2">
-                <q-field label="관심사" stack-label outlined bg-color="white">
+                <q-field
+                  label="관심사"
+                  stack-label
+                  outlined
+                  bg-color="white"
+                  :rules="[
+                    () =>
+                      (interestSelected.length > 0 &&
+                        interestSelected.length < 4) ||
+                      '관심사를 1~3개 선택해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
                   <div class="row justify-center">
                     <template
                       v-for="(interest, index) in interests"
@@ -164,7 +216,20 @@
             </tr>
             <tr>
               <td class="q-pa-xs" style="width: 100%" colspan="2">
-                <q-field label="성격" stack-label outlined bg-color="white">
+                <q-field
+                  label="성격"
+                  stack-label
+                  outlined
+                  bg-color="white"
+                  :rules="[
+                    () =>
+                      (personalitySelected.length > 0 &&
+                        personalitySelected.length < 4) ||
+                      '성격을 1~3개 선택해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
                   <div class="row justify-center">
                     <template
                       v-for="(personality, index) in personalities"
@@ -207,14 +272,16 @@
 <script>
 import { ref, reactive } from 'vue'
 
+import { mapState, mapActions } from 'vuex'
+const userStore = 'userStore'
+
 export default {
   setup() {
-    const url = ref(require('../../assets/profile/0.png'))
+    const imageNo = ref(0)
+    const imageUrl = ref(require('../../assets/profile/0.png'))
     const popupProfile = ref(false)
     const nickname = ref(null)
-    // 2*2
-    const drinkOptions = ref(['안함', '가끔', '자주'])
-    const smokeOptions = ref(['비흡연', '흡연'])
+    const nicknameValid = ref(false)
     const mbtiOptions = ref([
       '모름',
       'INFP',
@@ -234,7 +301,6 @@ export default {
       'ESTP',
       'ENTJ'
     ])
-    const religionOptions = ref(['무교', '개신교', '불교', '천주교', '기타'])
     const drinkSelected = ref(null)
     const smokeSelected = ref(null)
     const mbtiSelected = ref(null)
@@ -268,13 +334,58 @@ export default {
     ])
 
     return {
-      url,
+      imageNo,
+      imageUrl,
       popupProfile,
       nickname,
-      drinkOptions,
-      smokeOptions,
+      nicknameValid,
+      drinkOptions: [
+        {
+          label: '안함',
+          value: 0
+        },
+        {
+          label: '가끔',
+          value: 1
+        },
+        {
+          label: '자주',
+          value: 2
+        }
+      ],
+      smokeOptions: [
+        {
+          label: '비흡연',
+          value: 0
+        },
+        {
+          label: '흡연',
+          value: 1
+        }
+      ],
       mbtiOptions,
-      religionOptions,
+      religionOptions: [
+        {
+          label: '무교',
+          value: 0
+        },
+        {
+          label: '개신교',
+          value: 1
+        },
+        {
+          label: '불교',
+          value: 2
+        },
+        {
+          label: '천주교',
+          value: 3
+        },
+        {
+          label: '기타',
+          value: 4
+        }
+      ],
       drinkSelected,
       smokeSelected,
       mbtiSelected,
@@ -283,13 +394,8 @@ export default {
       personalities,
 
       imgSelect(n) {
-        url.value = require('../../assets/profile/' + n + '.png')
-      },
-
-      onSubmit() {
-        console.log(nickname)
-        // 채워주삼
-        // 아니면 q-form에 action method로 되면 이거 지우삼
+        imageNo.value = n
+        imageUrl.value = require('../../assets/profile/' + n + '.png')
       },
 
       toggle(num, key) {
@@ -297,7 +403,46 @@ export default {
         if (num === 1) item = interests
         else item = personalities
         item[key].value = !item[key].value
+      },
+      checkNickname(nickname) {
+        if (nickname !== null) nicknameValid.value = true
+        console.log(nicknameValid.value)
       }
+    }
+  },
+  computed: {
+    ...mapState(userStore, ['accountInfo']),
+
+    interestSelected() {
+      const arr = []
+      this.interests.forEach((interest) => {
+        if (interest.value) arr.push(interest.key)
+      })
+      return arr
+    },
+    personalitySelected() {
+      const arr = []
+      this.personalities.forEach((personality) => {
+        if (personality.value) arr.push(personality.key)
+      })
+      return arr
+    }
+  },
+  methods: {
+    ...mapActions(userStore, ['trySignup']),
+
+    async onSubmit() {
+      await this.trySignup({
+        ...this.accountInfo,
+        imageNo: this.imageNo,
+        nickname: this.nickname,
+        drink: this.drinkSelected,
+        smoke: this.smokeSelected,
+        mbti: this.mbtiSelected,
+        religion: this.religionSelected,
+        interests: this.interestSelected,
+        personalities: this.personalitySelected
+      })
     }
   }
 }
