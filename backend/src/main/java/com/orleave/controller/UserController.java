@@ -2,8 +2,6 @@ package com.orleave.controller;
 
 import java.util.NoSuchElementException;
 
-import javax.mail.SendFailedException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -106,7 +104,7 @@ public class UserController {
 		
 		//임의로 리턴된 User 인스턴스. 현재 코드는 회원 가입 성공 여부만 판단하기 때문에 굳이 Insert 된 유저 정보를 응답하지 않음.
 		try {
-			User user = userService.createUser(signupInfo);
+			userService.createUser(signupInfo);
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} catch (DataIntegrityViolationException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
@@ -117,20 +115,21 @@ public class UserController {
 	@ApiOperation(value = "회원 프로필 정보 조회", notes = "로그인한 회원 본인의 프로필 정보를 응답한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<ProfileResponseDto> getProfile(@ApiIgnore Authentication authentication) {
+	public ResponseEntity<? extends BaseResponseDto> getProfile(@ApiIgnore Authentication authentication) {
 		/**
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
 		 */
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		
-		return ResponseEntity.status(200).body(ProfileResponseDto.of(user));
+		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
 	}
 
 	
@@ -138,7 +137,7 @@ public class UserController {
 	@ApiOperation(value = "회원 본인 정보 조회", notes = "로그인한 회원 본인의 정보를 응답한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
@@ -150,7 +149,6 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		
 		return ResponseEntity.status(200).body(UserResponseDto.of(user));
 	}
 	
@@ -165,7 +163,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> emailConfirm(
             @RequestBody @ApiParam(value="이메일정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
 		try {
-			String confirm = mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
+			mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
@@ -206,7 +204,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> emailCheck(
             @RequestParam @ApiParam(value="이메일", required = true) String email) throws Exception {
 		try {
-			User user = userService.getUserByEmail(email);
+			userService.getUserByEmail(email);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Email"));
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
@@ -224,7 +222,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseDto> nicknameCheck(
             @RequestParam @ApiParam(value="닉네임", required = true) String nickname) throws Exception {
 		try {
-			User user = userService.getUserByNickname(nickname);
+			userService.getUserByNickname(nickname);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
@@ -236,28 +234,22 @@ public class UserController {
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "프로필 수정 실패"),
-        @ApiResponse(code = 403, message = "권한 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> modifyProfile(
             @RequestBody @ApiParam(value="프로필", required = true) ProfileModifyRequestDto profileModifyRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
-		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			String email = userDetails.getUsername();
-			User user = userService.getUserByEmail(email);
-			if (userService.modifyProfile(user.getNo(), profileModifyRequestDto)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-			
-		} catch (NullPointerException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
-		}
-		
-		
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		User user = userService.getUserByEmail(email);
+		if (userService.modifyProfile(user.getNo(), profileModifyRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}		
     }
 	
 	@PostMapping("/password")
@@ -265,25 +257,21 @@ public class UserController {
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "비밀번호 불일치"),
-        @ApiResponse(code = 403, message = "권한 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> passwordcheck(
             @RequestBody @ApiParam(value="비밀번호", required = true) PasswordRequestDto passwordRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
-		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			String email = userDetails.getUsername();
-			User user = userService.getUserByEmail(email);
-			if (userService.passwordcheck(user.getNo(), passwordRequestDto.getPassword())) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-			
-		} catch (NullPointerException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		User user = userService.getUserByEmail(email);
+		if (userService.passwordcheck(user.getNo(), passwordRequestDto.getPassword())) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
     }
 	
@@ -292,25 +280,21 @@ public class UserController {
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "비밀번호 변경 실패"),
-        @ApiResponse(code = 400, message = "권한 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> modifypassword(
             @RequestBody @ApiParam(value="비밀번호", required = true) PasswordRequestDto passwordRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
-		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			String email = userDetails.getUsername();
-			User user = userService.getUserByEmail(email);
-			if (userService.modifypassword(user.getNo(), passwordRequestDto.getPassword())) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-			
-		} catch (NullPointerException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		User user = userService.getUserByEmail(email);
+		if (userService.modifypassword(user.getNo(), passwordRequestDto.getPassword())) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
     }
 	
@@ -319,23 +303,20 @@ public class UserController {
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "회원 탈퇴 실패"),
-        @ApiResponse(code = 403, message = "권한 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseDto> withdrawal(
             @ApiIgnore Authentication authentication) throws Exception {
-		try {
-			SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-			String email = userDetails.getUsername();
-			User user = userService.getUserByEmail(email);
-			if (userService.deleteUser(user)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-		} catch (NullPointerException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		User user = userService.getUserByEmail(email);
+		if (userService.deleteUser(user)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
     }
 }

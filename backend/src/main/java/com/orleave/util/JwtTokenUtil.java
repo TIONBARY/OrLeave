@@ -13,9 +13,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
-
-import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * jwt 토큰 유틸 정의.
@@ -35,7 +32,7 @@ public class JwtTokenUtil {
 		this.expirationTime = expirationTime;
 	}
     
-	public void setExpirationTime() {
+	public void setExpirationTime(int expirationTime) {
     		//JwtTokenUtil.expirationTime = Integer.parseInt(expirationTime);
     		JwtTokenUtil.expirationTime = expirationTime;
 	}

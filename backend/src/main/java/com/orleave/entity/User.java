@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -75,16 +75,23 @@ public class User {
 	private MeetingSetting meetingSetting; 
 	
 	@OneToMany(mappedBy = "user")
-	private List<UserInterest> interests = new ArrayList<UserInterest>();
+	private List<UserInterest> interests;
 	
 	public void addInterest(UserInterest interest) {
 		interests.add(interest);
 	}
 	
 	@OneToMany(mappedBy = "user")
-	private List<UserPersonality> personalities = new ArrayList<UserPersonality>();
+	private List<UserPersonality> personalities;
 	
 	public void addPersonality(UserPersonality personality) {
 		personalities.add(personality);
+	}
+	
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+	private List<Inquiry> inquiries;
+	
+	public void addInquiry(Inquiry inquiry) {
+		inquiries.add(inquiry);
 	}
 }
