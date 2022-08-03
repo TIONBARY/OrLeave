@@ -165,10 +165,39 @@
         </q-page-container>
       </q-layout>
     </div> -->
+    <div class="scrollDiv">
+      <q-img
+        data-aos="flip-left"
+        class="cloudImg"
+        :src="require('../assets/cloud1.png')"
+        style="right: 0%; top: 0%; width: 50%"
+      />
+      <q-img
+        data-aos="flip-left"
+        class="cloudImg"
+        :src="require('../assets/cloud2.png')"
+        style="left: 0%; top: 15%; width: 50%"
+      />
+      <q-img
+        data-aos="flip-left"
+        class="cloudImg"
+        :src="require('../assets/cloud3.png')"
+        style="right: 0%; top: 30%; width: 50%"
+      />
+      <q-img
+        data-aos="flip-left"
+        class="cloudImg"
+        :src="require('../assets/cloud4.png')"
+        style="left: 0%; top: 45%; width: 50%"
+      />
+    </div>
   </div>
 </template>
 <script>
 import { ref } from 'vue'
+import { onMounted } from '@vue/runtime-core'
+import AOS from 'aos'
+
 export default {
   components: {},
   data() {
@@ -177,6 +206,10 @@ export default {
     }
   },
   setup() {
+    onMounted(() => {
+      AOS.init()
+    })
+
     const index = ref(2)
     const popupMeetingsetting = ref(false)
     const distance = ref(1)
@@ -212,5 +245,15 @@ export default {
 <style scoped>
 section {
   height: 100vh;
+}
+
+.scrollDiv {
+  position: relative;
+  width: 100%;
+  height: 2000pt;
+}
+
+.cloudImg {
+  position: absolute;
 }
 </style>
