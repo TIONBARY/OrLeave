@@ -22,6 +22,8 @@ public class QUser extends EntityPathBase<User> {
 
     public static final QUser user = new QUser("user");
 
+    public final ListPath<Ban, QBan> bans = this.<Ban, QBan>createList("bans", Ban.class, QBan.class, PathInits.DIRECT2);
+
     public final DatePath<java.time.LocalDate> birthDay = createDate("birthDay", java.time.LocalDate.class);
 
     public final NumberPath<Integer> drink = createNumber("drink", Integer.class);
