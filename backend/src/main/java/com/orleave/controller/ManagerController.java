@@ -9,17 +9,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.UserListDto;
+import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
+import com.orleave.dto.response.NoticeDetailResponseDto;
 import com.orleave.dto.response.UserListResponseDto;
+import com.orleave.dto.response.UserReportListResponseDto;
 import com.orleave.entity.User;
 import com.orleave.service.ManagerService;
 import com.orleave.service.UserService;
@@ -93,6 +98,19 @@ public class ManagerController {
 	public ResponseEntity<UserListResponseDto> getAllUsers(@RequestParam("page") int page, @RequestParam("size") int size) {
 		Page<UserListDto> userList = managerService.getUsers(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(UserListResponseDto.of(200, "Success", userList));
+	}
+	
+	
+	@GetMapping("/users/{no}")
+	@ApiOperation(value = "유저 신고 목록 조회", notes = "선택한 유저의 신고 목록을 조회한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 404, message = "신고 목록 조회 실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<UserReportListResponseDto> getUserReportList(@RequestParam("page") int page, @RequestParam("size") int size,@PathVariable("no") int no) {
+		Page<UserReportListDto> userReportList = managerService.getUserReports(PageRequest.of(page, size, Sort.by("no").descending()),no);
+		return ResponseEntity.status(200).body(UserReportListResponseDto.of(200, "Success", userReportList));
 	}
 	
 }

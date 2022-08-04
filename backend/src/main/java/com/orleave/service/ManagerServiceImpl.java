@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.orleave.dto.UserListDto;
-import com.orleave.entity.MeetingLog;
+import com.orleave.dto.UserReportListDto;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
@@ -44,6 +44,19 @@ public class ManagerServiceImpl implements ManagerService{
 				);
 				
 		return users;
+	}
+
+	@Override
+	public Page<UserReportListDto> getUserReports(Pageable pageable, int no) {
+		Page<UserReportListDto> reports= reportRepository.findByReported(no, pageable).map(
+				report -> UserReportListDto.builder()
+				.no(report.getNo())
+				.user_email(report.getUser().getEmail())
+				.category(report.getCategory())
+				.reportTime(report.getReportTime())
+				.build()
+				);
+		return reports;
 	}
 
 }
