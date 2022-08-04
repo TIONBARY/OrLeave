@@ -26,6 +26,17 @@
         <q-img src="../../assets/meeting/leave.png" width="130px" no-spinner />
       </q-btn>
     </div>
+
+    <meeting-chat />
   </div>
 </template>
+
+<script>
+import MeetingChat from '@/components/meeting/MeetingChat.vue'
+export default {
+  components: {
+    MeetingChat
+  }
+}
+</script>
 <style scoped></style>
