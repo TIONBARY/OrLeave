@@ -9,10 +9,12 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "aos": "^3.0.0-beta.6",
     "core-js": "^3.8.3",
     "quasar": "^2.0.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
+    "vue-scroll-snap": "^0.1.11",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

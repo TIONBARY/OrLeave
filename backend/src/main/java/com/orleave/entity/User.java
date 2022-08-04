@@ -88,7 +88,7 @@ public class User {
 		personalities.add(personality);
 	}
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "user")
 	private List<Inquiry> inquiries;
 	
 	public void addInquiry(Inquiry inquiry) {
@@ -107,5 +107,11 @@ public class User {
 	
 	public void addReport(Report report) {
 		reports.add(report);
+
+	@OneToMany(mappedBy = "user")
+	private List<Ban> bans;
+	
+	public void addBan(Ban ban) {
+		bans.add(ban);
 	}
 }

@@ -15,28 +15,28 @@ import lombok.Setter;
 @Setter
 @ApiModel("UserRegisterPostRequest")
 public class SignupRequestDto {
-	@ApiModelProperty(name="유저 Email", example="ssafy_web@ssafy.com")
+	@ApiModelProperty(name="email", example="ssafy_web@ssafy.com")
 	String email;
-	@ApiModelProperty(name="유저 Password", example="your_password")
+	@ApiModelProperty(name="password", example="your_password")
 	String password;
-	@ApiModelProperty(name="사용자 성별", example="M")
+	@ApiModelProperty(name="gender", example="M")
 	String gender;
-	@ApiModelProperty(name="사용자 생년월일", example="2000-01-01")
+	@ApiModelProperty(name="birthDay", example="2000-01-01")
 	LocalDate birthDay;
-	@ApiModelProperty(name="사용자 닉네임", example="nickname")
+	@ApiModelProperty(name="nickname", example="nickname")
 	String nickname;
-	@ApiModelProperty(name="사용자 MBTI", example="ISFJ")
+	@ApiModelProperty(name="mbti", example="ISFJ")
 	String mbti;
-	@ApiModelProperty(name="사용자 종교", example="0")
+	@ApiModelProperty(name="religion", example="0")
 	int religion;
-	@ApiModelProperty(name="사용자 흡연 여부", example="0")
+	@ApiModelProperty(name="smoke", example="0")
 	int smoke;
-	@ApiModelProperty(name="사용자 음주 여부", example="0")
+	@ApiModelProperty(name="drink", example="0")
 	int drink;
-	@ApiModelProperty(name="사용자 프로필 이미지 번호", example="3")
+	@ApiModelProperty(name="imageNo", example="3")
 	int imageNo;
-	@ApiModelProperty(name="사용자 관심사", example="[1, 2, 3]")
+	@ApiModelProperty(name="interests", example="[1, 2, 3]")
 	ArrayList<Integer> interests;
-	@ApiModelProperty(name="사용자 성격", example="[1, 3, 5]")
+	@ApiModelProperty(name="personalities", example="[1, 3, 5]")
 	ArrayList<Integer> personalities;
 }
