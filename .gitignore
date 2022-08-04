@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 **/src/main/resources/dist
+**/src/main/generated/**
 
 application-db.properties
 application-jwt.properties
