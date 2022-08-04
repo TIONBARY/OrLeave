@@ -94,4 +94,18 @@ public class User {
 	public void addInquiry(Inquiry inquiry) {
 		inquiries.add(inquiry);
 	}
+	
+	@OneToMany(mappedBy = "user1")
+	private List<MeetingLog> meetinglogs;
+	
+	public void addMeetingLog(MeetingLog meetinglog) {
+		meetinglogs.add(meetinglog);
+	}
+	
+	@OneToMany(mappedBy = "user")
+	private List<Report> reports;
+	
+	public void addReport(Report report) {
+		reports.add(report);
+	}
 }
