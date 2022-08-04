@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "매칭 API", tags = {"Matching"})
@@ -40,8 +40,8 @@ public class MatchingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<BaseResponseDto> startMatching(@ApiIgnore Authentication authentication, 
-			@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto) {
+	public ResponseEntity<BaseResponseDto> startMatching(@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto,
+			@ApiIgnore Authentication authentication) {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		matchingService.startMatching(no, locationRequestDto.getLat(), locationRequestDto.getLng());

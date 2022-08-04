@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +26,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "차단 API", tags = {"Ban"})
@@ -70,7 +71,7 @@ public class BanController {
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Created"));
 	}
 	
-	@DeleteMapping("")
+	@DeleteMapping("/{bannedNo}")
 	@ApiOperation(value = "차단 취소", notes = "대상 유저의 차단을 취소한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
@@ -80,11 +81,11 @@ public class BanController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> deleteBan (
-			@ApiIgnore Authentication authentication, @ApiParam(value="차단 회원", required = true) BanRequestDto banRequestDto) {
+			@ApiIgnore Authentication authentication, @PathVariable("bannedNo") int bannedNo) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
-		banService.deleteBan(user, banRequestDto.getBannedNo());
+		banService.deleteBan(user, bannedNo);
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
 	}
 }
