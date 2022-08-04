@@ -36,10 +36,10 @@ public class ManagerServiceImpl implements ManagerService{
 				.email(user.getEmail())
 				.nickname(user.getNickname())
 				.gender(user.getGender())
-				.birthday(user.getBirthDay())
-				.usertype(user.getUserType())
-				.matchcount(meetingLogRepository.countByUser1(user.getNo()))
-				.reportcount(reportRepository.countByUser(user.getNo()))
+				.birthDay(user.getBirthDay())
+				.userType(user.getUserType())
+				.matchcount(meetingLogRepository.countByUser1No(user.getNo()))
+				.reportcount(reportRepository.countByUserNo(user.getNo()))
 				.build()
 				);
 				
