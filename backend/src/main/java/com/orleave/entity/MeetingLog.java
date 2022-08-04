@@ -36,7 +36,7 @@ public class MeetingLog {
 	private User user1;
 	
 	@Column(name = "user2_no")
-	private int user2_no;
+	private int user2;
 	
 	@Column(name = "created_time", nullable = false)
 	private LocalDateTime createdTime;
