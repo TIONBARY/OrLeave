@@ -34,14 +34,14 @@ public class Report {
     @JoinColumn(name = "user_no")
 	private User user;
 	
-	@Column(name = "reported_no")
+	@Column(name = "reported_no", nullable = false)
 	private int reported_no;
 	
-	@Column(name="category")
+	@Column(name="category", nullable = false)
 	private int category; 
 	
-	@Column(name="context")
-	private int context; 
+	@Column(name = "content", nullable = false, columnDefinition = "TEXT")
+	private String content;
 	
 
 }
