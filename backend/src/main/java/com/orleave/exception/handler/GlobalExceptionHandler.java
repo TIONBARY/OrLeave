@@ -14,4 +14,9 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<BaseResponseDto> handleMatchingUserNotFoundException(MatchingUserNotFoundException e) {
         return ResponseEntity.status(400).body(BaseResponseDto.of(400, "User Not Exist In Matching"));
     }
+	
+	@ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<BaseResponseDto> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
+    }
 }

@@ -35,8 +35,4 @@ public class MeetingServiceImpl implements MeetingService{
 			meetingSettingRepository.save(meetingsetting);
 		return true;
 	}
-	
-	
-	
-
 }
