@@ -7,9 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel("PasswordRequest")
-public class PasswordRequestDto {
-
-	@ApiModelProperty(name="password", example="your_password")
-	String password;
+@ApiModel("LocationRequest")
+public class LocationRequestDto {
+	@ApiModelProperty(name="lat", example="37.5")
+	double lat;
+	@ApiModelProperty(name="lng", example="127.5")
+	double lng;
 }

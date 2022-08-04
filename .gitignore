@@ -17,8 +17,11 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+**/src/main/resources/dist
+
 application-db.properties
 application-jwt.properties
+application-openvidu.properties
 email.properties
 
 ### IntelliJ IDEA ###

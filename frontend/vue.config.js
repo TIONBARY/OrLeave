@@ -9,5 +9,6 @@ module.exports = defineConfig({
       importStrategy: 'kebab',
       rtlSupport: false
     }
-  }
+  },
+  outputDir: '../backend/src/main/resources/dist'
 })
