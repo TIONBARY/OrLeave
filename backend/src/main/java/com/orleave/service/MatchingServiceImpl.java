@@ -65,14 +65,14 @@ public class MatchingServiceImpl implements MatchingService {
 		WaitingUserDto femaleDto = females.get(userNo);
 		if (femaleDto == null) throw new MatchingUserNotFoundException();
 		MeetingSetting femaleMeetingSetting = meetingSettingRepository.findById(userNo).get();
-		for (int maleNo : males.keySet()) {
+		outer: for (int maleNo : males.keySet()) {
 			List<Ban> femaleBan = banRepository.findByUserNo(userNo);
 			for (Ban ban : femaleBan) {
-				if (ban.getBannedNo() == maleNo) continue;
+				if (ban.getBannedNo() == maleNo) continue outer;
 			}
 			List<Ban> maleBan = banRepository.findByUserNo(maleNo);
 			for (Ban ban : maleBan) {
-				if (ban.getBannedNo() == userNo) continue;
+				if (ban.getBannedNo() == userNo) continue outer;
 			}
 			WaitingUserDto maleDto = males.get(maleNo);
 			if (maleDto == null) throw new MatchingUserNotFoundException();

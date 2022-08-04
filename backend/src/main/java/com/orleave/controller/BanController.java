@@ -57,7 +57,7 @@ public class BanController {
 	@ApiOperation(value = "차단 추가", notes = "대상 유저를 차단한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 400, message = "1:1문의 생성 실패"),
+        @ApiResponse(code = 400, message = "부적절한 입력"),
         @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
@@ -75,7 +75,7 @@ public class BanController {
 	@ApiOperation(value = "차단 취소", notes = "대상 유저의 차단을 취소한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 400, message = "1:1문의 생성 실패"),
+        @ApiResponse(code = 400, message = "부적절한 입력"),
         @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
