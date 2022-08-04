@@ -21,6 +21,7 @@ bin/
 
 application-db.properties
 application-jwt.properties
+application-openvidu.properties
 email.properties
 
 ### IntelliJ IDEA ###
