@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.request.MeetingSettingRequestDto;
-import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.MeetingSettingResponseDto;
 import com.orleave.entity.MeetingSetting;
