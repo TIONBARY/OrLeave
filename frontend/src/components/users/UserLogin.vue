@@ -13,17 +13,19 @@
               label="이메일"
               outlined
               type="email"
-              v-model="id"
+              v-model="loginInfo.email"
               bg-color="white"
               maxlength="30"
+              required
             />
             <q-input
               label="비밀번호"
               outlined
               type="password"
-              v-model="pw"
+              v-model="loginInfo.password"
               bg-color="white"
               maxlength="20"
+              required
             />
             <div>
               <q-btn
@@ -68,19 +70,32 @@
 
 <script>
 import { ref } from 'vue'
+
+import { mapState, mapActions } from 'vuex'
+const userStore = 'userStore'
+
 export default {
   setup() {
-    const id = ref(null)
-    const pw = ref(null)
+    const loginInfo = ref({ email: null, password: null })
     return {
-      id,
-      pw
+      loginInfo
     }
   },
+  // isLogin, isLoginError 얘넨 왜 필요하징
+  computed: {
+    ...mapState(userStore, ['isLogin', 'isLoginError'])
+  },
+  // getUserInfo는 왜 필요하징
   methods: {
-    onSubmit() {
-      // 조건 검사해서 비어있거나, db랑 일치하는 정보가 없으면 모달창 띄움
-      console.log('ID: ' + this.id + '\nPW: ' + this.pw)
+    ...mapActions(userStore, ['tryLogin', 'getUserInfo']),
+    async onSubmit() {
+      await this.tryLogin(this.loginInfo)
+      if (this.isLogin) {
+        console.log('로그인 성공')
+        this.$router.push({ path: '/' })
+      } else {
+        console.log('로그인 실패...ㅜㅜ')
+      }
     },
     printLog(msg) {
       console.log(msg)
