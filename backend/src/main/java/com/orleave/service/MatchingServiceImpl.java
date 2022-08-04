@@ -10,12 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.orleave.dto.WaitingFemaleDto;
-import com.orleave.dto.WaitingMaleDto;
 import com.orleave.dto.WaitingUserDto;
 import com.orleave.entity.Ban;
 import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.User;
+import com.orleave.exception.MatchingUserNotFoundException;
 import com.orleave.repository.BanRepository;
 import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.UserRepository;
@@ -61,9 +60,10 @@ public class MatchingServiceImpl implements MatchingService {
 	}
 
 	@Override
-	public WaitingUserDto findMatching(int userNo) {
+	public WaitingUserDto findMatching(int userNo) throws MatchingUserNotFoundException {
 		ArrayList<WaitingUserDto> malesList = new ArrayList<>();
 		WaitingUserDto femaleDto = females.get(userNo);
+		if (femaleDto == null) throw new MatchingUserNotFoundException();
 		MeetingSetting femaleMeetingSetting = meetingSettingRepository.findById(userNo).get();
 		for (int maleNo : males.keySet()) {
 			List<Ban> femaleBan = banRepository.findByUserNo(userNo);
@@ -75,6 +75,7 @@ public class MatchingServiceImpl implements MatchingService {
 				if (ban.getBannedNo() == userNo) continue;
 			}
 			WaitingUserDto maleDto = males.get(maleNo);
+			if (maleDto == null) throw new MatchingUserNotFoundException();
 			MeetingSetting maleMeetingSetting = meetingSettingRepository.findById(maleNo).get();
 			if (!check(maleMeetingSetting, maleDto, femaleDto)) continue;
 			if (!check(femaleMeetingSetting, femaleDto, maleDto)) continue;
@@ -83,6 +84,12 @@ public class MatchingServiceImpl implements MatchingService {
 		if (malesList.isEmpty()) return null;
 		Random rand = new Random();
 		return malesList.get(rand.nextInt(malesList.size()));
+	}
+	
+	public void stopMatching(int userNo) throws MatchingUserNotFoundException {
+		if (males.containsKey(userNo)) males.remove(userNo);
+		else if (females.containsKey(userNo)) females.remove(userNo);
+		else throw new MatchingUserNotFoundException();
 	}
 
 	private boolean check(MeetingSetting ms, WaitingUserDto first, WaitingUserDto second) {
