@@ -105,23 +105,34 @@
       </div>
     </div>
     <div class="item pageSection">
-      <h1 class="intro-title">듣다,</h1>
-      <h2 class="intro-content">
-        상대방과 이야기를 나누며<br />어떤 사람인지 알아보세요.
-      </h2>
-      <q-img class="cloudImg" :src="require('../assets/main/dateimg1.png')" />
+      <div class="intro-title text-left">
+        <h1>듣다,</h1>
+        <h2>상대방과 이야기를 나누며<br />어떤 사람인지 알아보세요.</h2>
+      </div>
+      <q-img
+        class="img-container intro-img"
+        :src="require('../assets/main/dateimg1.png')"
+      />
     </div>
     <div class="item pageSection">
-      <h1 class="intro-title">보다,</h1>
-      <h2 class="intro-content">
-        마음이 잘 통한다면,<br />서로의 눈을 보며 대화해보세요.
-      </h2>
-      <q-img class="cloudImg" :src="require('../assets/main/dateimg2.png')" />
+      <div class="intro-title text-left">
+        <h1>보다,</h1>
+        <h2>마음이 잘 통한다면,<br />서로의 눈을 보며 대화해보세요.</h2>
+      </div>
+      <q-img
+        class="img-container intro-img"
+        :src="require('../assets/main/dateimg2.png')"
+      />
     </div>
     <div class="item pageSection">
-      <h1 class="intro-title">잡다,</h1>
-      <h2 class="intro-content">마음이에 드는 상대를<br />쟁취하세요.</h2>
-      <q-img class="cloudImg" :src="require('../assets/main/dateimg3.png')" />
+      <div class="intro-title text-left">
+        <h1>잡다,</h1>
+        <h2>마음이에 드는 상대를<br />쟁취하세요.</h2>
+      </div>
+      <q-img
+        class="img-container intro-img"
+        :src="require('../assets/main/dateimg3.png')"
+      />
     </div>
     <div class="item">
       <div class="third">
@@ -243,8 +254,8 @@ export default {
 }
 .img-container {
   background-color: whitesmoke;
-  border-radius: 10px;
-  padding: 5px;
+  border-radius: 20px;
+  padding: 0px;
   height: auto;
   width: auto;
 }
@@ -252,11 +263,18 @@ export default {
 .pageSection {
   position: relative;
 }
-.cloudImg {
+
+.intro-title {
+  position: absolute;
+  left: 20%;
+  top: 10%;
+}
+.intro-img {
   position: absolute;
   right: 20%;
-  top: 5%;
-  width: 30%;
+  bottom: 15%;
+  min-width: 30%;
+  min-height: 30%;
 }
 
 /* scroll-snap에 필요한 css */
