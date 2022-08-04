@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @ApiModel("EmailConfirmRequest")
 public class EmailConfirmRequestDto {
-	@ApiModelProperty(name="인증할 Email", example="ssafy_web@ssafy.com")
+	@ApiModelProperty(name="email", example="ssafy_web@ssafy.com")
 	String email;
 }

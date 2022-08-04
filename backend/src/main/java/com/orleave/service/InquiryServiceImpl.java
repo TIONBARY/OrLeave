@@ -18,14 +18,19 @@ import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
 import com.orleave.repository.InquiryRepository;
+import com.orleave.repository.UserRepository;
 
 
 @Service
 public class InquiryServiceImpl implements InquiryService{
 	@Autowired
 	InquiryRepository inquiryRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
+	@Transactional
 	public Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable) {
 		Page<InquiryListDto> inquiryList = inquiryRepository.findByUserNo(userNo, pageable)
 				.map(inquiry -> InquiryListDto.builder()
@@ -47,7 +52,6 @@ public class InquiryServiceImpl implements InquiryService{
 				.user(user)
 				.build();
 		inquiryRepository.save(inquiry);
-		user.addInquiry(inquiry);
 		return true;
 	}
 
@@ -69,6 +73,7 @@ public class InquiryServiceImpl implements InquiryService{
 	}
 
 	@Override
+	@Transactional
 	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws AuthenticationException{
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;
@@ -81,6 +86,7 @@ public class InquiryServiceImpl implements InquiryService{
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteInquiry(int no, int userNo) throws AuthenticationException {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;

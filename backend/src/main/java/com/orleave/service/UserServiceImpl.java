@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
+import com.orleave.entity.Ban;
+import com.orleave.entity.Inquiry;
 import com.orleave.entity.LoginTrial;
 import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.User;
@@ -103,6 +105,8 @@ public class UserServiceImpl implements UserService {
 			user.addPersonality(userPersonality);
 			userPersonalityRepository.save(userPersonality);
 		}
+		user.setInquiries(new ArrayList<Inquiry>());
+		user.setBans(new ArrayList<Ban>());
 	}
 	
 	@Override
