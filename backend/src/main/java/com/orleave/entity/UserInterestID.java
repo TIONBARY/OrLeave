@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 public class UserInterestID implements Serializable{
+	private static final long serialVersionUID = 7532482466716062979L;
 	private int user;
 	private int interest;
 }

@@ -92,10 +92,10 @@ public class EmailServiceImpl implements EmailService{
     }
     @Override
     @Transactional
-    public String sendSimpleMessage(String to)throws Exception {
+    public void sendSimpleMessage(String to) throws Exception {
         // TODO Auto-generated method stub
         MimeMessage message = createMessage(to);
-        try{//예외처리
+        try {
             emailSender.send(message);
             Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(to);
             EmailConfirm ec = null;
@@ -111,11 +111,10 @@ public class EmailServiceImpl implements EmailService{
             	ec.setTime(LocalDateTime.now());
             }
             emailConfirmRepository.save(ec);
-        }catch(MailException es){
+        } catch(MailException es) {
             es.printStackTrace();
             throw new IllegalArgumentException();
         }
-        return ePw;
     }
 
 	@Override

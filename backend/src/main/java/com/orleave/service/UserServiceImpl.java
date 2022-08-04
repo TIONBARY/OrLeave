@@ -3,7 +3,6 @@ package com.orleave.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
 
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.orleave.dto.request.PasswordRequestDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.LoginTrial;
@@ -55,12 +53,12 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	@Transactional
-	public User createUser(SignupRequestDto signupInfo) {
+	public void createUser(SignupRequestDto signupInfo) {
 		
 		User user = User.builder()
 				.email(signupInfo.getEmail())
 				.password(passwordEncoder.encode(signupInfo.getPassword()))
-				.userType(signupInfo.getUserType())
+				.userType("USER")
 				.gender(signupInfo.getGender())
 				.birthDay(signupInfo.getBirthDay())
 				.nickname(signupInfo.getNickname())
@@ -105,7 +103,6 @@ public class UserServiceImpl implements UserService {
 			user.addPersonality(userPersonality);
 			userPersonalityRepository.save(userPersonality);
 		}
-		return user;
 	}
 	
 	@Override
