@@ -11,4 +11,5 @@ public interface ManagerService {
 	Page<UserListDto> getUsers(Pageable pageable);
 	Page<UserReportListDto> getUserReports(Pageable pageable,int no);
 	ReportDetailDto getReportDetail(int no);
+	boolean BanUser(int no);
 }

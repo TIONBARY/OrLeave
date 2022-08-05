@@ -13,6 +13,7 @@ import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
 import com.orleave.entity.Notice;
 import com.orleave.entity.Report;
+import com.orleave.entity.User;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
@@ -75,6 +76,14 @@ public class ManagerServiceImpl implements ManagerService{
 				.content(reportDetail.getContent())
 				.build();
 		return dto;
+	}
+
+	@Override
+	public boolean BanUser(int no) {
+		User user=userRepository.findById(no).get();
+		user.setUserType("Banned");
+		userRepository.save(user);
+		return true;
 	}
 
 }
