@@ -36,7 +36,6 @@
       label="비디오 해제"
       @click="toggle_cam(camera)"
     />
-    <!-- @click="simulateProgress(0)" -->
 
     <q-btn
       v-if="mute === false"
@@ -90,12 +89,7 @@
 import MeetingChat from '@/components/meeting/MeetingChat.vue'
 import { ref } from 'vue'
 export default {
-  components: {},
-  data() {
-    return {
-      MeetingChat
-    }
-  },
+  components: { MeetingChat },
   setup() {
     const level = ref(1)
     const question = ref(null)
