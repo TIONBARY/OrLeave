@@ -94,17 +94,25 @@ public class ManagerServiceImpl implements ManagerService{
 
 	@Override
 	public boolean BanUser(int no) {
-		User user=userRepository.findById(no).get();
-		user.setUserType("Banned");
-		userRepository.save(user);
+		try {
+			User user=userRepository.findById(no).get();
+			user.setUserType("Banned");
+			userRepository.save(user);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean ModifyNickname(NicknameModifyRequestDto dto) {
-		User user=userRepository.findById(dto.getNo()).get();
-		user.setNickname(dto.getNickname());
-		userRepository.save(user);
+		try {
+			User user=userRepository.findById(dto.getNo()).get();
+			user.setNickname(dto.getNickname());
+			userRepository.save(user);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
@@ -122,32 +130,39 @@ public class ManagerServiceImpl implements ManagerService{
 
 	@Override
 	public boolean CreateNotices(NoticeRequestDto dto) {
-
+		try {
 			Notice notice=Notice.builder()
 					.title(dto.getTitle())
 					.content(dto.getContent())
 					.createdTime(LocalDateTime.now())
 					.build();
 			noticeRepository.save(notice);
-	
-		
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean ModifyNotices(NoticeModifyRequestDto dto) {
-		Notice notice=noticeRepository.findById(dto.getNo()).get();
-		notice.setContent(dto.getContent());
-		notice.setTitle(dto.getTitle());
-		noticeRepository.save(notice);
-		
-		
+		try {
+			Notice notice=noticeRepository.findById(dto.getNo()).get();
+			notice.setContent(dto.getContent());
+			notice.setTitle(dto.getTitle());
+			noticeRepository.save(notice);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean DeleteNotices(int no) {
-		noticeRepository.deleteById(no);
+		try {
+			noticeRepository.deleteById(no);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
