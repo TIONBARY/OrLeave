@@ -23,6 +23,7 @@ import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.LoginRequestDto;
+import com.orleave.dto.request.NicknameModifyRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
@@ -169,6 +170,31 @@ public class ManagerController {
 		
 		
 		if (managerService.BanUser(userNoRequestDto.getNo())) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	
+	@PutMapping("/nickname")
+	@ApiOperation(value = "닉네임 변경", notes = "선택한 유저의 닉네임을 변경한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "정지 실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> ModifyNickname(
+			@RequestBody @ApiParam(value="유저 정보", required = true)NicknameModifyRequestDto nicknameModifyRequestDto
+			,@ApiIgnore Authentication authentication) {
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		
+		if (managerService.ModifyNickname(nicknameModifyRequestDto)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));

@@ -11,6 +11,7 @@ import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.NicknameModifyRequestDto;
 import com.orleave.entity.Notice;
 import com.orleave.entity.Report;
 import com.orleave.entity.User;
@@ -82,6 +83,14 @@ public class ManagerServiceImpl implements ManagerService{
 	public boolean BanUser(int no) {
 		User user=userRepository.findById(no).get();
 		user.setUserType("Banned");
+		userRepository.save(user);
+		return true;
+	}
+
+	@Override
+	public boolean ModifyNickname(NicknameModifyRequestDto dto) {
+		User user=userRepository.findById(dto.getNo()).get();
+		user.setNickname(dto.getNickname());
 		userRepository.save(user);
 		return true;
 	}
