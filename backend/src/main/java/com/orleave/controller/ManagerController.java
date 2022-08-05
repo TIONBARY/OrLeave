@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,11 @@ import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeModifyRequestDto;
+import com.orleave.dto.request.NoticeRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
@@ -195,6 +199,96 @@ public class ManagerController {
 		
 		
 		if (managerService.ModifyNickname(nicknameModifyRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@PutMapping("/inquiry/answer")
+	@ApiOperation(value = "문의 답변", notes = "선택한 문의에 답변을 남긴다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> InquiryAnswer(
+			@RequestBody @ApiParam(value="문의 답변", required = true)InquiryAnswerRequestDto inquiryAnswerRequestDto
+			,@ApiIgnore Authentication authentication) {
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		
+		if (managerService.InquiryAnswer(inquiryAnswerRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@PostMapping("/notices")
+	@ApiOperation(value="공지사항 작성",notes="새로운 공지사항을 작성한다.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="성공"),
+		@ApiResponse(code = 403, message="권한이 없는 사용자"),
+		@ApiResponse(code = 404, message="실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+	})
+	public ResponseEntity<? extends BaseResponseDto> CreateNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeRequestDto noticeRequestDto
+			,@ApiIgnore Authentication authentication){
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		if (managerService.CreateNotices(noticeRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@PutMapping("/notices")
+	@ApiOperation(value = "공지사항 수정", notes = "선택한 공지를 수정한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> ModifyNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeModifyRequestDto noticeModifyRequestDto
+			,@ApiIgnore Authentication authentication){
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		if (managerService.ModifyNotices(noticeModifyRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@DeleteMapping("/notices/{notice_no}")
+	@ApiOperation(value = "공지사항 삭제", notes = "선택한 공지를 수정한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> DeleteNotices(@PathVariable("notice_no") int no,
+			@ApiIgnore Authentication authentication){
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		if (managerService.DeleteNotices(no)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));

@@ -1,5 +1,6 @@
 package com.orleave.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,17 @@ import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeModifyRequestDto;
+import com.orleave.dto.request.NoticeRequestDto;
+import com.orleave.entity.Inquiry;
 import com.orleave.entity.Notice;
 import com.orleave.entity.Report;
 import com.orleave.entity.User;
+import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.MeetingLogRepository;
+import com.orleave.repository.NoticeRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
 
@@ -24,6 +31,12 @@ public class ManagerServiceImpl implements ManagerService{
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	InquiryRepository inquiryRepository;
+	
+	@Autowired
+	NoticeRepository noticeRepository;
 	
 	@Autowired
 	MeetingLogRepository meetingLogRepository;
@@ -81,17 +94,75 @@ public class ManagerServiceImpl implements ManagerService{
 
 	@Override
 	public boolean BanUser(int no) {
-		User user=userRepository.findById(no).get();
-		user.setUserType("Banned");
-		userRepository.save(user);
+		try {
+			User user=userRepository.findById(no).get();
+			user.setUserType("Banned");
+			userRepository.save(user);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean ModifyNickname(NicknameModifyRequestDto dto) {
-		User user=userRepository.findById(dto.getNo()).get();
-		user.setNickname(dto.getNickname());
-		userRepository.save(user);
+		try {
+			User user=userRepository.findById(dto.getNo()).get();
+			user.setNickname(dto.getNickname());
+			userRepository.save(user);
+		}catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean InquiryAnswer(InquiryAnswerRequestDto dto) {
+		try {
+			Inquiry inquiry=inquiryRepository.findById(dto.getNo()).get();
+			inquiry.setAnswer(dto.getAnswer());
+			inquiryRepository.save(inquiry);
+		}catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean CreateNotices(NoticeRequestDto dto) {
+		try {
+			Notice notice=Notice.builder()
+					.title(dto.getTitle())
+					.content(dto.getContent())
+					.createdTime(LocalDateTime.now())
+					.build();
+			noticeRepository.save(notice);
+		}catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean ModifyNotices(NoticeModifyRequestDto dto) {
+		try {
+			Notice notice=noticeRepository.findById(dto.getNo()).get();
+			notice.setContent(dto.getContent());
+			notice.setTitle(dto.getTitle());
+			noticeRepository.save(notice);
+		}catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean DeleteNotices(int no) {
+		try {
+			noticeRepository.deleteById(no);
+		}catch(Exception e) {
+			return false;
+		}
 		return true;
 	}
 
