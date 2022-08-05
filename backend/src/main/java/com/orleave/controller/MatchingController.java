@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "매칭 API", tags = {"Matching"})
@@ -40,8 +41,8 @@ public class MatchingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<BaseResponseDto> startMatching(@ApiIgnore Authentication authentication, 
-			@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto) {
+	public ResponseEntity<BaseResponseDto> startMatching(@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto,
+			@ApiIgnore Authentication authentication) {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		matchingService.startMatching(no, locationRequestDto.getLat(), locationRequestDto.getLng());
@@ -65,7 +66,7 @@ public class MatchingController {
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", matchedUser));
 	}
 	
-	@DeleteMapping("")
+	@GetMapping("/stop")
 	@ApiOperation(value = "매칭 취소하기", notes = "매칭을 취소한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
@@ -79,5 +80,22 @@ public class MatchingController {
 		int no = userDetails.getUserno();
 		matchingService.stopMatching(no);
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success"));
+	}
+	
+	@GetMapping("/success/{no}")
+	@ApiOperation(value = "매칭 성사", notes = "매칭을 양쪽이 수락했을 경우 남자 쪽에서 여성 쪽 데이터를 가져온다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "매칭된 상대 없음"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> MatchingSuccess(@PathVariable("no") @ApiParam(value="상대 유저의 번호", required = true) int femaleNo,
+			@ApiIgnore Authentication authentication) throws Exception {
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int no = userDetails.getUserno();
+		WaitingUserDto femaleDto = matchingService.matchingSuccess(no, femaleNo);
+		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", femaleDto));
 	}
 }

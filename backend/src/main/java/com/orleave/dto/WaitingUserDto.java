@@ -1,5 +1,7 @@
 package com.orleave.dto;
 
+import java.util.ArrayList;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -35,4 +37,8 @@ public class WaitingUserDto {
 	int drink;
 	@ApiModelProperty(name="사용자 프로필 이미지 번호", example="10")
 	int imageNo;
+	@ApiModelProperty(name="사용자 관심사")
+	ArrayList<Integer> interests;
+	@ApiModelProperty(name="사용자 성격")
+	ArrayList<Integer> personalities;
 }

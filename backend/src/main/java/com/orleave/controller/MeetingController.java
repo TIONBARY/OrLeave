@@ -1,5 +1,7 @@
 package com.orleave.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.MeetingLogListDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
+import com.orleave.dto.response.MeetingLogResponseDto;
 import com.orleave.dto.response.MeetingSettingResponseDto;
 import com.orleave.entity.MeetingSetting;
 import com.orleave.service.MeetingService;
@@ -81,6 +85,25 @@ public class MeetingController {
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
+	}
+	
+	@GetMapping("/recent-call")
+	@ApiOperation(value = "최근 미팅 목록 가져오기", notes = "본인의 일주일 동안의 미팅 목록을 가져온다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) {
+		/**
+		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
+		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
+		 */
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int no = userDetails.getUserno();
+		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(no);
+		return ResponseEntity.status(200).body(MeetingLogResponseDto.of(200, "Success", meetingLogs));
 	}
 
 }

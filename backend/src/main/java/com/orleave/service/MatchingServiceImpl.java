@@ -1,21 +1,28 @@
 package com.orleave.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.orleave.dto.WaitingUserDto;
 import com.orleave.entity.Ban;
+import com.orleave.entity.MeetingLog;
 import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.User;
+import com.orleave.entity.UserInterest;
+import com.orleave.entity.UserPersonality;
 import com.orleave.exception.MatchingUserNotFoundException;
 import com.orleave.repository.BanRepository;
+import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.UserRepository;
 
@@ -30,6 +37,9 @@ public class MatchingServiceImpl implements MatchingService {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	MeetingLogRepository meetingLogRepository;
 	
 	private Map<Integer, WaitingUserDto> males;
 	private Map<Integer, WaitingUserDto> females;
@@ -55,6 +65,14 @@ public class MatchingServiceImpl implements MatchingService {
 				.drink(user.getDrink())
 				.imageNo(user.getImageNo())
 				.build();
+		userDto.setInterests(new ArrayList<Integer>());
+		for (UserInterest interest : user.getInterests()) {
+			userDto.getInterests().add(interest.getInterest());
+		}
+		userDto.setPersonalities(new ArrayList<Integer>());
+		for (UserPersonality personality : user.getPersonalities()) {
+			userDto.getPersonalities().add(personality.getPersonality());
+		}
 		if (user.getGender().equals("M")) males.put(userNo, userDto);
 		else females.put(userNo, userDto);
 	}
@@ -65,14 +83,14 @@ public class MatchingServiceImpl implements MatchingService {
 		WaitingUserDto femaleDto = females.get(userNo);
 		if (femaleDto == null) throw new MatchingUserNotFoundException();
 		MeetingSetting femaleMeetingSetting = meetingSettingRepository.findById(userNo).get();
-		for (int maleNo : males.keySet()) {
+		outer: for (int maleNo : males.keySet()) {
 			List<Ban> femaleBan = banRepository.findByUserNo(userNo);
 			for (Ban ban : femaleBan) {
-				if (ban.getBannedNo() == maleNo) continue;
+				if (ban.getBannedNo() == maleNo) continue outer;
 			}
 			List<Ban> maleBan = banRepository.findByUserNo(maleNo);
 			for (Ban ban : maleBan) {
-				if (ban.getBannedNo() == userNo) continue;
+				if (ban.getBannedNo() == userNo) continue outer;
 			}
 			WaitingUserDto maleDto = males.get(maleNo);
 			if (maleDto == null) throw new MatchingUserNotFoundException();
@@ -90,6 +108,28 @@ public class MatchingServiceImpl implements MatchingService {
 		if (males.containsKey(userNo)) males.remove(userNo);
 		else if (females.containsKey(userNo)) females.remove(userNo);
 		else throw new MatchingUserNotFoundException();
+	}
+	
+	@Override
+	@Transactional
+	public WaitingUserDto matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException {
+		WaitingUserDto femaleDto = females.get(femaleNo);
+		if (femaleDto == null) throw new MatchingUserNotFoundException();
+		males.remove(userNo);
+		females.remove(femaleNo);
+		MeetingLog meetingLog1 = MeetingLog.builder()
+				.user1(userRepository.findById(userNo).get())
+				.user2(femaleNo)
+				.createdTime(LocalDateTime.now())
+				.build();
+		MeetingLog meetingLog2 = MeetingLog.builder()
+				.user1(userRepository.findById(femaleNo).get())
+				.user2(userNo)
+				.createdTime(LocalDateTime.now())
+				.build();
+		meetingLogRepository.save(meetingLog1);
+		meetingLogRepository.save(meetingLog2);
+		return femaleDto;
 	}
 
 	private boolean check(MeetingSetting ms, WaitingUserDto first, WaitingUserDto second) {
