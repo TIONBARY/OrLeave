@@ -106,6 +106,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(UserListResponseDto.of(403, "failed", null));
 		
 		Page<UserListDto> userList = managerService.getUsers(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(UserListResponseDto.of(200, "Success", userList));
