@@ -41,7 +41,7 @@ public class BanServiceImpl implements BanService {
 		for (Ban ban : bans) {
 			banDtos.add(BanListDto.builder()
 					.no(ban.getNo())
-					.userNo(userNo)
+					.bannedNo(ban.getBannedNo())
 					.bannedUserNickname(userRepository.findById(ban.getBannedNo()).get().getNickname())
 					.build());
 		}
