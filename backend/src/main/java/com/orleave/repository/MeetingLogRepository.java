@@ -7,5 +7,5 @@ import com.orleave.entity.MeetingLog;
 
 @Repository
 public interface MeetingLogRepository extends JpaRepository<MeetingLog, Integer> {
-	Long countByUser1(int no);
+	long countByUser1No(int no);
 }
