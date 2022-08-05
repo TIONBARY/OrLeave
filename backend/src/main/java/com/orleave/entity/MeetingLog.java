@@ -35,7 +35,7 @@ public class MeetingLog {
     @JoinColumn(name = "user1_no")
 	private User user1;
 	
-	@Column(name = "user2_no")
+	@Column(name = "user2_no", nullable = false, columnDefinition = "INT UNSIGNED")
 	private int user2;
 	
 	@Column(name = "created_time", nullable = false)

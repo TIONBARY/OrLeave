@@ -7,4 +7,5 @@ public interface MatchingService {
 	void startMatching(int userNo, double lat, double lng);
 	WaitingUserDto findMatching(int userNo) throws MatchingUserNotFoundException;
 	void stopMatching(int userNo) throws MatchingUserNotFoundException;
+	WaitingUserDto matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException;
 }
