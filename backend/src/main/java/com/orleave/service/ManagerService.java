@@ -8,6 +8,7 @@ import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeRequestDto;
 
 public interface ManagerService {
 	Page<UserListDto> getUsers(Pageable pageable);
@@ -16,4 +17,5 @@ public interface ManagerService {
 	boolean BanUser(int no);
 	boolean ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
 	boolean InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
+	boolean CreateNotices(NoticeRequestDto noticeRequestDto);
 }

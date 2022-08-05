@@ -25,6 +25,7 @@ import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
@@ -220,6 +221,28 @@ public class ManagerController {
 		
 		
 		if (managerService.InquiryAnswer(inquiryAnswerRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@PostMapping("/notices")
+	@ApiOperation(value="공지사항 작성",notes="새로운 공지사항을 작성한다.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="성공"),
+		@ApiResponse(code = 403, message="권한이 없는 사용자"),
+		@ApiResponse(code = 404, message="실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+	})
+	public ResponseEntity<? extends BaseResponseDto> CreateNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeRequestDto noticeRequestDto
+			,@ApiIgnore Authentication authentication){
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		if (managerService.CreateNotices(noticeRequestDto)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
