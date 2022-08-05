@@ -6,13 +6,18 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orleave.dto.MeetingLogListDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
+import com.orleave.dto.request.ReportRequestDto;
 import com.orleave.entity.MeetingLog;
 import com.orleave.entity.MeetingSetting;
+import com.orleave.entity.Report;
+import com.orleave.entity.User;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.MeetingSettingRepository;
+import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
 
 
@@ -28,6 +33,9 @@ public class MeetingServiceImpl implements MeetingService{
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	ReportRepository reportRepository;
 	
 	@Override
 	public MeetingSetting getSettingByNo(int no) {
@@ -65,5 +73,18 @@ public class MeetingServiceImpl implements MeetingService{
 			logs.add(dto);
 		}
 		return logs;
+	}
+	
+	@Override
+	@Transactional
+	public void reportUser(User user, ReportRequestDto reportRequestDto) {
+		Report report = Report.builder()
+				.user(user)
+				.reported(reportRequestDto.getReportedNo())
+				.category(reportRequestDto.getCategory())
+				.content(reportRequestDto.getContent())
+				.reportTime(LocalDateTime.now())
+				.build();
+		reportRepository.save(report);
 	}
 }
