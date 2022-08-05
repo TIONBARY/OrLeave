@@ -6,18 +6,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.MeetingLogListDto;
+import com.orleave.dto.request.LocationRequestDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
+import com.orleave.dto.request.ReportRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.MeetingLogResponseDto;
 import com.orleave.dto.response.MeetingSettingResponseDto;
 import com.orleave.entity.MeetingSetting;
+import com.orleave.entity.User;
 import com.orleave.service.MeetingService;
 import com.orleave.service.UserService;
 
@@ -104,6 +109,23 @@ public class MeetingController {
 		int no = userDetails.getUserno();
 		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(no);
 		return ResponseEntity.status(200).body(MeetingLogResponseDto.of(200, "Success", meetingLogs));
+	}
+	
+	@PostMapping("")
+	@ApiOperation(value = "신고하기", notes = "미팅 상대를 신고한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<BaseResponseDto> report(@RequestBody @ApiParam(value="신고 내용", required = true) ReportRequestDto reportRequestDto,
+			@ApiIgnore Authentication authentication) {
+		if (authentication == null) throw new TokenExpiredException("Token Expired");
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		User user = userDetails.getUser();
+		meetingService.reportUser(user, reportRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Created"));
 	}
 
 }
