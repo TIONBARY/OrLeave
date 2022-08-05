@@ -8,6 +8,7 @@ import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeModifyRequestDto;
 import com.orleave.dto.request.NoticeRequestDto;
 
 public interface ManagerService {
@@ -18,4 +19,5 @@ public interface ManagerService {
 	boolean ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
 	boolean InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
 	boolean CreateNotices(NoticeRequestDto noticeRequestDto);
+	boolean ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto);
 }

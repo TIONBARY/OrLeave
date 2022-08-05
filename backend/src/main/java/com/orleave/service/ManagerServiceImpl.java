@@ -14,6 +14,7 @@ import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
 import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.dto.request.NoticeModifyRequestDto;
 import com.orleave.dto.request.NoticeRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.Notice;
@@ -129,6 +130,17 @@ public class ManagerServiceImpl implements ManagerService{
 					.build();
 			noticeRepository.save(notice);
 	
+		
+		return true;
+	}
+
+	@Override
+	public boolean ModifyNotices(NoticeModifyRequestDto dto) {
+		Notice notice=noticeRepository.findById(dto.getNo()).get();
+		notice.setContent(dto.getContent());
+		notice.setTitle(dto.getTitle());
+		noticeRepository.save(notice);
+		
 		
 		return true;
 	}
