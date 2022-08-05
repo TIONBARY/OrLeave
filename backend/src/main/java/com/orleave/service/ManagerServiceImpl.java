@@ -1,12 +1,18 @@
 package com.orleave.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.NoticeDetailDto;
+import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.entity.Notice;
+import com.orleave.entity.Report;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
@@ -57,6 +63,18 @@ public class ManagerServiceImpl implements ManagerService{
 				.build()
 				);
 		return reports;
+	}
+
+	@Override
+	public ReportDetailDto getReportDetail(int no) {
+		Optional<Report> report = reportRepository.findById(no);
+		if (!report.isPresent()) return null;
+		Report reportDetail= report.get();
+		ReportDetailDto dto = ReportDetailDto.builder()
+				.no(reportDetail.getNo())
+				.content(reportDetail.getContent())
+				.build();
+		return dto;
 	}
 
 }
