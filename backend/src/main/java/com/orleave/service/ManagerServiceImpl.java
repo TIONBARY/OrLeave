@@ -1,12 +1,20 @@
 package com.orleave.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.NoticeDetailDto;
+import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
-import com.orleave.entity.MeetingLog;
+import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.NicknameModifyRequestDto;
+import com.orleave.entity.Notice;
+import com.orleave.entity.Report;
+import com.orleave.entity.User;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
@@ -36,14 +44,55 @@ public class ManagerServiceImpl implements ManagerService{
 				.email(user.getEmail())
 				.nickname(user.getNickname())
 				.gender(user.getGender())
-				.birthday(user.getBirthDay())
-				.usertype(user.getUserType())
-				.matchcount(meetingLogRepository.countByUser1(user.getNo()))
-				.reportcount(reportRepository.countByUser(user.getNo()))
+				.birthDay(user.getBirthDay())
+				.userType(user.getUserType())
+				.matchcount(meetingLogRepository.countByUser1No(user.getNo()))
+				.reportcount(reportRepository.countByUserNo(user.getNo()))
 				.build()
 				);
 				
 		return users;
+	}
+
+	@Override
+	public Page<UserReportListDto> getUserReports(Pageable pageable, int no) {
+		Page<UserReportListDto> reports= reportRepository.findByReported(no, pageable).map(
+				report -> UserReportListDto.builder()
+				.no(report.getNo())
+				.user_email(report.getUser().getEmail())
+				.category(report.getCategory())
+				.reportTime(report.getReportTime())
+				.build()
+				);
+		return reports;
+	}
+
+	@Override
+	public ReportDetailDto getReportDetail(int no) {
+		Optional<Report> report = reportRepository.findById(no);
+		if (!report.isPresent()) return null;
+		Report reportDetail= report.get();
+		ReportDetailDto dto = ReportDetailDto.builder()
+				.no(reportDetail.getNo())
+				.content(reportDetail.getContent())
+				.build();
+		return dto;
+	}
+
+	@Override
+	public boolean BanUser(int no) {
+		User user=userRepository.findById(no).get();
+		user.setUserType("Banned");
+		userRepository.save(user);
+		return true;
+	}
+
+	@Override
+	public boolean ModifyNickname(NicknameModifyRequestDto dto) {
+		User user=userRepository.findById(dto.getNo()).get();
+		user.setNickname(dto.getNickname());
+		userRepository.save(user);
+		return true;
 	}
 
 }

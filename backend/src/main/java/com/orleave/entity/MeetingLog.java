@@ -32,7 +32,7 @@ public class MeetingLog {
 	private int no;
 	
 	@ManyToOne()
-    @JoinColumn(name = "user1_no")
+    @JoinColumn(name = "user1_no", nullable = false)
 	private User user1;
 	
 	@Column(name = "user2_no", nullable = false, columnDefinition = "INT UNSIGNED")
