@@ -299,7 +299,7 @@ public class UserController {
 		}
     }
 	
-	@DeleteMapping("/")
+	@DeleteMapping("")
 	@ApiOperation(value = "회원 탈퇴", notes = "회원 정보 삭제")
 	@ApiResponses({
         @ApiResponse(code = 200, message = "성공"),

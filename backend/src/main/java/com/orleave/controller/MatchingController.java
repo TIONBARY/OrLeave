@@ -66,7 +66,7 @@ public class MatchingController {
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", matchedUser));
 	}
 	
-	@DeleteMapping("")
+	@GetMapping("/stop")
 	@ApiOperation(value = "매칭 취소하기", notes = "매칭을 취소한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
@@ -82,7 +82,7 @@ public class MatchingController {
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success"));
 	}
 	
-	@GetMapping("/{no}")
+	@GetMapping("/success/{no}")
 	@ApiOperation(value = "매칭 성사", notes = "매칭을 양쪽이 수락했을 경우 남자 쪽에서 여성 쪽 데이터를 가져온다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),

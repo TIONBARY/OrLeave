@@ -36,7 +36,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "1:1문의 API", tags = {"Inquiry"})
 @RestController
-@RequestMapping("/api/v1/inquires")
+@RequestMapping("/api/v1/inquiries")
 public class InquiryController {
 	
 	@Autowired
