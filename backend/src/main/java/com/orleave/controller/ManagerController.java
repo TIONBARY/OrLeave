@@ -22,6 +22,7 @@ import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
@@ -195,6 +196,30 @@ public class ManagerController {
 		
 		
 		if (managerService.ModifyNickname(nicknameModifyRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@PutMapping("/inquiry/answer")
+	@ApiOperation(value = "문의 답변", notes = "선택한 문의에 답변을 남긴다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> InquiryAnswer(
+			@RequestBody @ApiParam(value="문의 답변", required = true)InquiryAnswerRequestDto inquiryAnswerRequestDto
+			,@ApiIgnore Authentication authentication) {
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		
+		if (managerService.InquiryAnswer(inquiryAnswerRequestDto)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
+import com.orleave.dto.request.InquiryAnswerRequestDto;
 import com.orleave.dto.request.NicknameModifyRequestDto;
 
 public interface ManagerService {
@@ -14,4 +15,5 @@ public interface ManagerService {
 	ReportDetailDto getReportDetail(int no);
 	boolean BanUser(int no);
 	boolean ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
+	boolean InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
 }
