@@ -145,4 +145,10 @@ public class ManagerServiceImpl implements ManagerService{
 		return true;
 	}
 
+	@Override
+	public boolean DeleteNotices(int no) {
+		noticeRepository.deleteById(no);
+		return true;
+	}
+
 }

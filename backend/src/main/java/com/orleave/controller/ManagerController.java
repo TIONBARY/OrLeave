@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -266,6 +267,28 @@ public class ManagerController {
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
 		if (managerService.ModifyNotices(noticeModifyRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
+		}
+	}
+	
+	@DeleteMapping("/notices/{notice_no}")
+	@ApiOperation(value = "공지사항 삭제", notes = "선택한 공지를 수정한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> DeleteNotices(@PathVariable("notice_no") int no,
+			@ApiIgnore Authentication authentication){
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		
+		if (managerService.DeleteNotices(no)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		} else {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));

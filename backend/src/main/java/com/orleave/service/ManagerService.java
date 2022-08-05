@@ -20,4 +20,5 @@ public interface ManagerService {
 	boolean InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
 	boolean CreateNotices(NoticeRequestDto noticeRequestDto);
 	boolean ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto);
+	boolean DeleteNotices(int no);
 }
