@@ -2,12 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '../views/MainView.vue'
 import UserView from '../views/UserView.vue'
 import MeetingView from '../views/MeetingView.vue'
+import NoticeView from '../views/NoticeView.vue'
+import InquiryView from '../views/InquiryView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
 import userProfileRegist from '../components/users/UserProfileRegist.vue'
 import MeetingLobby from '../components/meeting/MeetingLobby.vue'
 import MeetingRoom from '../components/meeting/MeetingRoom.vue'
+import NoticeList from '../components/notices/NoticeList.vue'
+import NoticeDetail from '../components/notices/NoticeDetail.vue'
+import InquiryList from '../components/inquiries/InquiryList.vue'
+import InquiryDetail from '../components/inquiries/InquiryDetail.vue'
+import InquiryRegist from '../components/inquiries/InquiryRegist.vue'
 
 const routes = [
   {
@@ -38,6 +45,38 @@ const routes = [
     children: [
       { path: 'lobby', component: MeetingLobby },
       { path: 'room', component: MeetingRoom }
+    ]
+  },
+  {
+    path: '/notice',
+    component: NoticeView,
+    children: [
+      {
+        path: 'list',
+        component: NoticeList
+      },
+      {
+        path: 'detail/:articleno',
+        component: NoticeDetail
+      }
+    ]
+  },
+  {
+    path: '/inquiry',
+    component: InquiryView,
+    children: [
+      {
+        path: 'list',
+        component: InquiryList
+      },
+      {
+        path: 'detail/:articleno',
+        component: InquiryDetail
+      },
+      {
+        path: 'write',
+        component: InquiryRegist
+      }
     ]
   }
 ]
