@@ -2,20 +2,39 @@ import { apiInstance } from './index.js'
 
 const api = apiInstance()
 
-async function login(loginInfo, success, fail) {
+async function tryLogin(loginInfo, success, fail) {
   await api
     .post('/users/login', JSON.stringify(loginInfo))
     .then(success)
     .catch(fail)
 }
 
-async function signup(signupInfo, success, fail) {
-  console.log(JSON.stringify(signupInfo))
+function checkEmailExist(email, success, fail) {
+  api
+    .get('/users/email?email=' + email)
+    .then(success)
+    .catch(fail)
+}
+
+async function setConfirmKey(email, success, fail) {
+  api.post('/users/email', JSON.stringify(email)).then(success).catch(fail)
+}
+
+async function trySignup(signupInfo, success, fail) {
   await api.post('/users', JSON.stringify(signupInfo)).then(success).catch(fail)
 }
 
-async function getUserInfo(accessToken, success, fail) {
-  await api.get('/users/profile').then(success).catch(fail)
+async function requestProfile(success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  console.log(Authorization)
+  await api
+    .get('/users/profile', {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
 }
 
-export { login, signup, getUserInfo }
+export { tryLogin, checkEmailExist, setConfirmKey, trySignup, requestProfile }

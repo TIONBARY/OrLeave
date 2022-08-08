@@ -279,7 +279,7 @@ const userStore = 'userStore'
 export default {
   setup() {
     const imageNo = ref(0)
-    const imageUrl = ref(require('../../assets/profile/0.png'))
+    // const imageUrl = ref(require('../../assets/profile/0.png'))
     const popupProfile = ref(false)
     const nickname = ref(null)
     const nicknameValid = ref(false)
@@ -333,10 +333,9 @@ export default {
       { key: 9, name: '온화한', value: false },
       { key: 10, name: '소박한', value: false }
     ])
-
     return {
       imageNo,
-      imageUrl,
+      // imageUrl,
       popupProfile,
       nickname,
       nicknameValid,
@@ -396,7 +395,7 @@ export default {
 
       imgSelect(n) {
         imageNo.value = n
-        imageUrl.value = require('../../assets/profile/' + n + '.png')
+        // imageUrl.value = require('../../assets/profile/' + n + '.png')
       },
 
       toggle(num, key) {
@@ -405,6 +404,7 @@ export default {
         else item = personalities
         item[key].value = !item[key].value
       },
+
       checkNickname(nickname) {
         if (nickname !== null) nicknameValid.value = true
         console.log(nicknameValid.value)
@@ -412,7 +412,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(userStore, ['accountInfo']),
+    ...mapState(userStore, ['profile']),
+
+    imgUrl() {
+      return '../../assets/profile/' + this.imageNo + '.png'
+    },
 
     interestSelected() {
       const arr = []
@@ -430,11 +434,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['trySignup']),
+    ...mapActions(userStore, ['getProfile']),
 
     async onSubmit() {
-      await this.trySignup({
-        ...this.accountInfo,
+      await this.tryModifyProfile({
         imageNo: this.imageNo,
         nickname: this.nickname,
         drink: this.drinkSelected,
@@ -445,6 +448,13 @@ export default {
         personalities: this.personalitySelected
       })
     }
+  },
+  created() {
+    this.getProfile()
+    console.log('hihi')
+    console.log(this.profile)
+    this.imageNo = this.profile.imageNo
+    this.nickname = this.profile.nickname
   }
 }
 </script>

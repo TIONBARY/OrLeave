@@ -405,6 +405,7 @@ export default {
         else item = personalities
         item[key].value = !item[key].value
       },
+
       checkNickname(nickname) {
         if (nickname !== null) nicknameValid.value = true
         console.log(nicknameValid.value)
@@ -412,7 +413,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(userStore, ['accountInfo']),
+    ...mapState(userStore, ['signupInfo']),
 
     interestSelected() {
       const arr = []
@@ -430,11 +431,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['trySignup']),
+    ...mapActions(userStore, ['signup']),
 
     async onSubmit() {
-      await this.trySignup({
-        ...this.accountInfo,
+      await this.signup({
+        ...this.signupInfo,
         imageNo: this.imageNo,
         nickname: this.nickname,
         drink: this.drinkSelected,

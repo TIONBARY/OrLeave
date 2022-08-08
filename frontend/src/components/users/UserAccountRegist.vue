@@ -161,20 +161,24 @@ export default {
       gender,
       birthday,
 
-      codeTransfer() {
-        console.log('인증번호 전송')
-      },
-
       confirm() {
         console.log('인증번호 확인')
       }
     }
   },
   methods: {
-    ...mapActions(userStore, ['saveAccountInfo']),
-
+    ...mapActions(userStore, [
+      'checkEmail',
+      'sendConfirmKey',
+      'saveSignupInfo'
+    ]),
+    codeTransfer() {
+      console.log(this.checkEmail())
+      console.log('인증번호 전송')
+      this.sendConfirmKey()
+    },
     async onSubmit() {
-      await this.saveAccountInfo({
+      await this.saveSignupInfo({
         email: this.email,
         password: this.password,
         gender: this.gender,

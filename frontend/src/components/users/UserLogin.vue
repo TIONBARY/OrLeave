@@ -81,15 +81,13 @@ export default {
       loginInfo
     }
   },
-  // isLogin, isLoginError 얘넨 왜 필요하징
   computed: {
-    ...mapState(userStore, ['isLogin', 'isLoginError'])
+    ...mapState(userStore, ['isLogin'])
   },
-  // getUserInfo는 왜 필요하징
   methods: {
-    ...mapActions(userStore, ['tryLogin', 'getUserInfo']),
+    ...mapActions(userStore, ['login', 'getUserInfo', 'logout']),
     async onSubmit() {
-      await this.tryLogin(this.loginInfo)
+      await this.login(this.loginInfo)
       if (this.isLogin) {
         console.log('로그인 성공')
         this.$router.push({ path: '/' })
