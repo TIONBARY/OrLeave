@@ -1,7 +1,9 @@
 <template>
-  <menu-bar />
-  <main-content />
-  <!-- <main-index /> -->
+  <div>
+    <menu-bar />
+    <main-content />
+    <!-- <main-index /> -->
+  </div>
 </template>
 
 <script>

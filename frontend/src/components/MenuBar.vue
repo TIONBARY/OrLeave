@@ -135,38 +135,30 @@
     </q-dialog>
   </div>
 </template>
+
 <script>
 import { ref } from 'vue'
-// import Vue from 'vue'
+
 export default {
   components: {},
-  data() {
-    return {
-      sampleData: ''
-    }
-  },
   setup() {
     const index = ref(2)
     const popupBlock = ref(false)
+    const blockList = ref([
+      { userNo: 123, nickname: '소나무', isBlocked: true },
+      { userNo: 45, nickname: '비타민', isBlocked: true },
+      { userNo: 673, nickname: '하이', isBlocked: true }
+    ])
     return {
       index,
-      chatMsg: '',
-      sendChat(chatMsg) {
-        this.chat_log.push({ text: chatMsg, sent: true })
-        console.log(this.chat_log)
-      },
       popupBlock,
-      blockList: [
-        { userNo: 123, nickname: '소나무' },
-        { userNo: 45, nickname: '비타민' },
-        { userNo: 673, nickname: '하이' }
-      ],
       blocknickname: ['소나무', '비타민', '하이'],
       opponentList: [
-        { userNo: 45, nickname: '비타민' },
-        { userNo: 373, nickname: '펭하' },
-        { userNo: 994, nickname: '펭바' }
+        { userNo: 45, nickname: '비타민', isBlocked: false },
+        { userNo: 373, nickname: '펭하', isBlocked: false },
+        { userNo: 994, nickname: '펭바', isBlocked: false }
       ],
+      blockList,
       removeBlock(index) {
         const idx = this.blocknickname.indexOf(this.blockList[index].nickname)
         if (idx !== -1) {
@@ -183,19 +175,7 @@ export default {
         }
       }
     }
-  },
-  watch: {
-    blockList: {
-      handler(val) {
-        console.log('변경', val)
-      },
-      deep: true
-    }
-  },
-  created() {},
-  mounted() {},
-  unmounted() {},
-  methods: {}
+  }
 }
 </script>
 <style scoped>
