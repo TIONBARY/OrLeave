@@ -46,12 +46,24 @@
                 문의 내용
               </td>
               <td>
-                <q-input
-                  type="textarea"
-                  outlined
-                  v-model="boardContent"
-                  style="background-color: white"
-                  dense
+                <q-editor
+                  v-model="editor"
+                  ref="editorRef"
+                  toolbar-text-color="white"
+                  toolbar-toggle-color="yellow-8"
+                  toolbar-bg="primary"
+                  :toolbar="[
+                    [
+                      {
+                        label: $q.lang.editor.align,
+                        icon: $q.iconSet.editor.align,
+                        fixedLabel: true,
+                        list: 'only-icons',
+                        options: ['left', 'center', 'right', 'justify']
+                      }
+                    ],
+                    ['bold', 'italic', 'underline']
+                  ]"
                 />
               </td>
             </tr>
@@ -60,11 +72,11 @@
                 이미지 첨부
               </td>
               <td>
-                <q-input
-                  outlined
-                  type="file"
-                  v-model="boardImage"
-                  style="background-color: white"
+                <q-file
+                  v-model="file"
+                  label="파일을 선택하세요."
+                  filled
+                  style="max-width: 300px; background-color: white"
                   dense
                 />
               </td>
@@ -98,6 +110,10 @@ export default {
 
       boardSelected,
       boardOptions,
+
+      editor: ref(null),
+
+      file: ref(null),
 
       onSubmit() {
         console.log(boardImage)

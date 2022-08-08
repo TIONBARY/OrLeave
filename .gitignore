@@ -45,3 +45,5 @@ out/
 
 
 node_modules/
+.metadata
+/.recommenders/

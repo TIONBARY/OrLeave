@@ -11,25 +11,25 @@
       <section class="basic-container">
         <table>
           <th colspan="2" class="q-pa-md" style="text-align: start">내 문의</th>
-          <tr :key="boardList" v-for="boardList in boardLists">
+          <tr :key="inquiry" v-for="inquiry in inquiries">
+            <td class="q-pa-md" style="text-align: start">
+              {{ inquiry.no }}
+            </td>
             <td class="q-pa-md" style="text-align: start">
               <router-link to="/inquiry/detail/1">{{
-                boardList.boardTitle
+                inquiry.title
               }}</router-link>
             </td>
             <td class="q-pa-md" style="text-align: end">
-              {{ boardList.boardDate }}
+              {{ inquiry.created_time }}
             </td>
           </tr>
         </table>
       </section>
       <br />
-      <div>
-        <q-btn>이전</q-btn>
-        <q-btn>1</q-btn>
-        <q-btn>2</q-btn>
-        <q-btn>다음</q-btn>
-        <router-link to="/board/write">문의하기</router-link>
+      <q-btn @click="moveRegist()">문의하기</q-btn>
+      <div class="q-pa-lg flex flex-center">
+        <q-pagination v-model="currentPage" :max="5" input />
       </div>
     </div>
   </div>
@@ -37,26 +37,42 @@
 
 <script>
 import { ref } from 'vue'
+import { mapState, mapActions } from 'vuex'
+
+const userStore = 'userStore'
+const inquiryStore = 'inquiryStore'
+const perPage = ref(10)
+const currentPage = ref(1)
 
 export default {
   setup() {
-    const boardLists = ref([
-      {
-        boardTitle: '화상통화시 음성 연결이 잘 안되는 문제가 자주 있습니다.',
-        boardDate: '2022/08/02'
-      },
-      {
-        boardTitle: '매칭이 잘 안됩니다.',
-        boardDate: '2022/07/02'
-      },
-      {
-        boardTitle: '알림 소리를 키우고 싶습니다.',
-        boardDate: '2022/06/02'
-      }
-    ])
-
     return {
-      boardLists
+      perPage,
+      currentPage
+    }
+  },
+  computed: {
+    ...mapState(userStore, ['userInfo']),
+    ...mapState(inquiryStore, ['inquiries']),
+    pagedInquiries() {
+      const items = this.inquiries
+      return items.slice(
+        (this.currentPage - 1) * this.perPage,
+        this.currentPage * this.perPage
+      )
+    },
+    rows() {
+      return this.inquiries.length
+    }
+  },
+  created() {
+    console.log('InquiryList Comp.')
+    this.inquiryList(currentPage, perPage)
+  },
+  methods: {
+    ...mapActions(inquiryStore, ['getinquiries']),
+    moveRegist() {
+      this.$router.push('/inquiry/regist')
     }
   }
 }

@@ -56,7 +56,7 @@ const routes = [
         component: NoticeList
       },
       {
-        path: 'detail/:articleno',
+        path: ':articleno',
         component: NoticeDetail
       }
     ]
@@ -70,11 +70,11 @@ const routes = [
         component: InquiryList
       },
       {
-        path: 'detail/:articleno',
+        path: ':articleno',
         component: InquiryDetail
       },
       {
-        path: 'write',
+        path: 'regist',
         component: InquiryRegist
       }
     ]
