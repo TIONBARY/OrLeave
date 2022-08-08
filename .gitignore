@@ -23,6 +23,7 @@ application-db.properties
 application-jwt.properties
 application-openvidu.properties
 email.properties
+selfsigned.jks
 
 ### IntelliJ IDEA ###
 .idea

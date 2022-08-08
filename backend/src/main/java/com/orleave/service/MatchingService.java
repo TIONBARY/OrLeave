@@ -8,4 +8,5 @@ public interface MatchingService {
 	WaitingUserDto findMatching(int userNo) throws MatchingUserNotFoundException;
 	void stopMatching(int userNo) throws MatchingUserNotFoundException;
 	WaitingUserDto matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException;
+	WaitingUserDto getUserInfo(int userNo) throws MatchingUserNotFoundException;
 }

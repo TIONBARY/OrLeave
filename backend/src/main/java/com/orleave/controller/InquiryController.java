@@ -54,7 +54,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUser().getNo();
+		int userNo = userDetails.getUserno();
 		Page<InquiryListDto> inquiryList = inquiryService.getInquiriesByUserNo(userNo, PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
 	}
@@ -91,7 +91,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUser().getNo();
+		int userNo = userDetails.getUserno();
 		try {
 			InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
 			return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
@@ -112,7 +112,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUser().getNo();
+		int userNo = userDetails.getUserno();
 		try {
 			if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
 				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
@@ -137,7 +137,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUser().getNo();
+		int userNo = userDetails.getUserno();
 		try {
 			if(inquiryService.deleteInquiry(no, userNo)) {
 				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
