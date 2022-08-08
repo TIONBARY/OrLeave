@@ -131,6 +131,13 @@ public class MatchingServiceImpl implements MatchingService {
 		meetingLogRepository.save(meetingLog2);
 		return femaleDto;
 	}
+	
+	@Override
+	public WaitingUserDto getUserInfo(int userNo) throws MatchingUserNotFoundException {
+		WaitingUserDto female = females.get(userNo);
+		if (female == null) throw new MatchingUserNotFoundException();
+		return female;
+	}
 
 	private boolean check(MeetingSetting ms, WaitingUserDto first, WaitingUserDto second) {
 		int age = second.getAge();

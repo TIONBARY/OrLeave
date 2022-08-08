@@ -1,14 +1,12 @@
 package com.orleave.dto.message;
 
-import com.orleave.dto.WaitingUserDto;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class MatchingInfo {
+public class MatchingReceiveInfo {
 	String roomId;
 	int maleNo;
-	WaitingUserDto female;
+	int femaleNo;
 }
