@@ -88,9 +88,7 @@
             <q-item-section>1:1문의</q-item-section>
           </q-item>
           <q-item clickable>
-            <q-item-section @click="popupMatching = true"
-              >차단관리</q-item-section
-            >
+            <q-item-section @click="popupBlock = true">차단관리</q-item-section>
           </q-item>
           <q-separator />
           <q-item clickable>
@@ -101,7 +99,7 @@
     </q-avatar>
 
     <!-- 차단관리팝업 -->
-    <q-dialog v-model="popupMatching" persistent>
+    <q-dialog v-model="popupBlock" persistent>
       <q-card class="popup">
         <q-bar class="popup-bar">
           <q-space />
@@ -110,17 +108,26 @@
         <q-card-section class="popup-text">
           차단리스트
           <div style="background-color: white">
-            <div :key="block.nickname" v-for="block in blockList">
+            <div
+              :key="block.nickname"
+              v-for="(block, index) in blockList"
+              class="full-width row justify-between"
+            >
               {{ block.nickname }}
-              <q-btn flat icon="close" @click="removeBlock(block.nickname)" />
+              <q-btn flat icon="close" @click=";[removeBlock(index)]" />
             </div>
           </div>
         </q-card-section>
         <q-card-section class="popup-text">
           최근 통화 목록
           <div style="background-color: white">
-            <div :key="opponent.nickname" v-for="opponent in opponentList">
+            <div
+              :key="opponent.nickname"
+              v-for="(opponent, index) in opponentList"
+              class="full-width row justify-between"
+            >
               {{ opponent.nickname }}
+              <q-btn flat icon="add" @click="AddBlock(index)" />
             </div>
           </div>
         </q-card-section>
@@ -130,7 +137,7 @@
 </template>
 <script>
 import { ref } from 'vue'
-
+// import Vue from 'vue'
 export default {
   components: {},
   data() {
@@ -140,7 +147,7 @@ export default {
   },
   setup() {
     const index = ref(2)
-    const popupMatching = ref(false)
+    const popupBlock = ref(false)
     return {
       index,
       chatMsg: '',
@@ -148,22 +155,41 @@ export default {
         this.chat_log.push({ text: chatMsg, sent: true })
         console.log(this.chat_log)
       },
-      popupMatching,
+      popupBlock,
       blockList: [
-        { nickname: '소나무' },
-        { nickname: '비타민' },
-        { nickname: '하이' }
+        { userNo: 123, nickname: '소나무' },
+        { userNo: 45, nickname: '비타민' },
+        { userNo: 673, nickname: '하이' }
       ],
+      blocknickname: ['소나무', '비타민', '하이'],
       opponentList: [
-        { nickname: '시카' },
-        { nickname: '펭하' },
-        { nickname: '펭바' }
+        { userNo: 45, nickname: '비타민' },
+        { userNo: 373, nickname: '펭하' },
+        { userNo: 994, nickname: '펭바' }
       ],
-      removeBlock(nickname) {
-        this.blockList.splice(this.blockList.indexOf(nickname), 1)
-        console.log(this.blockList)
-        console.log(nickname)
+      removeBlock(index) {
+        const idx = this.blocknickname.indexOf(this.blockList[index].nickname)
+        if (idx !== -1) {
+          this.blocknickname.splice(index, 1)
+        }
+        this.blockList.splice(index, 1)
+      },
+      AddBlock(index) {
+        if (
+          this.blocknickname.indexOf(this.opponentList[index].nickname) === -1
+        ) {
+          this.blocknickname.push(this.opponentList[index].nickname)
+          this.blockList.push(this.opponentList[index])
+        }
       }
+    }
+  },
+  watch: {
+    blockList: {
+      handler(val) {
+        console.log('변경', val)
+      },
+      deep: true
     }
   },
   created() {},
