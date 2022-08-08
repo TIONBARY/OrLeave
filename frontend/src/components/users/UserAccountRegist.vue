@@ -14,12 +14,26 @@
             v-model="email"
             dense
             required
+            :readonly="isReadonly"
+            :rules="[checkReadonly]"
+            lazy-rules="ondemand"
+            hide-bottom-space
+            id="Email"
           >
             <template v-slot:append>
               <q-btn
+                v-if="!isReadonly"
                 color="secondary"
-                @click="codeTransfer"
+                @click="sendEmail"
                 label="인증번호전송"
+                size="10px"
+                dense
+              />
+              <q-btn
+                v-else
+                color="secondary"
+                @click="rewrite"
+                label="이메일재입력"
                 size="10px"
                 dense
               />
@@ -129,6 +143,7 @@ const userStore = 'userStore'
 export default {
   setup() {
     const email = ref(null)
+    const isReadonly = ref(false)
     const code = ref(null)
     const timer = ref('3:00')
     const password = ref(null)
@@ -149,9 +164,9 @@ export default {
     ])
     const gender = ref(null)
     const birthday = ref('2022/01/01')
-
     return {
       email,
+      isReadonly,
       code,
       timer,
       password,
@@ -172,10 +187,27 @@ export default {
       'sendConfirmKey',
       'saveSignupInfo'
     ]),
-    codeTransfer() {
-      console.log(this.checkEmail())
-      console.log('인증번호 전송')
-      this.sendConfirmKey()
+    async sendEmail() {
+      if (this.email < 3 || !this.email.includes('@')) {
+        return
+      }
+      await this.checkEmail(this.email)
+        .then(() => {
+          console.log('valid')
+          this.isReadonly = true
+          this.sendConfirmKey() // 이건 아직 테스트 안해봄
+        })
+        .catch(() => {
+          console.log('invalid')
+        })
+
+      console.log('END')
+    },
+    checkReadonly() {
+      return this.isReadonly || '이메일을 인증해주세요'
+    },
+    rewrite() {
+      this.isReadonly = false
     },
     async onSubmit() {
       await this.saveSignupInfo({

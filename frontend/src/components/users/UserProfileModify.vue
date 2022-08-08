@@ -451,10 +451,15 @@ export default {
   },
   created() {
     this.getProfile()
-    console.log('hihi')
     console.log(this.profile)
     this.imageNo = this.profile.imageNo
     this.nickname = this.profile.nickname
+    this.drink = this.profile.drink
+    this.smoke = this.profile.smoke
+    this.mbti = this.profile.mbti
+    this.religion = this.profile.religion
+    this.interests = this.profile.interests
+    this.personalities = this.profile.personalities
   }
 }
 </script>

@@ -3,7 +3,8 @@ import {
   checkEmailExist,
   setConfirmKey,
   trySignup,
-  requestProfile
+  requestProfile,
+  requestModifyProfile
 } from '@/api/user.js'
 
 const userStore = {
@@ -26,6 +27,9 @@ const userStore = {
     },
     SET_PROFILE: (state, profile) => {
       state.profile = profile
+    },
+    SET_DUPLICATED: (state, value) => {
+      state.isDuplicated = value
     }
   },
   actions: {
@@ -57,8 +61,8 @@ const userStore = {
     },
 
     // 버튼 연결 아직 안함...
-    checkEmail({ commit }, email) {
-      return checkEmailExist(
+    async checkEmail({ commit }, email) {
+      await checkEmailExist(
         email,
         (response) => {
           if (response.data.statusCode === 200) {
@@ -115,6 +119,18 @@ const userStore = {
           console.log('is it undefined?' + this.profile)
         },
         (error) => console.log(error)
+      )
+    },
+
+    async modifyProfile({ commit }) {
+      await requestModifyProfile(
+        this.profile,
+        (response) => {
+          console.log(response.data)
+        },
+        (error) => {
+          console.log(error)
+        }
       )
     }
   }
