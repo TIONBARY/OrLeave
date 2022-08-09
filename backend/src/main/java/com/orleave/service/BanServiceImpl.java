@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.orleave.dto.BanListDto;
 import com.orleave.entity.Ban;
 import com.orleave.entity.User;
+import com.orleave.exception.BanNotFoundException;
 import com.orleave.repository.BanRepository;
 import com.orleave.repository.UserRepository;
 
@@ -23,6 +26,7 @@ public class BanServiceImpl implements BanService {
 	UserRepository userRepository;
 	
 	@Override
+	@Transactional
 	public void createBan(User user, int user2No) {
 		if (user.getNo() == user2No) throw new IllegalArgumentException();
 		Optional<Ban> banCheck = banRepository.findByUserNoAndBannedNo(user.getNo(), user2No);
@@ -35,9 +39,11 @@ public class BanServiceImpl implements BanService {
 	}
 
 	@Override
+	@Transactional
 	public List<BanListDto> findByUserNo(int userNo) {
 		List<Ban> bans = banRepository.findByUserNo(userNo);
 		List<BanListDto> banDtos = new ArrayList<>();
+		
 		for (Ban ban : bans) {
 			banDtos.add(BanListDto.builder()
 					.no(ban.getNo())
@@ -51,7 +57,7 @@ public class BanServiceImpl implements BanService {
 	@Override
 	public void deleteBan(User user, int user2No) {
 		Optional<Ban> ban = banRepository.findByUserNoAndBannedNo(user.getNo(), user2No);
-		if (!ban.isPresent()) throw new IllegalArgumentException();
+		if (!ban.isPresent()) throw new BanNotFoundException();
 		banRepository.delete(ban.get());
 	}
 

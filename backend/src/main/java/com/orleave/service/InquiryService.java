@@ -15,8 +15,8 @@ import com.orleave.entity.User;
 public interface InquiryService {
 	Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable);
 	boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto);
-	InquiryDetailDto getInquiryDetail(int no, int userNo) throws AuthenticationException;
-	boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws AuthenticationException;
-	boolean deleteInquiry(int no, int userNo) throws AuthenticationException;
+	InquiryDetailDto getInquiryDetail(int no, int userNo);
+	boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto);
+	boolean deleteInquiry(int no, int userNo);
 	
 }
