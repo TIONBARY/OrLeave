@@ -53,17 +53,15 @@ public class MeetingController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<MeetingSettingResponseDto> getMeeingSetting(@ApiIgnore Authentication authentication) throws Exception {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+		if (authentication == null) return ResponseEntity.status(401).body(MeetingSettingResponseDto.of(401, "Unauthorized",null));
+		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		MeetingSetting meetingsetting = meetingService.getSettingByNo(no);
 		
 		
 		
-		return ResponseEntity.status(200).body(MeetingSettingResponseDto.of(meetingsetting));
+		return ResponseEntity.status(200).body(MeetingSettingResponseDto.of(200,"sucess",meetingsetting));
 	}
 	
 	
@@ -78,10 +76,8 @@ public class MeetingController {
 	public ResponseEntity<? extends BaseResponseDto> ModifyMeeingSetting(
 			@RequestBody @ApiParam(value="미팅설정", required = true) MeetingSettingRequestDto meetingSettingRequestDto,
 			@ApiIgnore Authentication authentication) throws Exception {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		
@@ -98,10 +94,8 @@ public class MeetingController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) throws Exception {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(no);
@@ -118,7 +112,8 @@ public class MeetingController {
     })
 	public ResponseEntity<BaseResponseDto> report(@RequestBody @ApiParam(value="신고 내용", required = true) ReportRequestDto reportRequestDto,
 			@ApiIgnore Authentication authentication) throws Exception {
-		if (authentication == null) throw new TokenExpiredException("Token Expired");
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
 		meetingService.reportUser(user, reportRequestDto);

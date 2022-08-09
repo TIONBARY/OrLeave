@@ -37,12 +37,14 @@ public class MatchingController {
 	@ApiOperation(value = "매칭 시작하기", notes = "매칭을 시작한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<BaseResponseDto> startMatching(@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto,
 			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		matchingService.startMatching(no, locationRequestDto.getLat(), locationRequestDto.getLng());
@@ -54,11 +56,13 @@ public class MatchingController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "매칭된 상대 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> findMatching(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		WaitingUserDto matchedUser = matchingService.findMatching(no);
@@ -71,11 +75,13 @@ public class MatchingController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "매칭된 상대 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> stopMatching(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		matchingService.stopMatching(no);
@@ -87,12 +93,14 @@ public class MatchingController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 400, message = "매칭된 상대 없음"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> MatchingSuccess(@PathVariable("no") @ApiParam(value="상대 유저의 번호", required = true) int femaleNo,
 			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		WaitingUserDto femaleDto = matchingService.matchingSuccess(no, femaleNo);

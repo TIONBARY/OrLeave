@@ -103,12 +103,13 @@ public class ManagerController {
 	@ApiOperation(value = "유저 목록 전체 조회", notes = "유저 목록을 페이지 정보에 따라 전체 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<UserListResponseDto> getAllUsers(@RequestParam("page") int page, @RequestParam("size") int size
 			,@ApiIgnore Authentication authentication) {
-		
+		if (authentication == null) return ResponseEntity.status(401).body(UserListResponseDto.of(401, "Unauthorized",null));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(UserListResponseDto.of(403, "failed", null));
@@ -122,12 +123,14 @@ public class ManagerController {
 	@ApiOperation(value = "유저 신고 목록 조회", notes = "선택한 유저의 신고 목록을 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "신고 목록 조회 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<UserReportListResponseDto> getUserReportList(@RequestParam("page") int page, @RequestParam("size") int size,@PathVariable("no") int no
 			,@ApiIgnore Authentication authentication) {
+		if (authentication == null) return ResponseEntity.status(401).body(UserReportListResponseDto.of(401, "Unauthorized",null));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(UserReportListResponseDto.of(403, "failed", null));
@@ -141,12 +144,14 @@ public class ManagerController {
 	@ApiOperation(value = "신고 목록  상세 조회", notes = "선택한 신고의 내용을 조회한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "신고  조회 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getReportDetail(@PathVariable("report_no") int no
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
@@ -160,6 +165,7 @@ public class ManagerController {
 	@ApiOperation(value = "선택 유저 정지", notes = "선택한 유저를 정지시킨다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "정지 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
@@ -167,6 +173,7 @@ public class ManagerController {
 	public ResponseEntity<? extends BaseResponseDto> BanUser(
 			@RequestBody @ApiParam(value="유저", required = true)UserNoRequestDto userNoRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -183,6 +190,7 @@ public class ManagerController {
 	@ApiOperation(value = "닉네임 변경", notes = "선택한 유저의 닉네임을 변경한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "정지 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
@@ -190,6 +198,7 @@ public class ManagerController {
 	public ResponseEntity<? extends BaseResponseDto> ModifyNickname(
 			@RequestBody @ApiParam(value="유저 정보", required = true)NicknameModifyRequestDto nicknameModifyRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -204,6 +213,7 @@ public class ManagerController {
 	@ApiOperation(value = "문의 답변", notes = "선택한 문의에 답변을 남긴다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "실패"),
         @ApiResponse(code = 500, message = "서버 오류")
@@ -211,6 +221,7 @@ public class ManagerController {
 	public ResponseEntity<? extends BaseResponseDto> InquiryAnswer(
 			@RequestBody @ApiParam(value="문의 답변", required = true)InquiryAnswerRequestDto inquiryAnswerRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -225,12 +236,14 @@ public class ManagerController {
 	@ApiOperation(value="공지사항 작성",notes="새로운 공지사항을 작성한다.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
 		@ApiResponse(code = 403, message="권한이 없는 사용자"),
 		@ApiResponse(code = 404, message="실패"),
         @ApiResponse(code = 500, message = "서버 오류")
 	})
 	public ResponseEntity<? extends BaseResponseDto> CreateNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeRequestDto noticeRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -245,12 +258,14 @@ public class ManagerController {
 	@ApiOperation(value = "공지사항 수정", notes = "선택한 공지를 수정한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> ModifyNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeModifyRequestDto noticeModifyRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -264,12 +279,14 @@ public class ManagerController {
 	@ApiOperation(value = "공지사항 삭제", notes = "선택한 공지를 수정한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
         @ApiResponse(code = 403, message = "권한이 없는 사용자"),
         @ApiResponse(code = 404, message = "실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> DeleteNotices(@PathVariable("notice_no") int no,
 			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
