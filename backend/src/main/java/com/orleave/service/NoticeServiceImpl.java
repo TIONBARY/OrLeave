@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.NoticeListDto;
 import com.orleave.entity.Notice;
+import com.orleave.exception.NoticeNotFoundException;
 import com.orleave.repository.NoticeRepository;
 
 @Service
@@ -19,7 +20,7 @@ public class NoticeServiceImpl implements NoticeService {
 	NoticeRepository noticeRepository;
 
 	@Override
-	public Page<NoticeListDto> getNotices(Pageable pageable) {
+	public Page<NoticeListDto> getNotices(Pageable pageable) throws Exception {
 		Page<NoticeListDto> notices = noticeRepository.findAll(pageable).map(notice -> NoticeListDto.builder()
 				.no(notice.getNo())
 				.title(notice.getTitle())
@@ -29,9 +30,9 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 
 	@Override
-	public NoticeDetailDto getNoticeDetail(int no) {
+	public NoticeDetailDto getNoticeDetail(int no) throws Exception {
 		Optional<Notice> noticeTemp = noticeRepository.findById(no);
-		if (!noticeTemp.isPresent()) return null;
+		if (!noticeTemp.isPresent()) throw new NoticeNotFoundException();
 		Notice notice = noticeTemp.get();
 		NoticeDetailDto dto = NoticeDetailDto.builder()
 				.no(notice.getNo())
