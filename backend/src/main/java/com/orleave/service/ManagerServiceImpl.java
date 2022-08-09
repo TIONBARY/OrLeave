@@ -22,6 +22,8 @@ import com.orleave.entity.Report;
 import com.orleave.entity.User;
 import com.orleave.exception.InquiryNotFoundException;
 import com.orleave.exception.NoticeNotFoundException;
+import com.orleave.exception.ReportNotFoundException;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.NoticeRepository;
@@ -78,7 +80,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public ReportDetailDto getReportDetail(int no) {
+	public ReportDetailDto getReportDetail(int no) throws Exception{
 		Optional<Report> report = reportRepository.findById(no);
 		if (!report.isPresent()) throw new ReportNotFoundException();
 		Report reportDetail= report.get();
@@ -90,9 +92,9 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void BanUser(int no) {
+	public void BanUser(int no) throws Exception {
 		Optional<User> usertemp=userRepository.findById(no);
-		if(!usertemp.isPresent()) throw new UserNotFountException();
+		if(!usertemp.isPresent()) throw new UserNotFoundException();
 		User user=usertemp.get();
 		user.setUserType("Banned");
 		userRepository.save(user);
@@ -100,7 +102,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void ModifyNickname(NicknameModifyRequestDto dto) {
+	public void ModifyNickname(NicknameModifyRequestDto dto) throws Exception{
 		Optional<User> usertemp=userRepository.findById(dto.getNo());
 		if(!usertemp.isPresent()) throw new UserNotFoundException();
 		User user=usertemp.get();
@@ -110,7 +112,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void InquiryAnswer(InquiryAnswerRequestDto dto) {
+	public void InquiryAnswer(InquiryAnswerRequestDto dto) throws Exception{
 		Optional<Inquiry> inquirytemp=inquiryRepository.findById(dto.getNo());
 		if(!inquirytemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry=inquirytemp.get();
@@ -119,7 +121,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void CreateNotices(NoticeRequestDto dto) {
+	public void CreateNotices(NoticeRequestDto dto) throws Exception{
 		if(dto.getContent() ==null || dto.getTitle()==null) throw new IllegalArgumentException();
 		Notice notice=Notice.builder()
 				.title(dto.getTitle())
@@ -130,7 +132,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void ModifyNotices(NoticeModifyRequestDto dto) {
+	public void ModifyNotices(NoticeModifyRequestDto dto) throws Exception{
 		Optional<Notice> noticetemp=noticeRepository.findById(dto.getNo());
 		if(!noticetemp.isPresent())	throw new NoticeNotFoundException();	
 		Notice notice=noticetemp.get();
@@ -140,7 +142,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public void DeleteNotices(int no) {
+	public void DeleteNotices(int no) throws Exception {
 		if(noticeRepository.findById(no)==null) throw new IllegalArgumentException();
 		noticeRepository.deleteById(no);
 		

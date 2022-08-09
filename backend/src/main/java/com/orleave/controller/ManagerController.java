@@ -82,9 +82,9 @@ public class ManagerController {
 		
 		String userNo = Integer.toString(user.getNo());
 		
-		if(!userService.logincheck(user.getNo())) {
-			return ResponseEntity.status(403).body(LoginResponseDto.of(403, "forbidden", null));
-		}
+		userService.logincheck(user.getNo());
+			
+		
 		String userType = user.getUserType();
 		int imageNo = user.getImageNo();
 		String nickname=user.getNickname();

@@ -10,8 +10,8 @@ import com.orleave.entity.User;
 
 public interface MeetingService {
 
-	MeetingSetting getSettingByNo(int no);
-	void modifyMeetingSetting(int no, MeetingSettingRequestDto meetingSettingRequestDto);
-	List<MeetingLogListDto> getRecentMeetingLogs(int userNo);
-	void reportUser(User user, ReportRequestDto reportRequestDto);
+	MeetingSetting getSettingByNo(int no)throws Exception;
+	void modifyMeetingSetting(int no, MeetingSettingRequestDto meetingSettingRequestDto)throws Exception;
+	List<MeetingLogListDto> getRecentMeetingLogs(int userNo)throws Exception;
+	void reportUser(User user, ReportRequestDto reportRequestDto)throws Exception;
 }

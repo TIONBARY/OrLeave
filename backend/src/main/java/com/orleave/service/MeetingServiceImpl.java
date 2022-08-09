@@ -16,6 +16,7 @@ import com.orleave.entity.MeetingLog;
 import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.Report;
 import com.orleave.entity.User;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.ReportRepository;
@@ -39,17 +40,17 @@ public class MeetingServiceImpl implements MeetingService{
 	ReportRepository reportRepository;
 	
 	@Override
-	public MeetingSetting getSettingByNo(int no) {
+	public MeetingSetting getSettingByNo(int no) throws Exception{
 		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
-		if(!meetingsettingtemp.isPresent()) throw UserNotFoundException();
+		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
 		MeetingSetting meetingsetting=meetingsettingtemp.get();
 		return meetingsetting;
 	}
 
 	@Override
-	public void modifyMeetingSetting(int no, MeetingSettingRequestDto dto) {
+	public void modifyMeetingSetting(int no, MeetingSettingRequestDto dto) throws Exception{
 		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
-		if(!meetingsettingtemp.isPresent()) throw UserNotFoundException();
+		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
 		MeetingSetting meetingsetting=meetingsettingtemp.get();
 		
 		meetingsetting.setReligion(dto.getReligion());
@@ -63,7 +64,7 @@ public class MeetingServiceImpl implements MeetingService{
 	}
 	
 	@Override
-	public List<MeetingLogListDto> getRecentMeetingLogs(int userNo) {
+	public List<MeetingLogListDto> getRecentMeetingLogs(int userNo) throws Exception{
 		Optional<User> user=userRepository.findById(userNo);
 		if(!user.isPresent()) throw new UserNotFoundException();
 		List<MeetingLog> list = meetingLogRepository.findByUser1NoAndCreatedTimeBetween(userNo, LocalDateTime.now().minusDays(7), LocalDateTime.now());
@@ -83,7 +84,7 @@ public class MeetingServiceImpl implements MeetingService{
 	
 	@Override
 	@Transactional
-	public void reportUser(User user, ReportRequestDto reportRequestDto) {
+	public void reportUser(User user, ReportRequestDto reportRequestDto) throws Exception{
 		if(user==null) throw new UserNotFoundException();
 		Report report = Report.builder()
 				.user(user)

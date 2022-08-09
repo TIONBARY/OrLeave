@@ -14,11 +14,11 @@ import com.orleave.dto.request.NoticeRequestDto;
 public interface ManagerService {
 	Page<UserListDto> getUsers(Pageable pageable);
 	Page<UserReportListDto> getUserReports(Pageable pageable,int no);
-	ReportDetailDto getReportDetail(int no);
-	void BanUser(int no);
-	void ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
-	void InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
-	void CreateNotices(NoticeRequestDto noticeRequestDto);
-	void ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto);
-	void DeleteNotices(int no);
+	ReportDetailDto getReportDetail(int no)throws Exception;
+	void BanUser(int no)throws Exception;
+	void ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto)throws Exception;
+	void InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto)throws Exception;
+	void CreateNotices(NoticeRequestDto noticeRequestDto)throws Exception;
+	void ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto)throws Exception;
+	void DeleteNotices(int no)throws Exception;
 }

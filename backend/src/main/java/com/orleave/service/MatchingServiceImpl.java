@@ -22,6 +22,7 @@ import com.orleave.entity.User;
 import com.orleave.entity.UserInterest;
 import com.orleave.entity.UserPersonality;
 import com.orleave.exception.MatchingUserNotFoundException;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.BanRepository;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.MeetingSettingRepository;
@@ -52,9 +53,9 @@ public class MatchingServiceImpl implements MatchingService {
 	}
 	
 	@Override
-	public void startMatching(int userNo, double lat, double lng) {
+	public void startMatching(int userNo, double lat, double lng) throws Exception {
 		Optional<User> usertemp = userRepository.findById(userNo);
-		if(!usertemp.isPresent()) throw UserNotFoundException();
+		if(!usertemp.isPresent()) throw new UserNotFoundException();
 		User user=usertemp.get();
 		WaitingUserDto userDto = WaitingUserDto.builder()
 				.no(user.getNo())
