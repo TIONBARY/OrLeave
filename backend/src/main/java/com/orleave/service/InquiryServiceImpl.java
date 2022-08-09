@@ -15,6 +15,7 @@ import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
+import com.orleave.exception.InquiryNotFoundException;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.UserRepository;
@@ -58,7 +59,7 @@ public class InquiryServiceImpl implements InquiryService{
 	@Transactional
 	public InquiryDetailDto getInquiryDetail(int no, int userNo) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return null;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
 		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		InquiryDetailDto dto = InquiryDetailDto.builder()
@@ -75,7 +76,7 @@ public class InquiryServiceImpl implements InquiryService{
 	@Transactional
 	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return false;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
 		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiry.setTitle(inquiryRequestDto.getTitle());
@@ -88,7 +89,7 @@ public class InquiryServiceImpl implements InquiryService{
 	@Transactional
 	public boolean deleteInquiry(int no, int userNo) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return false;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
 		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiryRepository.deleteById(no);

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import com.orleave.dto.BanListDto;
 import com.orleave.entity.Ban;
 import com.orleave.entity.User;
+import com.orleave.exception.BanDuplicationException;
 import com.orleave.exception.BanNotFoundException;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.BanRepository;
 import com.orleave.repository.UserRepository;
 
@@ -28,9 +30,11 @@ public class BanServiceImpl implements BanService {
 	@Override
 	@Transactional
 	public void createBan(User user, int user2No) throws Exception {
+		Optional<User> userCheck = userRepository.findById(user2No);
+		if (!userCheck.isPresent()) throw new UserNotFoundException();
 		if (user.getNo() == user2No) throw new IllegalArgumentException();
 		Optional<Ban> banCheck = banRepository.findByUserNoAndBannedNo(user.getNo(), user2No);
-		if (banCheck.isPresent()) throw new IllegalArgumentException();
+		if (banCheck.isPresent()) throw new BanDuplicationException();
 		Ban ban = Ban.builder()
 				.user(user)
 				.bannedNo(user2No)
