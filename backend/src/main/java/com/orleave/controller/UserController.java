@@ -133,8 +133,12 @@ public class UserController {
             @RequestBody @ApiParam(value="이메일과 인증코드", required = true) EmailCheckCodeRequestDto emailCheckCodeRequestDto) throws Exception {
 		String email = emailCheckCodeRequestDto.getEmail();
 		String code = emailCheckCodeRequestDto.getCode();
-		mailService.checkCode(email, code);
-		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		if (mailService.checkCode(email, code)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Wrong Code"));
+		}
+		
     }
 	
 	@GetMapping("/email")
