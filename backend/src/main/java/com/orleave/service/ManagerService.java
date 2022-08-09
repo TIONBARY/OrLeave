@@ -15,10 +15,10 @@ public interface ManagerService {
 	Page<UserListDto> getUsers(Pageable pageable);
 	Page<UserReportListDto> getUserReports(Pageable pageable,int no);
 	ReportDetailDto getReportDetail(int no);
-	boolean BanUser(int no);
-	boolean ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
-	boolean InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
-	boolean CreateNotices(NoticeRequestDto noticeRequestDto);
-	boolean ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto);
-	boolean DeleteNotices(int no);
+	void BanUser(int no);
+	void ModifyNickname(NicknameModifyRequestDto nicknameModifyRequestDto);
+	void InquiryAnswer(InquiryAnswerRequestDto inquiryAnswerRequestDto);
+	void CreateNotices(NoticeRequestDto noticeRequestDto);
+	void ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto);
+	void DeleteNotices(int no);
 }

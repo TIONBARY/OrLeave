@@ -85,11 +85,8 @@ public class MeetingController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		
-		if (meetingService.modifyMeetingSetting(no, meetingSettingRequestDto)) {
+		meetingService.modifyMeetingSetting(no, meetingSettingRequestDto);
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
 	}
 	
 	@GetMapping("/recent-call")
@@ -115,7 +112,7 @@ public class MeetingController {
 	@ApiOperation(value = "신고하기", notes = "미팅 상대를 신고한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })

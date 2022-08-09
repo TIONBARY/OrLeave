@@ -11,7 +11,7 @@ import com.orleave.entity.User;
 public interface MeetingService {
 
 	MeetingSetting getSettingByNo(int no);
-	boolean modifyMeetingSetting(int no, MeetingSettingRequestDto meetingSettingRequestDto);
+	void modifyMeetingSetting(int no, MeetingSettingRequestDto meetingSettingRequestDto);
 	List<MeetingLogListDto> getRecentMeetingLogs(int userNo);
 	void reportUser(User user, ReportRequestDto reportRequestDto);
 }

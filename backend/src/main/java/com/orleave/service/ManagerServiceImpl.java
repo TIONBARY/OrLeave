@@ -20,6 +20,8 @@ import com.orleave.entity.Inquiry;
 import com.orleave.entity.Notice;
 import com.orleave.entity.Report;
 import com.orleave.entity.User;
+import com.orleave.exception.InquiryNotFoundException;
+import com.orleave.exception.NoticeNotFoundException;
 import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.NoticeRepository;
@@ -45,13 +47,8 @@ public class ManagerServiceImpl implements ManagerService{
 	ReportRepository reportRepository;
 	
 	@Override
-	public Page<UserListDto> getUsers(Pageable pageable) {
-		
-		
-		
+	public Page<UserListDto> getUsers(Pageable pageable){
 		Page<UserListDto> users = userRepository.findAll(pageable).map(
-				
-				
 				user -> UserListDto.builder()
 				.no(user.getNo())
 				.email(user.getEmail())
@@ -68,7 +65,7 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public Page<UserReportListDto> getUserReports(Pageable pageable, int no) {
+	public Page<UserReportListDto> getUserReports(Pageable pageable, int no){
 		Page<UserReportListDto> reports= reportRepository.findByReported(no, pageable).map(
 				report -> UserReportListDto.builder()
 				.no(report.getNo())
@@ -83,7 +80,7 @@ public class ManagerServiceImpl implements ManagerService{
 	@Override
 	public ReportDetailDto getReportDetail(int no) {
 		Optional<Report> report = reportRepository.findById(no);
-		if (!report.isPresent()) return null;
+		if (!report.isPresent()) throw new ReportNotFoundException();
 		Report reportDetail= report.get();
 		ReportDetailDto dto = ReportDetailDto.builder()
 				.no(reportDetail.getNo())
@@ -93,77 +90,61 @@ public class ManagerServiceImpl implements ManagerService{
 	}
 
 	@Override
-	public boolean BanUser(int no) {
-		try {
-			User user=userRepository.findById(no).get();
-			user.setUserType("Banned");
-			userRepository.save(user);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void BanUser(int no) {
+		Optional<User> usertemp=userRepository.findById(no);
+		if(!usertemp.isPresent()) throw new UserNotFountException();
+		User user=usertemp.get();
+		user.setUserType("Banned");
+		userRepository.save(user);
+		
 	}
 
 	@Override
-	public boolean ModifyNickname(NicknameModifyRequestDto dto) {
-		try {
-			User user=userRepository.findById(dto.getNo()).get();
-			user.setNickname(dto.getNickname());
-			userRepository.save(user);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void ModifyNickname(NicknameModifyRequestDto dto) {
+		Optional<User> usertemp=userRepository.findById(dto.getNo());
+		if(!usertemp.isPresent()) throw new UserNotFoundException();
+		User user=usertemp.get();
+		if(dto.getNickname()==null) throw new IllegalArgumentException();
+		user.setNickname(dto.getNickname());
+		userRepository.save(user);
 	}
 
 	@Override
-	public boolean InquiryAnswer(InquiryAnswerRequestDto dto) {
-		try {
-			Inquiry inquiry=inquiryRepository.findById(dto.getNo()).get();
-			inquiry.setAnswer(dto.getAnswer());
-			inquiryRepository.save(inquiry);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void InquiryAnswer(InquiryAnswerRequestDto dto) {
+		Optional<Inquiry> inquirytemp=inquiryRepository.findById(dto.getNo());
+		if(!inquirytemp.isPresent()) throw new InquiryNotFoundException();
+		Inquiry inquiry=inquirytemp.get();
+		inquiry.setAnswer(dto.getAnswer());
+		inquiryRepository.save(inquiry);		
 	}
 
 	@Override
-	public boolean CreateNotices(NoticeRequestDto dto) {
-		try {
-			Notice notice=Notice.builder()
-					.title(dto.getTitle())
-					.content(dto.getContent())
-					.createdTime(LocalDateTime.now())
-					.build();
-			noticeRepository.save(notice);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void CreateNotices(NoticeRequestDto dto) {
+		if(dto.getContent() ==null || dto.getTitle()==null) throw new IllegalArgumentException();
+		Notice notice=Notice.builder()
+				.title(dto.getTitle())
+				.content(dto.getContent())
+				.createdTime(LocalDateTime.now())
+				.build();
+		noticeRepository.save(notice);
 	}
 
 	@Override
-	public boolean ModifyNotices(NoticeModifyRequestDto dto) {
-		try {
-			Notice notice=noticeRepository.findById(dto.getNo()).get();
-			notice.setContent(dto.getContent());
-			notice.setTitle(dto.getTitle());
-			noticeRepository.save(notice);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void ModifyNotices(NoticeModifyRequestDto dto) {
+		Optional<Notice> noticetemp=noticeRepository.findById(dto.getNo());
+		if(!noticetemp.isPresent())	throw new NoticeNotFoundException();	
+		Notice notice=noticetemp.get();
+		notice.setContent(dto.getContent());
+		notice.setTitle(dto.getTitle());
+		noticeRepository.save(notice);
 	}
 
 	@Override
-	public boolean DeleteNotices(int no) {
-		try {
-			noticeRepository.deleteById(no);
-		}catch(Exception e) {
-			return false;
-		}
-		return true;
+	public void DeleteNotices(int no) {
+		if(noticeRepository.findById(no)==null) throw new IllegalArgumentException();
+		noticeRepository.deleteById(no);
+		
+		
 	}
 
 }

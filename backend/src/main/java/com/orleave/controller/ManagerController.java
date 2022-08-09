@@ -173,11 +173,9 @@ public class ManagerController {
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
 		
-		if (managerService.BanUser(userNoRequestDto.getNo())) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.BanUser(userNoRequestDto.getNo());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		
 	}
 	
 	
@@ -198,11 +196,8 @@ public class ManagerController {
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
 		
-		if (managerService.ModifyNickname(nicknameModifyRequestDto)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.ModifyNickname(nicknameModifyRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
 	@PutMapping("/inquiry/answer")
@@ -222,11 +217,8 @@ public class ManagerController {
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
 		
-		if (managerService.InquiryAnswer(inquiryAnswerRequestDto)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.InquiryAnswer(inquiryAnswerRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
 	@PostMapping("/notices")
@@ -244,11 +236,9 @@ public class ManagerController {
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
-		if (managerService.CreateNotices(noticeRequestDto)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.CreateNotices(noticeRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		
 	}
 	
 	@PutMapping("/notices")
@@ -266,11 +256,8 @@ public class ManagerController {
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
-		if (managerService.ModifyNotices(noticeModifyRequestDto)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.ModifyNotices(noticeModifyRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
 	@DeleteMapping("/notices/{notice_no}")
@@ -288,11 +275,8 @@ public class ManagerController {
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
 		
-		if (managerService.DeleteNotices(no)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		managerService.DeleteNotices(no);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
 }

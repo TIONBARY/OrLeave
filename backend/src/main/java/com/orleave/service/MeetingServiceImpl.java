@@ -3,6 +3,7 @@ package com.orleave.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,27 +40,32 @@ public class MeetingServiceImpl implements MeetingService{
 	
 	@Override
 	public MeetingSetting getSettingByNo(int no) {
-		
-		MeetingSetting meetingsetting = meetingSettingRepository.findById(no).get();
+		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
+		if(!meetingsettingtemp.isPresent()) throw UserNotFoundException();
+		MeetingSetting meetingsetting=meetingsettingtemp.get();
 		return meetingsetting;
 	}
 
 	@Override
-	public boolean modifyMeetingSetting(int no, MeetingSettingRequestDto dto) {
-		MeetingSetting meetingsetting = meetingSettingRepository.findById(no).get();
-			meetingsetting.setReligion(dto.getReligion());
-			meetingsetting.setSmoke(dto.getSmoke());
-			meetingsetting.setDrinkMax(dto.getDrink_max());
-			meetingsetting.setDrinkMin(dto.getDrink_min());
-			meetingsetting.setDistance(dto.getDistance());
-			meetingsetting.setAgeMax(dto.getAge_max());
-			meetingsetting.setAgeMin(dto.getAge_min());
-			meetingSettingRepository.save(meetingsetting);
-		return true;
+	public void modifyMeetingSetting(int no, MeetingSettingRequestDto dto) {
+		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
+		if(!meetingsettingtemp.isPresent()) throw UserNotFoundException();
+		MeetingSetting meetingsetting=meetingsettingtemp.get();
+		
+		meetingsetting.setReligion(dto.getReligion());
+		meetingsetting.setSmoke(dto.getSmoke());
+		meetingsetting.setDrinkMax(dto.getDrink_max());
+		meetingsetting.setDrinkMin(dto.getDrink_min());
+		meetingsetting.setDistance(dto.getDistance());
+		meetingsetting.setAgeMax(dto.getAge_max());
+		meetingsetting.setAgeMin(dto.getAge_min());
+		meetingSettingRepository.save(meetingsetting);
 	}
 	
 	@Override
 	public List<MeetingLogListDto> getRecentMeetingLogs(int userNo) {
+		Optional<User> user=userRepository.findById(userNo);
+		if(!user.isPresent()) throw new UserNotFoundException();
 		List<MeetingLog> list = meetingLogRepository.findByUser1NoAndCreatedTimeBetween(userNo, LocalDateTime.now().minusDays(7), LocalDateTime.now());
 		List<MeetingLogListDto> logs = new ArrayList<>();
 		for (MeetingLog log : list) {
@@ -78,6 +84,7 @@ public class MeetingServiceImpl implements MeetingService{
 	@Override
 	@Transactional
 	public void reportUser(User user, ReportRequestDto reportRequestDto) {
+		if(user==null) throw new UserNotFoundException();
 		Report report = Report.builder()
 				.user(user)
 				.reported(reportRequestDto.getReportedNo())

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,7 +53,9 @@ public class MatchingServiceImpl implements MatchingService {
 	
 	@Override
 	public void startMatching(int userNo, double lat, double lng) {
-		User user = userRepository.findById(userNo).get();
+		Optional<User> usertemp = userRepository.findById(userNo);
+		if(!usertemp.isPresent()) throw UserNotFoundException();
+		User user=usertemp.get();
 		WaitingUserDto userDto = WaitingUserDto.builder()
 				.no(user.getNo())
 				.age(LocalDate.now().getYear() - user.getBirthDay().getYear() + 1)
