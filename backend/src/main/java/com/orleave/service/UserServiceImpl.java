@@ -192,6 +192,7 @@ public class UserServiceImpl implements UserService {
 		if (password != null && !passwordEncoder.matches(password, user.getPassword())) {
 			user.setPassword(passwordEncoder.encode(password));
 			userRepository.save(user);
+			return;
 		}
 		throw new WrongPasswordException();
 	}
