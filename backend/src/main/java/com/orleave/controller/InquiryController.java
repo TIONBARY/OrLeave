@@ -51,7 +51,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getInquiresByUserNo (
-			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
+			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
@@ -68,7 +68,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> createInquiry (
-			@ApiIgnore Authentication authentication, @RequestBody InquiryRequestDto inquiryRequestDto) {
+			@ApiIgnore Authentication authentication, @RequestBody InquiryRequestDto inquiryRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
@@ -88,7 +88,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getInquiryDetail(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
@@ -105,7 +105,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> modifyInquiry(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
@@ -126,7 +126,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> deleteInquiry(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();

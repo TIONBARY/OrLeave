@@ -69,7 +69,7 @@ public class ManagerController {
         @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseDto.class),
         @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseDto.class)
     })
-	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) {
+	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) throws Exception {
 		String email = loginInfo.getEmail();
 		String password = loginInfo.getPassword();
 		User user;
@@ -146,7 +146,7 @@ public class ManagerController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getReportDetail(@PathVariable("report_no") int no
-			,@ApiIgnore Authentication authentication) {
+			,@ApiIgnore Authentication authentication) throws Exception {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("manager"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
@@ -166,7 +166,7 @@ public class ManagerController {
     })
 	public ResponseEntity<? extends BaseResponseDto> BanUser(
 			@RequestBody @ApiParam(value="유저", required = true)UserNoRequestDto userNoRequestDto
-			,@ApiIgnore Authentication authentication) {
+			,@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -189,7 +189,7 @@ public class ManagerController {
     })
 	public ResponseEntity<? extends BaseResponseDto> ModifyNickname(
 			@RequestBody @ApiParam(value="유저 정보", required = true)NicknameModifyRequestDto nicknameModifyRequestDto
-			,@ApiIgnore Authentication authentication) {
+			,@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -210,7 +210,7 @@ public class ManagerController {
     })
 	public ResponseEntity<? extends BaseResponseDto> InquiryAnswer(
 			@RequestBody @ApiParam(value="문의 답변", required = true)InquiryAnswerRequestDto inquiryAnswerRequestDto
-			,@ApiIgnore Authentication authentication) {
+			,@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -230,7 +230,7 @@ public class ManagerController {
         @ApiResponse(code = 500, message = "서버 오류")
 	})
 	public ResponseEntity<? extends BaseResponseDto> CreateNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeRequestDto noticeRequestDto
-			,@ApiIgnore Authentication authentication){
+			,@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -250,7 +250,7 @@ public class ManagerController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> ModifyNotices(@RequestBody @ApiParam(value="공지 작성",required=true) NoticeModifyRequestDto noticeModifyRequestDto
-			,@ApiIgnore Authentication authentication){
+			,@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
@@ -269,7 +269,7 @@ public class ManagerController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> DeleteNotices(@PathVariable("notice_no") int no,
-			@ApiIgnore Authentication authentication){
+			@ApiIgnore Authentication authentication) throws Exception {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();

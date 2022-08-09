@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.orleave.entity.EmailConfirm;
+import com.orleave.exception.EmailConfirmNotFoundException;
 import com.orleave.exception.EmailTimeoutException;
 import com.orleave.repository.EmailConfirmRepository;
  
@@ -36,7 +37,7 @@ public class EmailServiceImpl implements EmailService{
  
     public static String ePw;
  
-    private MimeMessage createMessage(String to) throws Exception{
+    private MimeMessage createMessage(String to) throws Exception {
         ePw = createKey();
     	System.out.println("보내는 대상 : "+ to);
         System.out.println("인증 번호 : "+ ePw);
@@ -93,7 +94,7 @@ public class EmailServiceImpl implements EmailService{
     
     @Override
     @Transactional
-    public void sendSimpleMessage(String to) throws Exception{
+    public void sendSimpleMessage(String to) throws Exception {
         MimeMessage message = createMessage(to);
         try {
             emailSender.send(message);
@@ -120,7 +121,7 @@ public class EmailServiceImpl implements EmailService{
 
 	@Override
 	@Transactional
-	public boolean checkCode(String email, String code) {
+	public boolean checkCode(String email, String code) throws Exception {
 		Optional<EmailConfirm> emailConfirmTemp = emailConfirmRepository.findById(email);
 		if (!emailConfirmTemp.isPresent()) throw new EmailConfirmNotFoundException();
 		EmailConfirm emailConfirm = emailConfirmTemp.get();

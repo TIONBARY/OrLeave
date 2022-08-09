@@ -45,7 +45,7 @@ public class BanController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getBansByUserNo (
-			@ApiIgnore Authentication authentication) {
+			@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
@@ -63,7 +63,7 @@ public class BanController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> createBan (
-			@ApiIgnore Authentication authentication, @RequestBody @ApiParam(value="차단 회원", required = true) BanRequestDto banRequestDto) {
+			@ApiIgnore Authentication authentication, @RequestBody @ApiParam(value="차단 회원", required = true) BanRequestDto banRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
@@ -81,7 +81,7 @@ public class BanController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> deleteBan (
-			@ApiIgnore Authentication authentication, @PathVariable("bannedNo") int bannedNo) {
+			@ApiIgnore Authentication authentication, @PathVariable("bannedNo") int bannedNo) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();

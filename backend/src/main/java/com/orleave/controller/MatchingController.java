@@ -42,7 +42,7 @@ public class MatchingController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<BaseResponseDto> startMatching(@RequestBody @ApiParam(value="현재 위치", required = true) LocationRequestDto locationRequestDto,
-			@ApiIgnore Authentication authentication) {
+			@ApiIgnore Authentication authentication) throws Exception {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		matchingService.startMatching(no, locationRequestDto.getLat(), locationRequestDto.getLng());

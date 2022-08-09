@@ -27,7 +27,7 @@ public class BanServiceImpl implements BanService {
 	
 	@Override
 	@Transactional
-	public void createBan(User user, int user2No) {
+	public void createBan(User user, int user2No) throws Exception {
 		if (user.getNo() == user2No) throw new IllegalArgumentException();
 		Optional<Ban> banCheck = banRepository.findByUserNoAndBannedNo(user.getNo(), user2No);
 		if (banCheck.isPresent()) throw new IllegalArgumentException();
@@ -40,7 +40,7 @@ public class BanServiceImpl implements BanService {
 
 	@Override
 	@Transactional
-	public List<BanListDto> findByUserNo(int userNo) {
+	public List<BanListDto> findByUserNo(int userNo) throws Exception {
 		List<Ban> bans = banRepository.findByUserNo(userNo);
 		List<BanListDto> banDtos = new ArrayList<>();
 		
@@ -55,7 +55,7 @@ public class BanServiceImpl implements BanService {
 	}
 
 	@Override
-	public void deleteBan(User user, int user2No) {
+	public void deleteBan(User user, int user2No) throws Exception {
 		Optional<Ban> ban = banRepository.findByUserNoAndBannedNo(user.getNo(), user2No);
 		if (!ban.isPresent()) throw new BanNotFoundException();
 		banRepository.delete(ban.get());

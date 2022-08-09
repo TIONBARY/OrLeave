@@ -58,7 +58,7 @@ public class UserController {
 	@ApiOperation(value = "로그인", notes = "아이디와 패스워드를 통해 로그인 한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공", response = LoginResponseDto.class),
-        @ApiResponse(code = 401, message = "비밀번호 틀림"),
+        @ApiResponse(code = 400, message = "비밀번호 틀림"),
         @ApiResponse(code = 403, message = "로그인 횟수 초과"),
         @ApiResponse(code = 404, message = "해당 사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")

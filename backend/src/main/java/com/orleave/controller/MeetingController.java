@@ -52,7 +52,7 @@ public class MeetingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<MeetingSettingResponseDto> getMeeingSetting(@ApiIgnore Authentication authentication) {
+	public ResponseEntity<MeetingSettingResponseDto> getMeeingSetting(@ApiIgnore Authentication authentication) throws Exception {
 		/**
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
@@ -77,7 +77,7 @@ public class MeetingController {
     })
 	public ResponseEntity<? extends BaseResponseDto> ModifyMeeingSetting(
 			@RequestBody @ApiParam(value="미팅설정", required = true) MeetingSettingRequestDto meetingSettingRequestDto,
-			@ApiIgnore Authentication authentication) {
+			@ApiIgnore Authentication authentication) throws Exception {
 		/**
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
@@ -97,7 +97,7 @@ public class MeetingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) {
+	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) throws Exception {
 		/**
 		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
 		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
@@ -117,7 +117,7 @@ public class MeetingController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<BaseResponseDto> report(@RequestBody @ApiParam(value="신고 내용", required = true) ReportRequestDto reportRequestDto,
-			@ApiIgnore Authentication authentication) {
+			@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) throw new TokenExpiredException("Token Expired");
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
