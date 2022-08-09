@@ -92,12 +92,8 @@ public class InquiryController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
-			return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
-		}
+		InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
+		return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
 	}
 	@PutMapping("/{no}")
 	@ApiOperation(value = "1:1문의 수정", notes = "1:1문의를 수정한다.") 
@@ -113,14 +109,10 @@ public class InquiryController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 		
 	}
@@ -138,14 +130,10 @@ public class InquiryController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			if(inquiryService.deleteInquiry(no, userNo)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if(inquiryService.deleteInquiry(no, userNo)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 	}
 }

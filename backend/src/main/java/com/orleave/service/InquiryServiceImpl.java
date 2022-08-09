@@ -57,11 +57,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public InquiryDetailDto getInquiryDetail(int no, int userNo) throws AuthenticationException {
+	public InquiryDetailDto getInquiryDetail(int no, int userNo){
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return null;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		InquiryDetailDto dto = InquiryDetailDto.builder()
 				.no(inquiry.getNo())
 				.title(inquiry.getTitle())
@@ -74,11 +74,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws AuthenticationException{
+	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto){
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiry.setTitle(inquiryRequestDto.getTitle());
 		inquiry.setContent(inquiryRequestDto.getContent());
 		inquiryRepository.save(inquiry);
@@ -87,11 +87,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public boolean deleteInquiry(int no, int userNo) throws AuthenticationException {
+	public boolean deleteInquiry(int no, int userNo){
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
 		if (!inquiryTemp.isPresent()) return false;
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiryRepository.deleteById(no);
 		return true;
 	}
