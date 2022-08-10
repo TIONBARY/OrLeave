@@ -1,5 +1,7 @@
 package com.orleave.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,7 @@ import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.entity.User;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.EmailService;
+import com.orleave.service.OauthService;
 import com.orleave.service.UserService;
 import com.orleave.util.JwtTokenUtil;
 
@@ -50,6 +53,9 @@ public class UserController {
 	
 	@Autowired
 	EmailService mailService;
+	
+	@Autowired
+	OauthService oauthService;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -76,6 +82,19 @@ public class UserController {
 		userService.loginfailed(user.getNo());
 		return ResponseEntity.status(401).body(LoginResponseDto.of(401, "Invalid Password", null));
 	}
+	
+	@GetMapping("/login-kakao")
+    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestParam String code) throws IOException {
+       String access_Token = oauthService.getKaKaoAccessToken(code);
+       String email = oauthService.createKakaoUser(access_Token);
+       try {
+    	   User user = userService.getUserByEmail(email);
+    	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
+       } catch (UsernameNotFoundException e) {
+    	   System.out.println("Failed "+email);
+    	   return ResponseEntity.status(400).body(LoginResponseDto.of(400, "Signup Required", email));
+       }
+    }
 	
 	@PostMapping("")
 	@ApiOperation(value = "회원 가입", notes = "사용자의 개인 정보를 통해 회원가입 한다.") 

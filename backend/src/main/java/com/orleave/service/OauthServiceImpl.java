@@ -8,13 +8,22 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 @Service
-public class OauthServiceImpl {
+@PropertySource("classpath:application-oauth.properties")
+public class OauthServiceImpl implements OauthService {
+	
+	@Value("${kakao.client.id}")
+    private String clientId;
+	
+	@Value("${kakao.redirect.uri}")
+    private String redirectUri;
 	
 	public String getKaKaoAccessToken(String code){
         String access_Token="";
@@ -33,8 +42,8 @@ public class OauthServiceImpl {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id="); // TODO REST_API_KEY 입력
-            sb.append("&redirect_uri="); // TODO 인가코드 받은 redirect_uri 입력
+            sb.append("&client_id=").append(clientId); // TODO REST_API_KEY 입력
+            sb.append("&redirect_uri=").append(redirectUri); // TODO 인가코드 받은 redirect_uri 입력
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
@@ -73,7 +82,7 @@ public class OauthServiceImpl {
 	
 	
 	
-	public String[] createKakaoUser(String token) {
+	public String createKakaoUser(String token) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
 
@@ -107,10 +116,8 @@ public class OauthServiceImpl {
             int id = element.getAsJsonObject().get("id").getAsInt();
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             String email = "";
-            String nickname = "";
             if(hasEmail){
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
-                nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
             }
             
 
@@ -119,9 +126,7 @@ public class OauthServiceImpl {
 
             br.close();
             
-            String[] temp = {email, nickname};
-            
-            return temp;
+            return email;
 
         } catch (IOException e) {
             e.printStackTrace();
