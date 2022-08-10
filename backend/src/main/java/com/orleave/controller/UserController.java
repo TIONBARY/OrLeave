@@ -1,5 +1,7 @@
 package com.orleave.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,7 @@ import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.entity.User;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.EmailService;
+import com.orleave.service.OauthService;
 import com.orleave.service.UserService;
 import com.orleave.util.JwtTokenUtil;
 
@@ -52,6 +55,9 @@ public class UserController {
 	EmailService mailService;
 	
 	@Autowired
+	OauthService oauthService;
+	
+	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@PostMapping("/login")
@@ -71,11 +77,51 @@ public class UserController {
 		// 로그인 요청한 유저로부터 입력된 패스워드 와 디비에 저장된 유저의 암호화된 패스워드가 같은지 확인.(유효한 패스워드인지 여부 확인)
 		if (passwordEncoder.matches(password, user.getPassword())) {
 			// 유효한 패스워드가 맞는 경우, 로그인 성공으로 응답.(액세스 토큰을 포함하여 응답값 전달)
+			userService.loginSuccess(user.getNo());
 			return ResponseEntity.ok(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
 		}
 		userService.loginfailed(user.getNo());
 		return ResponseEntity.status(401).body(LoginResponseDto.of(401, "Invalid Password", null));
 	}
+	
+	@GetMapping("/login-kakao")
+    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestParam String code) throws IOException {
+       String access_Token = oauthService.getKaKaoAccessToken(code);
+       String email = oauthService.createKakaoUser(access_Token);
+       try {
+    	   User user = userService.getUserByEmail(email);
+    	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
+       } catch (UsernameNotFoundException e) {
+    	   System.out.println("Failed "+email);
+    	   return ResponseEntity.status(400).body(LoginResponseDto.of(400, "Signup Required", email));
+       }
+    }
+	
+	@GetMapping("/login-naver")
+    public ResponseEntity<LoginResponseDto> naverCallback(@RequestParam String code) throws IOException {
+       String access_Token = oauthService.getNaverAccessToken(code);
+       String email = oauthService.createNaverUser(access_Token);
+       try {
+    	   User user = userService.getUserByEmail(email);
+    	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
+       } catch (UsernameNotFoundException e) {
+    	   System.out.println("Failed "+email);
+    	   return ResponseEntity.status(400).body(LoginResponseDto.of(400, "Signup Required", email));
+       }
+    }
+	
+	@GetMapping("/login-google")
+    public ResponseEntity<LoginResponseDto> googleCallback(@RequestParam String code) throws IOException {
+       String access_Token = oauthService.getGoogleAccessToken(code);
+       String email = oauthService.createGoogleUser(access_Token);
+       try {
+    	   User user = userService.getUserByEmail(email);
+    	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
+       } catch (UsernameNotFoundException e) {
+    	   System.out.println("Failed "+email);
+    	   return ResponseEntity.status(400).body(LoginResponseDto.of(400, "Signup Required", email));
+       }
+    }
 	
 	@PostMapping("")
 	@ApiOperation(value = "회원 가입", notes = "사용자의 개인 정보를 통해 회원가입 한다.") 
