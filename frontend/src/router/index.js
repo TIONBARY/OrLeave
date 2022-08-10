@@ -8,6 +8,7 @@ import UserAccountRegist from '../components/users/UserAccountRegist.vue'
 import userProfileRegist from '../components/users/UserProfileRegist.vue'
 import MeetingLobby from '../components/meeting/MeetingLobby.vue'
 import MeetingRoom from '../components/meeting/MeetingRoom.vue'
+import MeetingTest from '../components/meeting/MeetingTest.vue'
 
 const routes = [
   {
@@ -36,8 +37,18 @@ const routes = [
     path: '/meeting',
     component: MeetingView,
     children: [
-      { path: 'lobby', component: MeetingLobby },
-      { path: 'room', component: MeetingRoom }
+      {
+        path: 'lobby',
+        component: MeetingLobby
+      },
+      {
+        path: 'room',
+        component: MeetingRoom
+      },
+      {
+        path: 'test',
+        component: MeetingTest
+      }
     ]
   }
 ]
