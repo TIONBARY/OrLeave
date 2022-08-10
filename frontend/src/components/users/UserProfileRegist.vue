@@ -272,7 +272,7 @@
 
 <script>
 import { ref, reactive } from 'vue'
-
+import { checkNicknameExist } from '@/api/user'
 import { mapState, mapActions } from 'vuex'
 const userStore = 'userStore'
 
@@ -404,11 +404,6 @@ export default {
         if (num === 1) item = interests
         else item = personalities
         item[key].value = !item[key].value
-      },
-
-      checkNickname(nickname) {
-        if (nickname !== null) nicknameValid.value = true
-        console.log(nicknameValid.value)
       }
     }
   },
@@ -433,7 +428,8 @@ export default {
   methods: {
     ...mapActions(userStore, ['signup']),
 
-    async onSubmit() {
+    async onSubmit(e) {
+      e.preventDefault()
       await this.signup({
         ...this.signupInfo,
         imageNo: this.imageNo,
@@ -444,6 +440,27 @@ export default {
         religion: this.religionSelected,
         interests: this.interestSelected,
         personalities: this.personalitySelected
+      })
+      this.$router.push('/')
+    },
+
+    checkNickname(nickname) {
+      if (nickname === null) {
+        this.nicknameValid = false
+        return
+      }
+      checkNicknameExist(nickname, (response) => {
+        if (response.data.statusCode === 200) {
+          console.log('해당 닉네임은 사용 가능합니다.')
+          this.nicknameValid = true
+        }
+      }, (error) => {
+        if (error.response.data.message === 'Duplicate Nickname') {
+          console.log('이미 사용 중인 닉네임입니다.')
+        } else {
+          console.log('에러가 발생했습니다. 다시 시도해주세요.')
+        }
+        this.nicknameValid = false
       })
     }
   }

@@ -7,14 +7,14 @@ async function trySignup(signupInfo, success, fail) {
 }
 async function setConfirmKey(email, success, fail) {
   await api
-    .post('/users/email', JSON.stringify(email))
+    .post('/users/email', JSON.stringify({ email: email }))
     .then(success)
     .catch(fail)
 }
 // @@@@@ 이메일 인증코드 확인 @@@@@
-async function FUNCTION1(REQUEST, success, fail) {
+async function confirmEmailCode(REQUEST, success, fail) {
   await api
-    .post('users/email', JSON.stringify(REQUEST))
+    .post('users/code', JSON.stringify(REQUEST))
     .then(success)
     .catch(fail)
 }
@@ -25,7 +25,7 @@ async function checkEmailExist(email, success, fail) {
     .catch(fail)
 }
 // @@@@@ 닉네임 중복여부 확인 @@@@@
-async function FUNCTION2(REQUEST, success, fail) {
+async function checkNicknameExist(REQUEST, success, fail) {
   await api
     .get('/users/nickname?nickname=' + REQUEST)
     .then(success)
@@ -41,7 +41,7 @@ async function tryLogin(loginInfo, success, fail) {
 // function
 //
 // @@@@@ 회원탈퇴 @@@@@
-async function FUNCTION3(success, fail) {
+async function withdrawal(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   console.log(Authorization)
   await api
@@ -54,7 +54,7 @@ async function FUNCTION3(success, fail) {
     .catch(fail)
 }
 // @@@@@ 비밀번호 재설정 @@@@@
-async function FUNCTION4(REQUEST, success, fail) {
+async function modifyPassword(REQUEST, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   console.log(Authorization)
   await api
@@ -67,7 +67,18 @@ async function FUNCTION4(REQUEST, success, fail) {
     .catch(fail)
 }
 // ? 비밀번호 검사 무슨 용도였지?
-// function
+async function checkPassword(REQUEST, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  console.log(Authorization)
+  await api
+    .post('/users/password'.JSON.stringify(REQUEST), {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
 //
 // 테스트 안해봄
 async function requestModifyProfile(profile, success, fail) {
@@ -101,14 +112,14 @@ async function requestProfile(success, fail) {
 export {
   trySignup,
   setConfirmKey,
-  FUNCTION1, // 이메일 인증코드 확인
+  confirmEmailCode, // 이메일 인증코드 확인
   checkEmailExist,
-  FUNCTION2, // 닉네임 중복여부 확인
+  checkNicknameExist, // 닉네임 중복여부 확인
   tryLogin,
   // 로그아웃
-  FUNCTION3, // 회원탈퇴
-  FUNCTION4, // 비밀번호 재설정
-  // 비밀번호 검사
+  withdrawal, // 회원탈퇴
+  modifyPassword, // 비밀번호 재설정
+  checkPassword, // 비밀번호 검사
   requestModifyProfile,
   requestProfile
   // 토큰확인
