@@ -56,8 +56,18 @@ const routes = [
     path: '/meeting',
     component: MeetingView,
     children: [
-      { path: 'lobby', component: MeetingLobby },
-      { path: 'room', component: MeetingRoom }
+      {
+        path: 'lobby',
+        component: MeetingLobby
+      },
+      {
+        path: 'room',
+        component: MeetingRoom
+      },
+      {
+        path: 'test',
+        component: MeetingTest
+      }
     ]
   },
   {
