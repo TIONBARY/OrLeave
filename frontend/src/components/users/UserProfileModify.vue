@@ -279,7 +279,7 @@ const userStore = 'userStore'
 export default {
   setup() {
     const imageNo = ref(0)
-    const imageUrl = ref(require('../../assets/profile/0.png'))
+    // const imageUrl = ref(require('../../assets/profile/0.png'))
     const popupProfile = ref(false)
     const nickname = ref(null)
     const nicknameValid = ref(false)
@@ -333,10 +333,9 @@ export default {
       { key: 9, name: '온화한', value: false },
       { key: 10, name: '소박한', value: false }
     ])
-
     return {
       imageNo,
-      imageUrl,
+      // imageUrl,
       popupProfile,
       nickname,
       nicknameValid,
@@ -396,7 +395,7 @@ export default {
 
       imgSelect(n) {
         imageNo.value = n
-        imageUrl.value = require('../../assets/profile/' + n + '.png')
+        // imageUrl.value = require('../../assets/profile/' + n + '.png')
       },
 
       toggle(num, key) {
@@ -413,7 +412,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(userStore, ['signupInfo']),
+    ...mapState(userStore, ['profile']),
+
+    imgUrl() {
+      return '../../assets/profile/' + this.imageNo + '.png'
+    },
 
     interestSelected() {
       const arr = []
@@ -431,11 +434,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['signup']),
+    ...mapActions(userStore, ['getProfile']),
 
     async onSubmit() {
-      await this.signup({
-        ...this.signupInfo,
+      await this.tryModifyProfile({
         imageNo: this.imageNo,
         nickname: this.nickname,
         drink: this.drinkSelected,
@@ -446,6 +448,18 @@ export default {
         personalities: this.personalitySelected
       })
     }
+  },
+  created() {
+    this.getProfile()
+    console.log(this.profile)
+    this.imageNo = this.profile.imageNo
+    this.nickname = this.profile.nickname
+    this.drink = this.profile.drink
+    this.smoke = this.profile.smoke
+    this.mbti = this.profile.mbti
+    this.religion = this.profile.religion
+    this.interests = this.profile.interests
+    this.personalities = this.profile.personalities
   }
 }
 </script>

@@ -5,7 +5,9 @@ import MeetingView from '../views/MeetingView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
-import userProfileRegist from '../components/users/UserProfileRegist.vue'
+import UserProfileRegist from '../components/users/UserProfileRegist.vue'
+import UserAccountModify from '../components/users/UserAccountModify.vue'
+import UserProfileModify from '../components/users/UserProfileModify.vue'
 import MeetingLobby from '../components/meeting/MeetingLobby.vue'
 import MeetingRoom from '../components/meeting/MeetingRoom.vue'
 
@@ -28,8 +30,19 @@ const routes = [
       },
       {
         path: 'signup/profile',
-        component: userProfileRegist
+        component: UserProfileRegist
+      },
+
+      // 추가
+      {
+        path: 'modify1',
+        component: UserAccountModify
+      },
+      {
+        path: 'modify2',
+        component: UserProfileModify
       }
+      // 추가
     ]
   },
   {
