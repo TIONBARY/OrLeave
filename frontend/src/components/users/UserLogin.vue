@@ -51,16 +51,18 @@
               class="full-width google"
               @click="googleLogin()"
             />
-            <q-btn
-              label="Naver Auth Login"
-              class="full-width naver"
-              @click="naverLogin()"
-            />
-            <q-btn
-              label="Kakao Auth Login"
-              class="full-width kakao"
-              @click="kakaoLogin()"
-            />
+            <div id="naverIdLogin"></div>
+            <!-- <q-btn @click="kakaoLogin()"> -->
+              <img
+                class="kakao"
+                :src="
+                  require('../../assets/main/kakao_login_large_narrow.png')
+                "
+                alt="kakao_login"
+                style="width: 277px;"
+                @click="kakaoLogin()"
+              />
+            <!-- </q-btn> -->
           </div>
         </div>
       </section>
@@ -73,6 +75,7 @@ import { ref } from 'vue'
 // import { kakaoLogin } from '@/api/user'
 import { mapState, mapActions } from 'vuex'
 import { KAKAO_REDIRECT_URI } from '@/config'
+import { naverService } from '@/api/auth'
 const userStore = 'userStore'
 
 export default {
@@ -81,6 +84,9 @@ export default {
     return {
       loginInfo
     }
+  },
+  mounted() {
+    naverService().setNaver()
   },
   computed: {
     ...mapState(userStore, ['isLogin'])
@@ -105,7 +111,6 @@ export default {
         redirectUri: KAKAO_REDIRECT_URI
       })
     }
-
   }
 }
 </script>
@@ -118,12 +123,8 @@ export default {
   background: #4285f4;
   color: white;
 }
-.naver {
-  background: #00c43b;
-  color: white;
-}
-.kakao {
-  background: #ffe812;
-  color: black;
+
+.kakao:hover {
+    cursor: pointer;
 }
 </style>

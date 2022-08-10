@@ -48,6 +48,17 @@ async function kakaoLogin(token, success, fail) {
     .then(success)
     .catch(fail)
 }
+
+async function naverLogin(token, success, fail) {
+  await api
+    .get('/users/login-naver', {
+      headers: {
+        token: token
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
 // ? 로그아웃 필요한지?
 // function
 //
@@ -128,6 +139,7 @@ export {
   checkNicknameExist, // 닉네임 중복여부 확인
   tryLogin,
   kakaoLogin,
+  naverLogin,
   // 로그아웃
   withdrawal, // 회원탈퇴
   modifyPassword, // 비밀번호 재설정

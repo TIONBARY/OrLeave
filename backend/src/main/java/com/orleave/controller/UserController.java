@@ -98,9 +98,8 @@ public class UserController {
     }
 	
 	@GetMapping("/login-naver")
-    public ResponseEntity<LoginResponseDto> naverCallback(@RequestParam String code) throws IOException {
-       String access_Token = oauthService.getNaverAccessToken(code);
-       String email = oauthService.createNaverUser(access_Token);
+    public ResponseEntity<LoginResponseDto> naverCallback(@RequestHeader("token") String token) throws IOException {
+       String email = oauthService.createNaverUser(token);
        try {
     	   User user = userService.getUserByEmail(email);
     	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));

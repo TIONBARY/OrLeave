@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { KAKAO_CLIENT_ID, KAKAO_ADMIN_ID, KAKAO_REDIRECT_URI } from '@/config/index.js'
+import {
+  KAKAO_CLIENT_ID,
+  KAKAO_ADMIN_ID,
+  KAKAO_REDIRECT_URI,
+  NAVER_CLIENT_ID,
+  NAVER_REDIRECT_URI
+} from '@/config/index.js'
 
 const kakaoHeader = {
   Authorization: KAKAO_ADMIN_ID,
@@ -27,4 +33,23 @@ const getKakaoToken = async (code) => {
   }
 }
 
-export { getKakaoToken }
+const naverService = () => {
+  const naverLogin = new window.naver.LoginWithNaverId({
+    clientId: NAVER_CLIENT_ID,
+    callbackUrl: NAVER_REDIRECT_URI,
+    isPopup: false /* 팝업을 통한 연동처리 여부 */,
+    loginButton: {
+      color: 'green',
+      type: 3,
+      height: 60
+    } /* 로그인 버튼의 타입을 지정 */
+  })
+  const setNaver = () => {
+    naverLogin.init()
+  }
+  return {
+    setNaver
+  }
+}
+
+export { getKakaoToken, naverService }

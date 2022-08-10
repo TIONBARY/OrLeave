@@ -18,15 +18,8 @@ export default {
       this.setKakaoToken()
     }
   },
-  // mounted() {
-  //   if (this.$route.hash) {
-  //     naverService().getUserInfo()
-  //   }
-  // },
   methods: {
     ...mapActions(userStore, [
-      'checkEmail',
-      'sendConfirmKey',
       'saveSignupInfo'
     ]),
     async setKakaoToken() {
@@ -53,6 +46,7 @@ export default {
             this.$router.push('/user/signup/profile')
           } else {
             console.log('에러가 발생했습니다. 다시 시도해 주세요.')
+            this.$router.push('/user/login')
           }
         }
       )
