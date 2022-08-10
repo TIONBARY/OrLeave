@@ -97,7 +97,64 @@
                 </q-input>
               </td>
             </tr>
-
+            <tr>
+              <td class="q-pa-xs" style="width: 100%" colspan="2">
+                <q-field
+                  label="성별"
+                  stack-label
+                  outlined
+                  bg-color="white"
+                  :rules="[() => gender !== null || '성별을 선택해주세요']"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
+                  <div class="row justify-center q-gutter-md">
+                    <q-radio dense v-model="gender" val="M" label="남" />
+                    <q-radio dense v-model="gender" val="F" label="여" />
+                  </div>
+                </q-field>
+              </td>
+              </tr>
+              <tr>
+              <td class="q-pa-xs" style="width: 100%" colspan="2">
+                <q-input
+                  label="생년월일"
+                  outlined
+                  v-model="birthday"
+                  bg-color="white"
+                  mask="date"
+                  :rules="[
+                    () =>
+                      parseInt(birthday.substring(0, 4)) <
+                        new Date().getFullYear() - 18 ||
+                      '생년월일을 확인해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date v-model="birthday">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </td>
+            </tr>
             <tr>
               <td class="q-pa-xs" style="width: 50%">
                 <q-select
@@ -283,6 +340,8 @@ export default {
     const popupProfile = ref(false)
     const nickname = ref(null)
     const nicknameValid = ref(false)
+    const gender = ref(null)
+    const birthday = ref('2022/01/01')
     const mbtiOptions = ref([
       '모름',
       'INFP',
@@ -340,6 +399,8 @@ export default {
       popupProfile,
       nickname,
       nicknameValid,
+      gender,
+      birthday,
       drinkOptions: [
         {
           label: '안함',
@@ -439,7 +500,9 @@ export default {
         mbti: this.mbtiSelected,
         religion: this.religionSelected,
         interests: this.interestSelected,
-        personalities: this.personalitySelected
+        personalities: this.personalitySelected,
+        gender: this.gender,
+        birthDay: this.birthday.replaceAll('/', '-')
       })
       this.$router.push('/')
     },
@@ -449,19 +512,23 @@ export default {
         this.nicknameValid = false
         return
       }
-      checkNicknameExist(nickname, (response) => {
-        if (response.data.statusCode === 200) {
-          console.log('해당 닉네임은 사용 가능합니다.')
-          this.nicknameValid = true
+      checkNicknameExist(
+        nickname,
+        (response) => {
+          if (response.data.statusCode === 200) {
+            console.log('해당 닉네임은 사용 가능합니다.')
+            this.nicknameValid = true
+          }
+        },
+        (error) => {
+          if (error.response.data.message === 'Duplicate Nickname') {
+            console.log('이미 사용 중인 닉네임입니다.')
+          } else {
+            console.log('에러가 발생했습니다. 다시 시도해주세요.')
+          }
+          this.nicknameValid = false
         }
-      }, (error) => {
-        if (error.response.data.message === 'Duplicate Nickname') {
-          console.log('이미 사용 중인 닉네임입니다.')
-        } else {
-          console.log('에러가 발생했습니다. 다시 시도해주세요.')
-        }
-        this.nicknameValid = false
-      })
+      )
     }
   }
 }

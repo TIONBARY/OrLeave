@@ -25,15 +25,26 @@ async function checkEmailExist(email, success, fail) {
     .catch(fail)
 }
 // @@@@@ 닉네임 중복여부 확인 @@@@@
-async function checkNicknameExist(REQUEST, success, fail) {
+async function checkNicknameExist(nickname, success, fail) {
   await api
-    .get('/users/nickname?nickname=' + REQUEST)
+    .get('/users/nickname?nickname=' + nickname)
     .then(success)
     .catch(fail)
 }
 async function tryLogin(loginInfo, success, fail) {
   await api
     .post('/users/login', JSON.stringify(loginInfo))
+    .then(success)
+    .catch(fail)
+}
+
+async function kakaoLogin(token, success, fail) {
+  await api
+    .get('/users/login-kakao', {
+      headers: {
+        token: token
+      }
+    })
     .then(success)
     .catch(fail)
 }
@@ -116,6 +127,7 @@ export {
   checkEmailExist,
   checkNicknameExist, // 닉네임 중복여부 확인
   tryLogin,
+  kakaoLogin,
   // 로그아웃
   withdrawal, // 회원탈퇴
   modifyPassword, // 비밀번호 재설정

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -85,9 +86,8 @@ public class UserController {
 	}
 	
 	@GetMapping("/login-kakao")
-    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestParam String code) throws IOException {
-       String access_Token = oauthService.getKaKaoAccessToken(code);
-       String email = oauthService.createKakaoUser(access_Token);
+    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestHeader("token") String token) throws IOException {
+       String email = oauthService.createKakaoUser(token);
        try {
     	   User user = userService.getUserByEmail(email);
     	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));

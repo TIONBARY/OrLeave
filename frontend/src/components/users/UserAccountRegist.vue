@@ -85,51 +85,6 @@
             lazy-rules="ondemand"
             required
           />
-          <q-field
-            label="성별"
-            stack-label
-            outlined
-            bg-color="white"
-            :rules="[() => gender !== null || '성별을 선택해주세요']"
-            lazy-rules="ondemand"
-            hide-bottom-space
-          >
-            <div class="row justify-center q-gutter-md">
-              <q-radio dense v-model="gender" val="M" label="남" />
-              <q-radio dense v-model="gender" val="F" label="여" />
-            </div>
-          </q-field>
-
-          <q-input
-            label="생년월일"
-            outlined
-            v-model="birthday"
-            bg-color="white"
-            mask="date"
-            :rules="[
-              () =>
-                parseInt(birthday.substring(0, 4)) <
-                  new Date().getFullYear() - 18 || '생년월일을 확인해주세요'
-            ]"
-            lazy-rules="ondemand"
-            hide-bottom-space
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy
-                  cover
-                  transition-show="scale"
-                  transition-hide="scale"
-                >
-                  <q-date v-model="birthday">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Close" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
         </section>
         <q-btn label="다음" type="submit" class="primary" />
       </q-form>
@@ -166,8 +121,6 @@ export default {
       '비밀번호가 일치하지 않습니다.',
       '비밀번호가 일치합니다.'
     ])
-    const gender = ref(null)
-    const birthday = ref('2022/01/01')
     return {
       email,
       isReadonly,
@@ -177,9 +130,7 @@ export default {
       password,
       passwordCheck,
       pwState,
-      pwMsg,
-      gender,
-      birthday
+      pwMsg
     }
   },
   methods: {
@@ -213,9 +164,7 @@ export default {
       e.preventDefault()
       await this.saveSignupInfo({
         email: this.email,
-        password: this.password,
-        gender: this.gender,
-        birthDay: this.birthday.replaceAll('/', '-')
+        password: this.password
       })
       this.$router.push('/user/signup/profile')
     },

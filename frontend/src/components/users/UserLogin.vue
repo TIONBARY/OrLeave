@@ -49,17 +49,17 @@
             <q-btn
               label="Google Auth Login"
               class="full-width google"
-              @click="printLog('google')"
+              @click="googleLogin()"
             />
             <q-btn
               label="Naver Auth Login"
               class="full-width naver"
-              @click="printLog('naver')"
+              @click="naverLogin()"
             />
             <q-btn
               label="Kakao Auth Login"
               class="full-width kakao"
-              @click="printLog('kakao')"
+              @click="kakaoLogin()"
             />
           </div>
         </div>
@@ -70,8 +70,9 @@
 
 <script>
 import { ref } from 'vue'
-
+// import { kakaoLogin } from '@/api/user'
 import { mapState, mapActions } from 'vuex'
+import { KAKAO_REDIRECT_URI } from '@/config'
 const userStore = 'userStore'
 
 export default {
@@ -97,7 +98,14 @@ export default {
     },
     printLog(msg) {
       console.log(msg)
+    },
+    kakaoLogin() {
+      window.Kakao.Auth.authorize({
+        scope: 'account_email',
+        redirectUri: KAKAO_REDIRECT_URI
+      })
     }
+
   }
 }
 </script>

@@ -19,12 +19,6 @@ import com.google.gson.JsonParser;
 @PropertySource("classpath:application-oauth.properties")
 public class OauthServiceImpl implements OauthService {
 	
-	@Value("${kakao.client.id}")
-    private String kakaoClientId;
-	
-	@Value("${kakao.redirect.uri}")
-    private String kakaoRedirectUri;
-	
 	@Value("${naver.client.id}")
     private String naverClientId;
 	
@@ -38,53 +32,7 @@ public class OauthServiceImpl implements OauthService {
     private String googleClientSecret;
 	
 	@Value("${google.redirect.uri}")
-    private String googleRedirectUri;
-	
-	public String getKaKaoAccessToken(String code){
-        String access_Token="";
-        String refresh_Token ="";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
-
-        try{
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-            StringBuilder sb = new StringBuilder();
-            sb.append("grant_type=authorization_code");
-            sb.append("&client_id=").append(kakaoClientId); // TODO REST_API_KEY 입력
-            sb.append("&redirect_uri=").append(kakaoRedirectUri); // TODO 인가코드 받은 redirect_uri 입력
-            sb.append("&code=" + code);
-            bw.write(sb.toString());
-            bw.flush();
-
-            int responseCode = conn.getResponseCode();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = "";
-            String result = "";
-
-            while ((line = br.readLine()) != null) {
-                result += line;
-            }
-            
-            JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result);
-
-            access_Token = element.getAsJsonObject().get("access_token").getAsString();
-            refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
-
-            br.close();
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return access_Token;
-    }
-	
-	
+    private String googleRedirectUri;	
 	
 	public String createKakaoUser(String token) {
 
