@@ -37,7 +37,7 @@ public class NoticeController {
         @ApiResponse(code = 200, message = "성공"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) {
+	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
 		Page<NoticeListDto> noticeList = noticeService.getNotices(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(NoticeListResponseDto.of(200, "Success", noticeList));
 	}
@@ -49,9 +49,8 @@ public class NoticeController {
         @ApiResponse(code = 404, message = "공지사항 조회 실패"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<? extends BaseResponseDto> getNoticeDetail(@PathVariable("no") int no) {
+	public ResponseEntity<? extends BaseResponseDto> getNoticeDetail(@PathVariable("no") int no) throws Exception {
 		NoticeDetailDto notice = noticeService.getNoticeDetail(no);
-		if (notice == null) return ResponseEntity.status(404).body(BaseResponseDto.of(404, "Not Found"));
 		return ResponseEntity.status(200).body(NoticeDetailResponseDto.of(200, "Success", notice));
 	}
 }

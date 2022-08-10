@@ -51,7 +51,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getInquiresByUserNo (
-			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) {
+			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
@@ -68,7 +68,7 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> createInquiry (
-			@ApiIgnore Authentication authentication, @RequestBody InquiryRequestDto inquiryRequestDto) {
+			@ApiIgnore Authentication authentication, @RequestBody InquiryRequestDto inquiryRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
@@ -88,16 +88,12 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> getInquiryDetail(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
-			return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
-		}
+		InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
+		return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
 	}
 	@PutMapping("/{no}")
 	@ApiOperation(value = "1:1문의 수정", notes = "1:1문의를 수정한다.") 
@@ -109,18 +105,14 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> modifyInquiry(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 		
 	}
@@ -134,18 +126,14 @@ public class InquiryController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> deleteInquiry(
-			@ApiIgnore Authentication authentication, @PathVariable("no") int no) {
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserno();
-		try {
-			if(inquiryService.deleteInquiry(no, userNo)) {
-				return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
-			} else {
-				return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-			}
-		} catch (AuthenticationException e) {
-			return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Forbidden"));
+		if(inquiryService.deleteInquiry(no, userNo)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 	}
 }

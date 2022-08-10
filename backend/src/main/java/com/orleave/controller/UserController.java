@@ -1,11 +1,9 @@
 package com.orleave.controller;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +24,8 @@ import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ProfileResponseDto;
-import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
-import com.orleave.exception.EmailTimeoutException;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.EmailService;
 import com.orleave.service.UserService;
 import com.orleave.util.JwtTokenUtil;
@@ -58,35 +55,23 @@ public class UserController {
 	PasswordEncoder passwordEncoder;
 	
 	@PostMapping("/login")
-	@ApiOperation(value = "로그인", notes = "<strong>아이디와 패스워드</strong>를 통해 로그인 한다.") 
+	@ApiOperation(value = "로그인", notes = "아이디와 패스워드를 통해 로그인 한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공", response = LoginResponseDto.class),
-        @ApiResponse(code = 401, message = "인증 실패", response = BaseResponseDto.class),
-        @ApiResponse(code = 403, message = "로그인 횟수 초과", response = BaseResponseDto.class),
-        @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseDto.class),
-        @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseDto.class)
+        @ApiResponse(code = 400, message = "비밀번호 틀림"),
+        @ApiResponse(code = 403, message = "로그인 횟수 초과"),
+        @ApiResponse(code = 404, message = "해당 사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) {
+	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) throws Exception {
 		String email = loginInfo.getEmail();
 		String password = loginInfo.getPassword();
-		User user;
-		try {
-			user = userService.getUserByEmail(email);
-		} catch (NoSuchElementException e) {
-			return ResponseEntity.status(404).body(LoginResponseDto.of(404, "Invalid Email", null));
-		}
-		String userNo = Integer.toString(user.getNo());
-		if(!userService.logincheck(user.getNo())) {
-			return ResponseEntity.status(403).body(LoginResponseDto.of(403, "forbidden", null));
-		}
-		String userType = user.getUserType();
-		int imageNo = user.getImageNo();
-		String nickname=user.getNickname();
-		String gender=user.getGender();
+		User user = userService.getUserByEmail(email);
+		userService.logincheck(user.getNo());
 		// 로그인 요청한 유저로부터 입력된 패스워드 와 디비에 저장된 유저의 암호화된 패스워드가 같은지 확인.(유효한 패스워드인지 여부 확인)
-		if(passwordEncoder.matches(password, user.getPassword())) {
+		if (passwordEncoder.matches(password, user.getPassword())) {
 			// 유효한 패스워드가 맞는 경우, 로그인 성공으로 응답.(액세스 토큰을 포함하여 응답값 전달)
-			return ResponseEntity.ok(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(userNo,userType,imageNo,nickname,gender)));
+			return ResponseEntity.ok(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
 		}
 		userService.loginfailed(user.getNo());
 		return ResponseEntity.status(401).body(LoginResponseDto.of(401, "Invalid Password", null));
@@ -101,15 +86,9 @@ public class UserController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<? extends BaseResponseDto> register(
-			@RequestBody @ApiParam(value="회원가입 정보", required = true) SignupRequestDto signupInfo) {
-		
-		//임의로 리턴된 User 인스턴스. 현재 코드는 회원 가입 성공 여부만 판단하기 때문에 굳이 Insert 된 유저 정보를 응답하지 않음.
-		try {
-			userService.createUser(signupInfo);
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} catch (DataIntegrityViolationException e) {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Input"));
-		}
+			@RequestBody @ApiParam(value="회원가입 정보", required = true) SignupRequestDto signupInfo) throws Exception {
+		userService.createUser(signupInfo);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
 	@GetMapping("/profile")
@@ -120,37 +99,12 @@ public class UserController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<? extends BaseResponseDto> getProfile(@ApiIgnore Authentication authentication) {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+	public ResponseEntity<? extends BaseResponseDto> getProfile(@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		
 		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
-	}
-
-	
-	@GetMapping("/info")
-	@ApiOperation(value = "회원 본인 정보 조회", notes = "로그인한 회원 본인의 정보를 응답한다.") 
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
-        @ApiResponse(code = 404, message = "사용자 없음"),
-        @ApiResponse(code = 500, message = "서버 오류")
-    })
-	public ResponseEntity<UserResponseDto> getUserInfo(@ApiIgnore Authentication authentication) {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
-		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		String email = userDetails.getUsername();
-		User user = userService.getUserByEmail(email);
-		return ResponseEntity.status(200).body(UserResponseDto.of(user));
 	}
 	
 	@PostMapping("/email")
@@ -163,12 +117,8 @@ public class UserController {
     })
     public ResponseEntity<? extends BaseResponseDto> emailConfirm(
             @RequestBody @ApiParam(value="이메일정보", required = true) EmailConfirmRequestDto emailConfirmRequestDto) throws Exception {
-		try {
-			mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
-		}
+		mailService.sendSimpleMessage(emailConfirmRequestDto.getEmail());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
     }
 	
 	@PostMapping("/code")
@@ -181,17 +131,14 @@ public class UserController {
     })
     public ResponseEntity<? extends BaseResponseDto> emailCheckCode(
             @RequestBody @ApiParam(value="이메일과 인증코드", required = true) EmailCheckCodeRequestDto emailCheckCodeRequestDto) throws Exception {
-		try {
-			String email = emailCheckCodeRequestDto.getEmail();
-			String code = emailCheckCodeRequestDto.getCode();
-			boolean success = mailService.checkCode(email, code);
-			if (success) return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-			else return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Wrong Code"));
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Invalid Email"));
-		} catch (EmailTimeoutException e) {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Timeout"));
+		String email = emailCheckCodeRequestDto.getEmail();
+		String code = emailCheckCodeRequestDto.getCode();
+		if (mailService.checkCode(email, code)) {
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		} else {
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Wrong Code"));
 		}
+		
     }
 	
 	@GetMapping("/email")
@@ -207,7 +154,7 @@ public class UserController {
 		try {
 			userService.getUserByEmail(email);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Email"));
-		} catch (NoSuchElementException e) {
+		} catch (UsernameNotFoundException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}
     }
@@ -225,7 +172,7 @@ public class UserController {
 		try {
 			userService.getUserByNickname(nickname);
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
-		} catch (NoSuchElementException e) {
+		} catch (UserNotFoundException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}
     }
@@ -246,11 +193,8 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		if (userService.modifyProfile(user.getNo(), profileModifyRequestDto)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}		
+		userService.modifyProfile(user.getNo(), profileModifyRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
     }
 	
 	@PostMapping("/password")
@@ -269,11 +213,8 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		if (userService.passwordcheck(user.getNo(), passwordRequestDto.getPassword())) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		userService.passwordcheck(user.getNo(), passwordRequestDto.getPassword());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
     }
 	
 	@PutMapping("/password")
@@ -292,11 +233,8 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		if (userService.modifypassword(user.getNo(), passwordRequestDto.getPassword())) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		userService.modifypassword(user.getNo(), passwordRequestDto.getPassword());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
     }
 	
 	@DeleteMapping("")
@@ -314,10 +252,7 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		if (userService.deleteUser(user)) {
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
+		userService.deleteUser(user);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
     }
 }

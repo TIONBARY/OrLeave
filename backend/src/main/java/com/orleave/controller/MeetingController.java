@@ -52,18 +52,16 @@ public class MeetingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<MeetingSettingResponseDto> getMeeingSetting(@ApiIgnore Authentication authentication) {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+	public ResponseEntity<MeetingSettingResponseDto> getMeeingSetting(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(MeetingSettingResponseDto.of(401, "Unauthorized",null));
+		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		MeetingSetting meetingsetting = meetingService.getSettingByNo(no);
 		
 		
 		
-		return ResponseEntity.status(200).body(MeetingSettingResponseDto.of(meetingsetting));
+		return ResponseEntity.status(200).body(MeetingSettingResponseDto.of(200,"sucess",meetingsetting));
 	}
 	
 	
@@ -77,19 +75,14 @@ public class MeetingController {
     })
 	public ResponseEntity<? extends BaseResponseDto> ModifyMeeingSetting(
 			@RequestBody @ApiParam(value="미팅설정", required = true) MeetingSettingRequestDto meetingSettingRequestDto,
-			@ApiIgnore Authentication authentication) {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		
-		if (meetingService.modifyMeetingSetting(no, meetingSettingRequestDto)) {
+		meetingService.modifyMeetingSetting(no, meetingSettingRequestDto);
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
-		} else {
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
-		}
 	}
 	
 	@GetMapping("/recent-call")
@@ -100,11 +93,9 @@ public class MeetingController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) {
-		/**
-		 * 요청 헤더 액세스 토큰이 포함된 경우에만 실행되는 인증 처리이후, 리턴되는 인증 정보 객체(authentication) 통해서 요청한 유저 식별.
-		 * 액세스 토큰이 없이 요청하는 경우, 403 에러({"error": "Forbidden", "message": "Access Denied"}) 발생.
-		 */
+	public ResponseEntity<? extends BaseResponseDto> getMeeingLogs(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int no = userDetails.getUserno();
 		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(no);
@@ -115,13 +106,14 @@ public class MeetingController {
 	@ApiOperation(value = "신고하기", notes = "미팅 상대를 신고한다.") 
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공"),
-        @ApiResponse(code = 401, message = "액세스 토큰 없음"),
+        @ApiResponse(code = 403, message = "액세스 토큰 없음"),
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<BaseResponseDto> report(@RequestBody @ApiParam(value="신고 내용", required = true) ReportRequestDto reportRequestDto,
-			@ApiIgnore Authentication authentication) {
-		if (authentication == null) throw new TokenExpiredException("Token Expired");
+			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		User user = userDetails.getUser();
 		meetingService.reportUser(user, reportRequestDto);

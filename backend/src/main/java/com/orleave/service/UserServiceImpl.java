@@ -3,10 +3,12 @@ package com.orleave.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,9 @@ import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.User;
 import com.orleave.entity.UserInterest;
 import com.orleave.entity.UserPersonality;
+import com.orleave.exception.LoginProhibitedException;
+import com.orleave.exception.UserNotFoundException;
+import com.orleave.exception.WrongPasswordException;
 import com.orleave.repository.LoginTrialRepository;
 import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.UserInterestRepository;
@@ -55,8 +60,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	@Transactional
-	public void createUser(SignupRequestDto signupInfo) {
-		
+	public void createUser(SignupRequestDto signupInfo) throws Exception {
 		User user = User.builder()
 				.email(signupInfo.getEmail())
 				.password(passwordEncoder.encode(signupInfo.getPassword()))
@@ -110,29 +114,32 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public User getUserByNo(int no) {
-		User user = userRepositorySupport.findUserByNo(no).get();
-		return user;
+	public User getUserByNo(int no) throws Exception {
+		Optional<User> user = userRepositorySupport.findUserByNo(no);
+		if (!user.isPresent()) throw new UserNotFoundException();
+		return user.get();
 	}
 	
 	@Override
-	public User getUserByEmail(String email) {
-		// 디비에 유저 정보 조회 (email을 통한 조회).
-		User user = userRepositorySupport.findUserByEmail(email).get();
-		return user;
+	public User getUserByEmail(String email) throws UsernameNotFoundException {
+		Optional<User> user = userRepositorySupport.findUserByEmail(email);
+		if (!user.isPresent()) throw new UsernameNotFoundException("User Not Found");
+		return user.get();
 	}
 	
 	@Override
-	public User getUserByNickname(String nickname) {
-		// 디비에 유저 정보 조회 (nickname을 통한 조회).
-		User user = userRepositorySupport.findUserByNickname(nickname).get();
-		return user;
+	public User getUserByNickname(String nickname) throws Exception {
+		Optional<User> user = userRepositorySupport.findUserByNickname(nickname);
+		if (!user.isPresent()) throw new UserNotFoundException();
+		return user.get();
 	}
 	
 	@Override
 	@Transactional
-	public boolean modifyProfile(int userNo, ProfileModifyRequestDto dto) {
-		User user = userRepositorySupport.findUserByNo(userNo).get();
+	public void modifyProfile(int userNo, ProfileModifyRequestDto dto) throws Exception {
+		Optional<User> tempUser = userRepositorySupport.findUserByNo(userNo);
+		if (!tempUser.isPresent()) throw new UserNotFoundException();
+		User user = tempUser.get();
 		user.setImageNo(dto.getImageNo());
 		user.setMbti(dto.getMbti());
 		user.setDrink(dto.getDrink());
@@ -163,68 +170,64 @@ public class UserServiceImpl implements UserService {
 			userPersonalityRepository.save(userPersonality);
 			user.addPersonality(userPersonality);
 		}
-		return true;
 	}
 
 	@Override
 	@Transactional
-	public boolean passwordcheck(int userNo, String password) {
-		User user = userRepositorySupport.findUserByNo(userNo).get();	
-		if(passwordEncoder.matches(password, user.getPassword())){
-			return true;
-		}else
-			return false;
-		
+	public void passwordcheck(int userNo, String password) throws Exception {
+		Optional<User> tempUser = userRepositorySupport.findUserByNo(userNo);
+		if (!tempUser.isPresent()) throw new UserNotFoundException();
+		User user = tempUser.get();
+		if (!passwordEncoder.matches(password, user.getPassword())){
+			throw new WrongPasswordException();
+		}
 	}
 
 	@Override
 	@Transactional
-	public boolean modifypassword(int userNo, String password) {
-		User user = userRepositorySupport.findUserByNo(userNo).get();
-		if(password!=null && !passwordEncoder.matches(password, user.getPassword())) {
+	public void modifypassword(int userNo, String password) throws Exception {
+		Optional<User> tempUser = userRepositorySupport.findUserByNo(userNo);
+		if (!tempUser.isPresent()) throw new UserNotFoundException();
+		User user = tempUser.get();
+		if (password != null && !passwordEncoder.matches(password, user.getPassword())) {
 			user.setPassword(passwordEncoder.encode(password));
 			userRepository.save(user);
-			return true;
-		}else {
-			return false;
+			return;
 		}
-			
+		throw new WrongPasswordException();
 	}
 	
 	@Override
 	@Transactional
-	public boolean deleteUser(User user) {
+	public void deleteUser(User user) throws Exception {
 		loginTrialRepository.deleteById(user.getNo());
 		meetingSettingRepository.deleteById(user.getNo());
 		userInterestRepository.deleteByUserNo(user.getNo());
 		userPersonalityRepository.deleteByUserNo(user.getNo());
 		userRepository.delete(user);
-		return true;
 	}
 
 	@Override
-	public void loginfailed(int no) {
-		LoginTrial logintrial=loginTrialRepository.findById(no).get();
-		if(logintrial.getCount()==4) {
+	public void loginfailed(int no) throws Exception {
+		Optional<LoginTrial> tempLoginTrial = loginTrialRepository.findById(no);
+		if (!tempLoginTrial.isPresent()) throw new UserNotFoundException();
+		LoginTrial logintrial = tempLoginTrial.get();
+		if (logintrial.getCount() == 4) {
 			logintrial.setCount(0);
 			logintrial.setTime(LocalDateTime.now());
-		}else {
-			
+		} else {
 			logintrial.setCount(logintrial.getCount()+1);
 		}
 		loginTrialRepository.save(logintrial);
-		
-		
 	}
 
 	@Override
-	public boolean logincheck(int no) {
-		LoginTrial logintrial=loginTrialRepository.findById(no).get();
-		
-		if(Duration.between(logintrial.getTime(), LocalDateTime.now()).getSeconds() > 60 * 5) {
-			return true;
-		}else {
-			return false;
+	public void logincheck(int no) throws Exception {
+		Optional<LoginTrial> tempLoginTrial = loginTrialRepository.findById(no);
+		if (!tempLoginTrial.isPresent()) throw new UserNotFoundException();
+		LoginTrial logintrial = tempLoginTrial.get();
+		if (Duration.between(logintrial.getTime(), LocalDateTime.now()).getSeconds() <= 60 * 5) {
+			throw new LoginProhibitedException();
 		}
 	}
 }
