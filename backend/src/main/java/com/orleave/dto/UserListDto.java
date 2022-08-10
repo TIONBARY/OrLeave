@@ -28,24 +28,11 @@ public class UserListDto {
 	@ApiModelProperty(name="성별")
 	String gender;
 	@ApiModelProperty(name="생년월일")
-	LocalDate birthday;
+	LocalDate birthDay;
 	@ApiModelProperty(name="매칭횟수")
 	Long matchcount;
 	@ApiModelProperty(name="신고당한횟수")
 	Long reportcount;
 	@ApiModelProperty(name="유저타입")
-	String usertype;
-
-	
-	public static UserListDto of(User user) {
-		UserListDto res = UserListDto.builder()
-				.no(user.getNo())
-				.email(user.getEmail())
-				.nickname(user.getNickname())
-				.gender(user.getGender())
-				.birthday(user.getBirthDay())
-				.usertype(user.getUserType())
-				.build();
-		return res;
-	}
+	String userType;
 }

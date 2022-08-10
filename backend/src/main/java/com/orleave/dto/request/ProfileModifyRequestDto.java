@@ -25,6 +25,6 @@ public class ProfileModifyRequestDto {
 	int imageNo;
 	@ApiModelProperty(name="interests", example="[1, 2, 3]")
 	ArrayList<Integer> interests;
-	@ApiModelProperty(name="사용자 성격", example="[1, 3, 5]")
+	@ApiModelProperty(name="personalities", example="[1, 3, 5]")
 	ArrayList<Integer> personalities;
 }

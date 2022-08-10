@@ -1,43 +1,50 @@
-import { login, signup } from '@/api/user.js'
+import {
+  tryLogin,
+  checkEmailExist,
+  setConfirmKey,
+  trySignup,
+  requestProfile,
+  requestModifyProfile
+} from '@/api/user.js'
 
 const userStore = {
   namespaced: true,
   state: {
     isLogin: false,
-    isLoginError: false,
-    isRegistError: false,
-    accountInfo: null
+    signupInfo: null,
+    profile: null
   },
   getters: {},
   mutations: {
     SET_IS_LOGIN: (state, isLogin) => {
       state.isLogin = isLogin
     },
-    SET_IS_LOGIN_ERROR: (state, isLoginError) => {
-      state.isLoginError = isLoginError
+    SET_LOGOUT: (state) => {
+      state.isLogin = false
     },
-    SET_IS_REGIST_ERROR: (state, isRegistError) => {
-      state.isRegistError = isRegistError
+    SET_SIGNUP_INFO: (state, signupInfo) => {
+      state.signupInfo = signupInfo
     },
-    SET_ACCOUNT_INFO: (state, accountInfo) => {
-      state.accountInfo = accountInfo
+    SET_PROFILE: (state, profile) => {
+      state.profile = profile
+    },
+    SET_DUPLICATED: (state, value) => {
+      state.isDuplicated = value
     }
   },
   actions: {
-    async tryLogin({ commit }, loginInfo) {
-      console.log('hello')
-      await login(
+    async login({ commit }, loginInfo) {
+      await tryLogin(
         loginInfo,
         (response) => {
-          console.log('ssjasdhqwehiqwfhi')
-          if (response.data.message === 'Success') {
-            const token = response.data['access-token']
+          if (response.data.statusCode === 200) {
+            const token = response.data.accessToken // 이걸 Authorization으로 바꿔주면 다됨!
             commit('SET_IS_LOGIN', true)
-            commit('SET_IS_LOGIN_ERROR', false)
-            sessionStorage.setItem('access-token', token)
+            console.log('로그인 성공!')
+            sessionStorage.setItem('Authorization', token)
           } else {
             commit('SET_IS_LOGIN', false)
-            commit('SET_IS_LOGIN_ERROR', true)
+            console.log('로그인 실패!')
           }
         },
         (error) => {
@@ -45,19 +52,81 @@ const userStore = {
         }
       )
     },
-    async saveAccountInfo({ commit }, accountInfo) {
-      await commit('SET_ACCOUNT_INFO', accountInfo)
+
+    // 메뉴바에 버튼을 만들어서 연결해야 함
+    logout({ commit }) {
+      commit('SET_LOGOUT')
+      sessionStorage.removeItem('Authorization')
+      location.reload()
     },
-    async trySignup({ commit }, signupInfo) {
-      await signup(
+
+    // 버튼 연결 아직 안함...
+    async checkEmail({ commit }, email) {
+      await checkEmailExist(
+        email,
+        (response) => {
+          if (response.data.statusCode === 200) {
+            console.log("email doesn't exist, SUCCESS!")
+          } else {
+            console.log('email exists, FAIL!')
+          }
+        },
+        (error) => console.log(error)
+      )
+    },
+
+    // 버튼 연결 아직 안함...
+    async sendConfirmKey({ commit }, email) {
+      await setConfirmKey(
+        email,
+        (response) => {
+          if (response.data.statusCode === 200) {
+            console.log('succeeded to send confirm key')
+          } else {
+            console.log('failed to send confirm key')
+          }
+        },
+        (error) => console.log(error)
+      )
+    },
+
+    async saveSignupInfo({ commit }, signupInfo) {
+      await commit('SET_SIGNUP_INFO', signupInfo)
+    },
+
+    async signup({ commit }, signupInfo) {
+      await trySignup(
         signupInfo,
         (response) => {
-          if (response.data.message === 'success') {
-            commit('SET_IS_REGIST_ERROR', false)
+          if (response.data.statusCode === 200) {
+            console.log('회원가입 성공!')
           } else {
-            commit('SET_IS_REGIST_ERROR', true)
             console.log('회원가입 실패!')
           }
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+
+    // 버튼 연결 아직 안함...
+    async getProfile({ commit }) {
+      await requestProfile(
+        (response) => {
+          commit('SET_PROFILE', response.data.profile)
+          console.log(response.data.profile)
+          console.log('is it undefined?' + this.profile)
+        },
+        (error) => console.log(error)
+      )
+    },
+
+    async modifyProfile({ commit }) {
+      await requestModifyProfile(
+        this.profile,
+        (response) => {
+          console.log(response.data)
         },
         (error) => {
           console.log(error)

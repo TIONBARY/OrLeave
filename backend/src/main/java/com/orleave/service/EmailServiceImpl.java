@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.orleave.entity.EmailConfirm;
+import com.orleave.exception.EmailConfirmNotFoundException;
 import com.orleave.exception.EmailTimeoutException;
 import com.orleave.repository.EmailConfirmRepository;
  
@@ -36,7 +37,7 @@ public class EmailServiceImpl implements EmailService{
  
     public static String ePw;
  
-    private MimeMessage createMessage(String to) throws Exception{
+    private MimeMessage createMessage(String to) throws Exception {
         ePw = createKey();
     	System.out.println("보내는 대상 : "+ to);
         System.out.println("인증 번호 : "+ ePw);
@@ -90,29 +91,30 @@ public class EmailServiceImpl implements EmailService{
  
         return key.toString();
     }
+    
     @Override
     @Transactional
     public void sendSimpleMessage(String to) throws Exception {
-        // TODO Auto-generated method stub
         MimeMessage message = createMessage(to);
         try {
             emailSender.send(message);
-            Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(to);
-            EmailConfirm ec = null;
-            if (!emailConfirm.isPresent()) {
-            	ec = EmailConfirm.builder()
+            Optional<EmailConfirm> emailConfirmTemp = emailConfirmRepository.findById(to);
+            EmailConfirm emailConfirm = null;
+            if (!emailConfirmTemp.isPresent()) {
+            	emailConfirm = EmailConfirm.builder()
             			.email(to)
             			.code(ePw)
             			.time(LocalDateTime.now())
             			.build();
-            } else {
-            	ec = emailConfirm.get();
-            	ec.setCode(ePw);
-            	ec.setTime(LocalDateTime.now());
+            } 
+            else {
+            	emailConfirm = emailConfirmTemp.get();
+            	emailConfirm.setCode(ePw);
+            	emailConfirm.setTime(LocalDateTime.now());
             }
-            emailConfirmRepository.save(ec);
-        } catch(MailException es) {
-            es.printStackTrace();
+            emailConfirmRepository.save(emailConfirm);
+        } catch(MailException e) {
+            e.printStackTrace();
             throw new IllegalArgumentException();
         }
     }
@@ -120,15 +122,15 @@ public class EmailServiceImpl implements EmailService{
 	@Override
 	@Transactional
 	public boolean checkCode(String email, String code) throws Exception {
-		Optional<EmailConfirm> emailConfirm = emailConfirmRepository.findById(email);
-		if (!emailConfirm.isPresent()) throw new IllegalArgumentException();
-		EmailConfirm ec = emailConfirm.get();
-		if (Duration.between(ec.getTime(), LocalDateTime.now()).getSeconds() > 60 * 3) {
-			emailConfirmRepository.delete(ec);
+		Optional<EmailConfirm> emailConfirmTemp = emailConfirmRepository.findById(email);
+		if (!emailConfirmTemp.isPresent()) throw new EmailConfirmNotFoundException();
+		EmailConfirm emailConfirm = emailConfirmTemp.get();
+		if (Duration.between(emailConfirm.getTime(), LocalDateTime.now()).getSeconds() > 180) {
+			emailConfirmRepository.delete(emailConfirm);
 			throw new EmailTimeoutException();
 		}
-		if (ec.getCode().equals(code)) {
-			emailConfirmRepository.delete(ec);
+		if (emailConfirm.getCode().equals(code)) {
+			emailConfirmRepository.delete(emailConfirm);
 			return true;
 		}
 		return false;

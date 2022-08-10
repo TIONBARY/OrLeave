@@ -22,4 +22,6 @@ public class NoticeDetailResponseDto extends BaseResponseDto {
 		res.setNotice(notice);
 		return res;
 	}
+
+	
 }

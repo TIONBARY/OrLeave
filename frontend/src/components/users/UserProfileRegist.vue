@@ -27,7 +27,7 @@
                 @click="popupProfile = true"
                 icon="collections"
               />
-
+              <!-- Popup~ -->
               <q-dialog
                 v-model="popupProfile"
                 style="text-align: center"
@@ -67,6 +67,7 @@
                   </q-card-section>
                 </q-card>
               </q-dialog>
+              <!-- ~Popup -->
             </article>
           </q-field>
           <!-- 닉네임 -->
@@ -404,6 +405,7 @@ export default {
         else item = personalities
         item[key].value = !item[key].value
       },
+
       checkNickname(nickname) {
         if (nickname !== null) nicknameValid.value = true
         console.log(nicknameValid.value)
@@ -411,7 +413,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(userStore, ['accountInfo']),
+    ...mapState(userStore, ['signupInfo']),
 
     interestSelected() {
       const arr = []
@@ -429,11 +431,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['trySignup']),
+    ...mapActions(userStore, ['signup']),
 
     async onSubmit() {
-      await this.trySignup({
-        ...this.accountInfo,
+      await this.signup({
+        ...this.signupInfo,
         imageNo: this.imageNo,
         nickname: this.nickname,
         drink: this.drinkSelected,
