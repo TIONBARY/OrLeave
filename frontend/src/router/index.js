@@ -63,10 +63,6 @@ const routes = [
       {
         path: 'room',
         component: MeetingRoom
-      },
-      {
-        path: 'test',
-        component: MeetingTest
       }
     ]
   },
