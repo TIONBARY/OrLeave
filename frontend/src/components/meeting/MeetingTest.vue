@@ -1,9 +1,6 @@
 <template>
   <div id="main-container" class="container">
     <div id="join" v-if="!session">
-      <div id="img-div">
-        <img src="resources/images/openvidu_grey_bg_transp_cropped.png" />
-      </div>
       <div id="join-dialog" class="jumbotron vertical-center">
         <h1>Join a video session</h1>
         <div class="form-group">
@@ -60,6 +57,9 @@
           @click="updateMainVideoStreamManager(sub)"
         />
       </div>
+      <button @click="toggleAudio()">audio</button>
+      <button @click="toggleVideo()">video</button>
+      <openvidu-webcomponent style="height: 100%"></openvidu-webcomponent>
     </div>
   </div>
 </template>
@@ -161,6 +161,24 @@ export default {
       })
 
       window.addEventListener('beforeunload', this.leaveSession)
+    },
+
+    toggleAudio() {
+      console.log('hi')
+      console.log(this.session)
+      console.log(this.mainStreamManager)
+      console.log(this.publisher)
+      console.log(this.subscribers)
+      console.log(this.OV)
+      this.publisher.stream.hasVideo = false
+    },
+
+    toggleVideo() {
+      console.log('hi')
+      console.log(this.session.publisher)
+      console.log(this.publisher.properties.publishVideo)
+      this.publisher.properties.publishVideo = false
+      console.log(this.publisher.properties.publishVideo)
     },
 
     leaveSession() {
