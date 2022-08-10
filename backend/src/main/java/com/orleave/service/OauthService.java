@@ -5,4 +5,6 @@ public interface OauthService {
 	String createKakaoUser(String token);
 	public String getNaverAccessToken(String code);
 	String createNaverUser(String token);
+	public String getGoogleAccessToken(String code);
+	String createGoogleUser(String token);
 }
