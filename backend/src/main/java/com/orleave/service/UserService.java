@@ -18,6 +18,7 @@ public interface UserService {
 	void passwordcheck(int userNo,String password) throws Exception;
 	void modifypassword(int userNo,String password) throws Exception;
 	void deleteUser(User user) throws Exception;
+	void loginSuccess(int no) throws Exception;
 	void loginfailed(int no) throws Exception;
 	void logincheck(int no) throws Exception;
 }

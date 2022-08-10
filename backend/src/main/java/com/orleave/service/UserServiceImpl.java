@@ -222,6 +222,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public void loginSuccess(int no) throws Exception {
+		Optional<LoginTrial> tempLoginTrial = loginTrialRepository.findById(no);
+		if (!tempLoginTrial.isPresent()) throw new UserNotFoundException();
+		LoginTrial logintrial = tempLoginTrial.get();
+		logintrial.setCount(0);
+		loginTrialRepository.save(logintrial);
+	}
+	
+	@Override
 	public void logincheck(int no) throws Exception {
 		Optional<LoginTrial> tempLoginTrial = loginTrialRepository.findById(no);
 		if (!tempLoginTrial.isPresent()) throw new UserNotFoundException();
