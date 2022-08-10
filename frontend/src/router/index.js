@@ -12,6 +12,7 @@ import UserAccountModify from '../components/users/UserAccountModify.vue'
 import UserProfileModify from '../components/users/UserProfileModify.vue'
 import MeetingLobby from '../components/meeting/MeetingLobby.vue'
 import MeetingRoom from '../components/meeting/MeetingRoom.vue'
+import MeetingTest from '../components/meeting/MeetingTest.vue'
 import NoticeList from '../components/notices/NoticeList.vue'
 import NoticeDetail from '../components/notices/NoticeDetail.vue'
 import InquiryList from '../components/inquiries/InquiryList.vue'
@@ -63,6 +64,10 @@ const routes = [
       {
         path: 'room',
         component: MeetingRoom
+      },
+      {
+        path: 'test',
+        component: MeetingTest
       }
     ]
   },
