@@ -4,6 +4,7 @@ import UserView from '../views/UserView.vue'
 import MeetingView from '../views/MeetingView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import InquiryView from '../views/InquiryView.vue'
+import ErrorView from '../views/ErrorView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
@@ -102,6 +103,14 @@ const routes = [
         component: InquiryRegist
       }
     ]
+  },
+  {
+    path: '/404',
+    component: ErrorView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
 ]
 
