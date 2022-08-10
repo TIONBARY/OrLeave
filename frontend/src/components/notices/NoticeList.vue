@@ -39,26 +39,29 @@
 <script>
 import { ref } from 'vue'
 
+import { mapState, mapActions } from 'vuex'
+const noticeStore = 'noticeStore'
+
 export default {
   setup() {
-    const noticeLists = ref([
+    const noticeLists = ref(
       {
-        noticeTitle: '시스템 점검 안내',
-        noticeDate: '2022/08/02'
-      },
-      {
-        noticeTitle: 'Internet Explorer 11 지원 종료 안내',
-        noticeDate: '2022/07/02'
-      },
-      {
-        noticeTitle: '서비스 이용 약관 개정 안내',
-        noticeDate: '2022/06/02'
+        noticeTitle: 1,
+        noticeDate: 1
       }
-    ])
-
+    )
     return {
       noticeLists
     }
+  },
+  computed: {
+    ...mapState(noticeStore, ['notices'])
+  },
+  methods: {
+    ...mapActions(noticeStore, ['noticeList'])
+  },
+  created() {
+    this.noticeList(0, 5)
   }
 }
 </script>
