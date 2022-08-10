@@ -59,6 +59,13 @@ async function naverLogin(token, success, fail) {
     .then(success)
     .catch(fail)
 }
+
+async function googleLogin(code, success, fail) {
+  await api
+    .get(`/users/login-google?code=${code}`)
+    .then(success)
+    .catch(fail)
+}
 // ? 로그아웃 필요한지?
 // function
 //
@@ -140,6 +147,7 @@ export {
   tryLogin,
   kakaoLogin,
   naverLogin,
+  googleLogin,
   // 로그아웃
   withdrawal, // 회원탈퇴
   modifyPassword, // 비밀번호 재설정

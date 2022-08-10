@@ -8,6 +8,7 @@ import InquiryView from '../views/InquiryView.vue'
 import UserLogin from '../components/users/UserLogin.vue'
 import KakaoLogin from '../components/users/KakaoLogin.vue'
 import NaverLogin from '../components/users/NaverLogin.vue'
+import GoogleLogin from '../components/users/GoogleLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
 import UserProfileRegist from '../components/users/UserProfileRegist.vue'
 import UserAccountModify from '../components/users/UserAccountModify.vue'
@@ -43,6 +44,11 @@ const routes = [
         path: 'login-naver',
         name: 'NaverAuth',
         component: NaverLogin
+      },
+      {
+        path: 'login-google',
+        name: 'GoogleAuth',
+        component: GoogleLogin
       },
       {
         path: 'signup/account',

@@ -46,22 +46,19 @@
             <router-link to="/user/signup/account">회원가입</router-link>
             <br />
             <router-link to="/user/signup/account">비밀번호찾기</router-link>
-            <q-btn
-              label="Google Auth Login"
-              class="full-width google"
-              @click="googleLogin()"
-            />
+            <div @click="googleLoginBtn">
+              <img style="width: 285px" src="@/assets/main/google_login.png" />
+            </div>
+            <div id="my-signin2" style="display: none"></div>
             <div id="naverIdLogin"></div>
             <!-- <q-btn @click="kakaoLogin()"> -->
-              <img
-                class="kakao"
-                :src="
-                  require('../../assets/main/kakao_login_large_narrow.png')
-                "
-                alt="kakao_login"
-                style="width: 277px;"
-                @click="kakaoLogin()"
-              />
+            <img
+              class="kakao"
+              :src="require('../../assets/main/kakao_login_large_narrow.png')"
+              alt="kakao_login"
+              style="width: 277px"
+              @click="kakaoLogin()"
+            />
             <!-- </q-btn> -->
           </div>
         </div>
@@ -74,7 +71,7 @@
 import { ref } from 'vue'
 // import { kakaoLogin } from '@/api/user'
 import { mapState, mapActions } from 'vuex'
-import { KAKAO_REDIRECT_URI } from '@/config'
+import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, KAKAO_REDIRECT_URI } from '@/config'
 import { naverService } from '@/api/auth'
 const userStore = 'userStore'
 
@@ -110,6 +107,9 @@ export default {
         scope: 'account_email',
         redirectUri: KAKAO_REDIRECT_URI
       })
+    },
+    async googleLoginBtn() {
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}`
     }
   }
 }
@@ -124,7 +124,7 @@ export default {
   color: white;
 }
 
-.kakao:hover {
-    cursor: pointer;
+img:hover {
+  cursor: pointer;
 }
 </style>
