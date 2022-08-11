@@ -57,15 +57,9 @@
           @click="updateMainVideoStreamManager(sub)"
         />
       </div>
-      <button @click="toggleAudio()">
-        <template v-if="isOn.audio">음소거</template>
-        <template v-else>음소거 해제</template>
-      </button>
-      <button @click="toggleVideo()">
-        <template v-if="isOn.video">비디오 끄기</template>
-        <template v-else>비디오 시작</template>
-      </button>
-      <button @click="testGo()">go</button>
+      <button @click="toggleAudio()">audio</button>
+      <button @click="toggleVideo()">video</button>
+      <openvidu-webcomponent style="height: 100%"></openvidu-webcomponent>
     </div>
   </div>
 </template>
@@ -74,9 +68,6 @@
 import axios from 'axios'
 import { OpenVidu } from 'openvidu-browser'
 import UserVideo from './video/UserVideo.vue'
-
-import { mapActions } from 'vuex'
-const meetingStore = 'meetingStore'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
@@ -97,10 +88,6 @@ export default {
       mainStreamManager: undefined,
       publisher: undefined,
       subscribers: [],
-      isOn: {
-        audio: true,
-        video: true
-      },
 
       mySessionId: 'SessionA',
       myUserName: 'Participant' + Math.floor(Math.random() * 100)
@@ -108,30 +95,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(meetingStore, ['enterSession']),
-
-    toggleAudio() {
-      this.isOn.audio = !this.isOn.audio
-      this.publisher.publishAudio(this.isOn.audio)
-    },
-    toggleVideo() {
-      this.isOn.video = !this.isOn.video
-      this.publisher.publishVideo(this.isOn.video)
-    },
-
-    testGo() {
-      this.publisher.stream.applyFilter('FaceOverlayFilter').then((filter) => {
-        filter.execMethod('setOverlayedImage', {
-          uri: 'https://cdn.pixabay.com/photo/2013/07/12/14/14/derby-148046_960_720.png',
-          offsetXPercent: '-0.2F',
-          offsetYPercent: '-0.8F',
-          widthPercent: '1.3F',
-          heightPercent: '1.0F'
-        })
-      })
-      console.log(this.publisher.stream)
-    },
-
     joinSession() {
       // --- Get an OpenVidu object ---
       this.OV = new OpenVidu()
@@ -164,9 +127,7 @@ export default {
 
       // 'getToken' method is simulating what your server-side should do.
       // 'token' parameter should be retrieved and returned by your own backend
-      this.getToken(this.mySessionId).then((response) => {
-        const token = response.data.token
-        console.log(token)
+      this.getToken(this.mySessionId).then((token) => {
         this.session
           .connect(token, { clientData: this.myUserName })
           .then(() => {
@@ -185,8 +146,9 @@ export default {
 
             this.mainStreamManager = publisher
             this.publisher = publisher
-            console.log(this.publisher)
+
             // --- Publish your stream ---
+
             this.session.publish(this.publisher)
           })
           .catch((error) => {
@@ -199,6 +161,24 @@ export default {
       })
 
       window.addEventListener('beforeunload', this.leaveSession)
+    },
+
+    toggleAudio() {
+      console.log('hi')
+      console.log(this.session)
+      console.log(this.mainStreamManager)
+      console.log(this.publisher)
+      console.log(this.subscribers)
+      console.log(this.OV)
+      this.publisher.stream.hasVideo = false
+    },
+
+    toggleVideo() {
+      console.log('hi')
+      console.log(this.session.publisher)
+      console.log(this.publisher.properties.publishVideo)
+      this.publisher.properties.publishVideo = false
+      console.log(this.publisher.properties.publishVideo)
     },
 
     leaveSession() {
@@ -226,24 +206,58 @@ export default {
      * These methods retrieve the mandatory user token from OpenVidu Server.
      * This behavior MUST BE IN YOUR SERVER-SIDE IN PRODUCTION (by using
      * the API REST, openvidu-java-client or openvidu-node-client):
-     *   1) Initialize a Session in OpenVidu Server (POST /openvidu/api/sessions)
+     *   1) Initialize a Session in OpenVidu Server(POST /openvidu/api/sessions)
      *   2) Create a Connection in OpenVidu Server (POST /openvidu/api/sessions/<SESSION_ID>/connection)
      *   3) The Connection.token must be consumed in Session.connect() method
      */
 
     getToken(mySessionId) {
-      return this.createSession(mySessionId)
+      return this.createSession(mySessionId).then((sessionId) =>
+        this.createToken(sessionId)
+      )
     },
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
-      return this.enterSession(sessionId)
+      return new Promise((resolve, reject) => {
+        axios
+          .post(
+            `${OPENVIDU_SERVER_URL}/openvidu/api/sessions`,
+            JSON.stringify({
+              customSessionId: sessionId
+            }),
+            {
+              auth: {
+                username: 'OPENVIDUAPP',
+                password: OPENVIDU_SERVER_SECRET
+              }
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => console.log(data.id))
+          .then((data) => resolve(data.id))
+          .catch((error) => {
+            if (error.response.status === 409) {
+              resolve(sessionId)
+            } else {
+              console.warn(
+                `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`
+              )
+              if (
+                window.confirm(
+                  `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`
+                )
+              ) {
+                location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`)
+              }
+              reject(error.response)
+            }
+          })
+      })
     },
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
     createToken(sessionId) {
-      console.log('new')
-      console.log(sessionId)
       return new Promise((resolve, reject) => {
         axios
           .post(
