@@ -13,14 +13,14 @@
           <th colspan="2" class="q-pa-md" style="text-align: start">
             공지사항
           </th>
-          <tr :key="noticeList" v-for="noticeList in noticeLists">
-            <td class="q-pa-md" style="text-align: start">
-              <router-link to="/notice/detail/1">{{
-                noticeList.noticeTitle
+          <tr :key="noticeList" v-for="noticeList in notices">
+            <td class="q-pa-md" style="text-align: start" >
+              <router-link :to="`/notice/${noticeList.no}`" @click="goDetail(noticeList.no)"   >{{
+                noticeList.title
               }}</router-link>
             </td>
             <td class="q-pa-md" style="text-align: end">
-              {{ noticeList.noticeDate }}
+              {{ noticeList.createdTime }}
             </td>
           </tr>
         </table>
@@ -44,24 +44,24 @@ const noticeStore = 'noticeStore'
 
 export default {
   setup() {
-    const noticeLists = ref(
-      {
-        noticeTitle: 1,
-        noticeDate: 1
-      }
-    )
+    const page = ref(0)
+    const size = ref(5)
     return {
-      noticeLists
+      page,
+      size
     }
   },
   computed: {
     ...mapState(noticeStore, ['notices'])
   },
   methods: {
-    ...mapActions(noticeStore, ['noticeList'])
+    ...mapActions(noticeStore, ['noticeList', 'noticeDetail']),
+    goDetail(no) {
+      this.noticeDetail(no)
+    }
   },
-  created() {
-    this.noticeList(0, 5)
+  async created() {
+    await this.noticeList(this.page)
   }
 }
 </script>

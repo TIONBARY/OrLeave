@@ -2,9 +2,10 @@ import { apiInstance } from './index.js'
 
 const api = apiInstance()
 
-async function noticeList(page, size, success, fail) {
+async function noticeList(page, success, fail) {
+  const params = { page: page, size: 15 }
   await api
-    .get('/notices', page, size)
+    .get('/notices', { params })
     .then(success)
     .catch(fail)
 }

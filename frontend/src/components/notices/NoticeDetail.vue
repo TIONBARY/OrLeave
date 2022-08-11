@@ -19,7 +19,7 @@
               class="q-pa-md"
               style="text-align: start; background-color: white"
             >
-              {{ noticeDetail.noticeTitle }}
+              {{ this.notice.title }}
             </td>
           </tr>
           <tr>
@@ -28,7 +28,7 @@
               class="q-pa-md"
               style="text-align: start; background-color: white"
             >
-              {{ noticeDetail.noticeContent }}
+              {{ this.notice.content }}
             </td>
           </tr>
         </table>
@@ -42,19 +42,19 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+
+import { mapState, mapActions } from 'vuex'
+const noticeStore = 'noticeStore'
 
 export default {
-  setup() {
-    const noticeDetail = ref({
-      noticeTitle: '시스템 점검 안내',
-      noticeContent:
-        '안녕하세요, 역삼 더 프리미엄 센트럴 메트로 어쩌구 개발팀 정승욱입니다. 2022년 07월 20일 04:00~06:00시까지 시스템 점검이 있음을 알립니다. 해당 시간에는 서비스 이용이 금지되오니 사용에 주의하시기 바랍니다. 늘 저희의 서비스를 사랑해주시고 이용해주셔서 감사합니다. 응원하는 마음으로 지켜봐주시면 감사하겠습니다. 감사합니다.'
-    })
-
-    return {
-      noticeDetail
-    }
+  computed: {
+    ...mapState(noticeStore, ['notice'])
+  },
+  methods: {
+    ...mapActions(noticeStore, ['noticeDetail'])
+  },
+  created() {
+  //  this.noticeDetail(this.notice.no)
   }
 }
 </script>
