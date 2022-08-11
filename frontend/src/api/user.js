@@ -72,7 +72,6 @@ async function googleLogin(code, success, fail) {
 // @@@@@ 회원탈퇴 @@@@@
 async function withdrawal(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  console.log(Authorization)
   await api
     .delete('/users', {
       headers: {
@@ -85,9 +84,8 @@ async function withdrawal(success, fail) {
 // @@@@@ 비밀번호 재설정 @@@@@
 async function modifyPassword(REQUEST, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  console.log(Authorization)
   await api
-    .put('/users/password'.JSON.stringify(REQUEST), {
+    .put('/users/password', JSON.stringify(REQUEST), {
       headers: {
         Authorization: Authorization
       }
@@ -98,7 +96,6 @@ async function modifyPassword(REQUEST, success, fail) {
 // ? 비밀번호 검사 무슨 용도였지?
 async function checkPassword(REQUEST, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  console.log(Authorization)
   await api
     .post('/users/password'.JSON.stringify(REQUEST), {
       headers: {
@@ -112,7 +109,6 @@ async function checkPassword(REQUEST, success, fail) {
 // 테스트 안해봄
 async function requestModifyProfile(profile, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  console.log(Authorization)
   await api
     .put('/users/profile', JSON.stringify(profile), {
       headers: {
@@ -124,7 +120,6 @@ async function requestModifyProfile(profile, success, fail) {
 }
 async function requestProfile(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  console.log(Authorization)
   await api
     .get('/users/profile', {
       headers: {
@@ -134,9 +129,18 @@ async function requestProfile(success, fail) {
     .then(success)
     .catch(fail)
 }
-// ? 토큰확인 이거 무슨 용도지?
-// function
-//
+
+async function getEmail(success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .get('/users/userInfo', {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
 
 export {
   trySignup,
@@ -153,6 +157,6 @@ export {
   modifyPassword, // 비밀번호 재설정
   checkPassword, // 비밀번호 검사
   requestModifyProfile,
-  requestProfile
-  // 토큰확인
+  requestProfile,
+  getEmail
 }

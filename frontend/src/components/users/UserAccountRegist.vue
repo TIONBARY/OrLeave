@@ -67,7 +67,10 @@
             placeholder="영문, 숫자, 특수문자 8~16"
             dense
             :rules="[
-              () => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/.test(password) || '영문, 숫자, 특수문자를 포함해 8~16자리'
+              () =>
+                /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/.test(
+                  password
+                ) || '영문, 숫자, 특수문자를 포함해 8~16자리'
             ]"
             required
           >
@@ -94,7 +97,7 @@
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { confirmEmailCode } from '@/api/user'
+import { confirmEmailCode, checkEmailExist } from '@/api/user'
 import { mapActions } from 'vuex'
 const userStore = 'userStore'
 
@@ -104,9 +107,12 @@ export default {
     const isReadonly = ref(false)
     const emailCheck = ref(false)
     const code = ref(null)
-    const timer = ref('3:00')
+    const timer = ref(null)
     const password = ref(null)
     const passwordCheck = ref(null)
+    const intervalId = ref(0)
+    const minutes = ref('03')
+    const seconds = ref('00')
     const pwState = reactive(
       computed(() => {
         if (password.value === null) return 0
@@ -130,7 +136,10 @@ export default {
       password,
       passwordCheck,
       pwState,
-      pwMsg
+      pwMsg,
+      intervalId,
+      minutes,
+      seconds
     }
   },
   methods: {
@@ -143,22 +152,45 @@ export default {
       if (this.email < 3 || !this.email.includes('@')) {
         return
       }
-      await this.checkEmail(this.email)
-        .then(() => {
+      checkEmailExist(
+        this.email,
+        ({ data }) => {
           console.log('valid')
-          this.sendConfirmKey(this.email)
-        })
-        .catch(() => {
+          if (data.statusCode === 200) {
+            this.sendConfirmKey(this.email)
+            this.startTimer(60 * 3)
+            this.isReadonly = true
+          }
+        },
+        ({ response: { data } }) => {
           console.log('invalid')
-        })
-
+          this.isReadonly = false
+        }
+      )
       console.log('END')
     },
     checkReadonly() {
-      return this.isReadonly || '이메일을 인증해주세요'
+      return this.emailCheck || '이메일을 인증해주세요'
     },
     rewrite() {
       this.isReadonly = false
+      this.emailCheck = false
+      clearInterval(this.intervalId)
+    },
+    startTimer(duration, display) {
+      let remain = duration
+      this.intervalId = setInterval(() => {
+        this.minutes = parseInt(remain / 60, 10)
+        this.seconds = parseInt(remain % 60, 10)
+
+        this.minutes = this.minutes < 10 ? '0' + this.minutes : this.minutes
+        this.seconds = this.seconds < 10 ? '0' + this.seconds : this.seconds
+        this.timer = this.minutes + ':' + this.seconds
+        if (--remain < 0) {
+          remain = duration
+          clearInterval(this.intervalId)
+        }
+      }, 1000)
     },
     async onSubmit(e) {
       e.preventDefault()
@@ -169,24 +201,33 @@ export default {
       this.$router.push('/user/signup/profile')
     },
     confirm() {
-      confirmEmailCode({
-        email: this.email,
-        code: this.code
-      }, (response) => {
-        if (response.data.statusCode === 200) {
-          console.log('인증되었습니다.')
-          this.isReadonly = true
+      confirmEmailCode(
+        {
+          email: this.email,
+          code: this.code
+        },
+        (response) => {
+          if (response.data.statusCode === 200) {
+            console.log('인증되었습니다.')
+            this.emailCheck = true
+            clearInterval(this.intervalId)
+            this.timer = null
+          }
+        },
+        (error) => {
+          if (error.response.data.message === 'Wrong Code') {
+            console.log('코드를 잘못 입력하셨습니다.')
+          } else if (error.response.data.message === 'Email Confirm Time Out') {
+            console.log('인증코드 입력 시간이 초과되었습니다.')
+            clearInterval(this.intervalId)
+          } else if (error.response.data.message === 'Code Not Sent') {
+            console.log('인증코드를 전송해주세요.')
+          } else {
+            console.log('에러가 발생했습니다. 다시 시도해주세요.')
+          }
+          this.emailCheck = false
         }
-      }, (error) => {
-        if (error.response.data.message === 'Wrong Code') {
-          console.log('코드를 잘못 입력하셨습니다.')
-        } else if (error.response.data.message === 'Email Confirm Time Out') {
-          console.log('인증코드 입력 시간이 초과되었습니다.')
-        } else {
-          console.log('에러가 발생했습니다. 다시 시도해주세요.')
-        }
-        this.isReadonly = false
-      })
+      )
     }
   }
 }

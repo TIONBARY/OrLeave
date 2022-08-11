@@ -62,11 +62,11 @@ const routes = [
 
       // 추가
       {
-        path: 'modify1',
+        path: 'modify/password',
         component: UserAccountModify
       },
       {
-        path: 'modify2',
+        path: 'modify/profile',
         component: UserProfileModify
       }
       // 추가
