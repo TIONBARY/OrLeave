@@ -2,8 +2,32 @@
   <div>
     <br />
     <br />
-    <h1>회원가입</h1>
-    <section class="basic-container">
+    <h1>프로필 수정</h1>
+    <section class="basic-container" v-if="!passwordCheck">
+      <q-form @submit="submitPassword" class="q-gutter-md row justify-center">
+        <section class="q-gutter-sm" style="width: 85%">
+          <q-input
+            label="비밀번호"
+            outlined
+            bg-color="white"
+            type="password"
+            v-model="password"
+            placeholder="영문, 숫자, 특수문자 8~16"
+            :rules="[
+              () =>
+                /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/.test(
+                  password
+                ) || '영문, 숫자, 특수문자를 포함해 8~16자리'
+            ]"
+            dense
+            required
+          >
+          </q-input>
+        </section>
+        <q-btn label="확인" type="submit" class="primary" />
+      </q-form>
+    </section>
+    <section class="basic-container" v-if="passwordCheck">
       <q-form @submit.prevent="onSubmit">
         <section class="row justify-center">
           <!-- 프로필 이미지들 넣어주기 -->
@@ -267,22 +291,31 @@
         <q-btn label="다음" type="submit" class="primary q-mt-md" />
       </q-form>
     </section>
+    <ConfirmModal
+      v-model="this.showModal"
+      @close="movePage"
+      :modalContent="this.modalContent"
+    />
   </div>
 </template>
 
 <script>
 import { ref, reactive } from 'vue'
-
+import { checkPassword, requestProfile, requestModifyProfile, checkNicknameExist } from '@/api/user'
 import { mapState, mapActions } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
 
 export default {
   setup() {
+    const beforeNickname = ref(null)
+    const passwordCheck = ref(false)
+    const password = ref(null)
     const imageNo = ref(0)
-    // const imageUrl = ref(require('../../assets/profile/0.png'))
+    const imageUrl = ref(require('../../assets/profile/0.png'))
     const popupProfile = ref(false)
     const nickname = ref(null)
-    const nicknameValid = ref(false)
+    const nicknameValid = ref(true)
     const mbtiOptions = ref([
       '모름',
       'INFP',
@@ -333,9 +366,16 @@ export default {
       { key: 9, name: '온화한', value: false },
       { key: 10, name: '소박한', value: false }
     ])
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
     return {
+      beforeNickname,
+      password,
+      passwordCheck,
       imageNo,
-      // imageUrl,
+      imageUrl,
       popupProfile,
       nickname,
       nicknameValid,
@@ -392,10 +432,14 @@ export default {
       religionSelected,
       interests,
       personalities,
+      showModal,
+      modalContent,
+      willPageMove,
+      path,
 
       imgSelect(n) {
         imageNo.value = n
-        // imageUrl.value = require('../../assets/profile/' + n + '.png')
+        imageUrl.value = require('../../assets/profile/' + n + '.png')
       },
 
       toggle(num, key) {
@@ -403,17 +447,14 @@ export default {
         if (num === 1) item = interests
         else item = personalities
         item[key].value = !item[key].value
-      },
-
-      checkNickname(nickname) {
-        if (nickname !== null) nicknameValid.value = true
-        console.log(nicknameValid.value)
       }
     }
   },
+  components: {
+    ConfirmModal
+  },
   computed: {
     ...mapState(userStore, ['profile']),
-
     imgUrl() {
       return '../../assets/profile/' + this.imageNo + '.png'
     },
@@ -435,9 +476,37 @@ export default {
   },
   methods: {
     ...mapActions(userStore, ['getProfile']),
-
+    submitPassword() {
+      checkPassword(
+        { password: this.password },
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '인증이 완료되었습니다.'
+            this.willPageMove = false
+            this.passwordCheck = true
+          }
+        },
+        ({ response }) => {
+          if (response.status === 404) {
+            this.showModal = true
+            this.modalContent = '비밀번호가 틀렸습니다.'
+            this.willPageMove = false
+          } else if (response.status === 401) {
+            this.showModal = true
+            this.modalContent = '로그인이 만료되었습니다. 다시 로그인해주세요.'
+            this.willPageMove = true
+            this.path = '/user/login'
+          } else {
+            this.showModal = true
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.willPageMove = false
+          }
+        }
+      )
+    },
     async onSubmit() {
-      await this.tryModifyProfile({
+      requestModifyProfile({
         imageNo: this.imageNo,
         nickname: this.nickname,
         drink: this.drinkSelected,
@@ -446,20 +515,91 @@ export default {
         religion: this.religionSelected,
         interests: this.interestSelected,
         personalities: this.personalitySelected
+      }, ({ data }) => {
+        if (data.statusCode === 200) {
+          this.showModal = true
+          this.modalContent = '프로필 수정을 완료했습니다.'
+          this.willPageMove = true
+          this.path = '/'
+        }
+      }, ({ response }) => {
+        if (response.statusCode === 401) {
+          this.showModal = true
+          this.modalContent = '로그인이 만료되었습니다. 다시 로그인해주세요.'
+          this.willPageMove = true
+          this.path = '/user/login'
+        } else {
+          this.showModal = true
+          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          this.willPageMove = false
+        }
       })
+    },
+    checkNickname(nickname) {
+      if (nickname === null) {
+        this.showModal = true
+        this.modalContent = '닉네임을 입력해주세요.'
+        this.willPageMove = false
+        this.nicknameValid = false
+        return
+      }
+      if (nickname === this.beforeNickname) {
+        this.showModal = true
+        this.modalContent = '현재 사용 중인 닉네임입니다.'
+        this.willPageMove = false
+        this.nicknameValid = true
+        return
+      }
+      checkNicknameExist(
+        nickname,
+        (response) => {
+          if (response.data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '해당 닉네임은 사용 가능합니다.'
+            this.willPageMove = false
+            this.nicknameValid = true
+          }
+        },
+        (error) => {
+          if (error.response.data.message === 'Duplicate Nickname') {
+            this.modalContent = '이미 사용 중인 닉네임입니다.'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          }
+          this.showModal = true
+          this.willPageMove = false
+          this.nicknameValid = false
+        }
+      )
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   },
   created() {
-    this.getProfile()
-    console.log(this.profile)
-    this.imageNo = this.profile.imageNo
-    this.nickname = this.profile.nickname
-    this.drink = this.profile.drink
-    this.smoke = this.profile.smoke
-    this.mbti = this.profile.mbti
-    this.religion = this.profile.religion
-    this.interests = this.profile.interests
-    this.personalities = this.profile.personalities
+    requestProfile(({ data: { profile } }) => {
+      this.imageNo = profile.imageNo
+      this.imageUrl = require('../../assets/profile/' + this.imageNo + '.png')
+      this.beforeNickname = profile.nickname
+      this.nickname = profile.nickname
+      this.drinkSelected = profile.drink
+      this.smokeSelected = profile.smoke
+      this.mbtiSelected = profile.mbti
+      this.religionSelected = profile.religion
+      profile.interests.forEach((interest) => {
+        this.interests[interest].value = true
+      })
+      profile.personalities.forEach((personality) => {
+        this.personalities[personality].value = true
+      })
+    }, () => {
+      this.showModal = true
+      this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+      this.willPageMove = true
+      this.path = '/'
+    })
   }
 }
 </script>

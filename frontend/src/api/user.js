@@ -104,7 +104,7 @@ async function modifyPasswordWithoutAuth(REQUEST, success, fail) {
 async function checkPassword(REQUEST, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .post('/users/password'.JSON.stringify(REQUEST), {
+    .post('/users/password', JSON.stringify(REQUEST), {
       headers: {
         Authorization: Authorization
       }
