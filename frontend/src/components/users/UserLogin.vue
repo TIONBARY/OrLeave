@@ -45,58 +45,94 @@
           <div class="q-gutter-md">
             <router-link to="/user/signup/account">회원가입</router-link>
             <br />
-            <router-link to="/user/signup/account">비밀번호찾기</router-link>
-            <q-btn
-              label="Google Auth Login"
-              class="full-width google"
-              @click="printLog('google')"
+            <router-link to="/user/forget/password">비밀번호찾기</router-link>
+            <div @click="googleLoginBtn">
+              <img style="width: 285px" src="@/assets/main/google_login.png" />
+            </div>
+            <div id="my-signin2" style="display: none"></div>
+            <div id="naverIdLogin"></div>
+            <!-- <q-btn @click="kakaoLogin()"> -->
+            <img
+              class="kakao"
+              :src="require('../../assets/main/kakao_login_large_narrow.png')"
+              alt="kakao_login"
+              style="width: 277px"
+              @click="kakaoLogin()"
             />
-            <q-btn
-              label="Naver Auth Login"
-              class="full-width naver"
-              @click="printLog('naver')"
-            />
-            <q-btn
-              label="Kakao Auth Login"
-              class="full-width kakao"
-              @click="printLog('kakao')"
-            />
+            <!-- </q-btn> -->
           </div>
         </div>
       </section>
+      <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-
-import { mapState, mapActions } from 'vuex'
-const userStore = 'userStore'
+// import { kakaoLogin } from '@/api/user'
+import { tryLogin } from '@/api/user'
+import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, KAKAO_REDIRECT_URI } from '@/config'
+import { naverService } from '@/api/auth'
+import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
   setup() {
     const loginInfo = ref({ email: null, password: null })
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
     return {
-      loginInfo
+      loginInfo,
+      showModal,
+      modalContent,
+      willPageMove,
+      path
     }
   },
-  computed: {
-    ...mapState(userStore, ['isLogin'])
+  components: {
+    ConfirmModal
+  },
+  mounted() {
+    naverService().setNaver()
   },
   methods: {
-    ...mapActions(userStore, ['login', 'getUserInfo', 'logout']),
     async onSubmit() {
-      await this.login(this.loginInfo)
-      if (this.isLogin) {
-        console.log('로그인 성공')
+      tryLogin(this.loginInfo, ({ data }) => {
+        const token = data.authorization
+        sessionStorage.setItem('Authorization', token)
         this.$router.push({ path: '/' })
-      } else {
-        console.log('로그인 실패...ㅜㅜ')
-      }
+      }, ({ response }) => {
+        if (response.status === 401) {
+          this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
+        } else if (response.data && response.data.message && response.data.message === 'Login Prohibited') {
+          this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
+        } else if (response.status === 403) {
+          this.modalContent = '회원가입하지 않은 계정입니다.'
+        } else {
+          this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
+        }
+        this.showModal = true
+        this.willPageMove = false
+      })
     },
     printLog(msg) {
       console.log(msg)
+    },
+    kakaoLogin() {
+      window.Kakao.Auth.authorize({
+        scope: 'account_email',
+        redirectUri: KAKAO_REDIRECT_URI
+      })
+    },
+    async googleLoginBtn() {
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}`
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }
@@ -110,12 +146,8 @@ export default {
   background: #4285f4;
   color: white;
 }
-.naver {
-  background: #00c43b;
-  color: white;
-}
-.kakao {
-  background: #ffe812;
-  color: black;
+
+img:hover {
+  cursor: pointer;
 }
 </style>
