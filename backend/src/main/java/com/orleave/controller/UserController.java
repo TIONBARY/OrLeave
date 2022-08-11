@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +24,11 @@ import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.request.PasswordRequestDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
+import com.orleave.dto.request.UserAccountRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ProfileResponseDto;
+import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.EmailService;
@@ -85,9 +88,8 @@ public class UserController {
 	}
 	
 	@GetMapping("/login-kakao")
-    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestParam String code) throws IOException {
-       String access_Token = oauthService.getKaKaoAccessToken(code);
-       String email = oauthService.createKakaoUser(access_Token);
+    public ResponseEntity<LoginResponseDto> kakaoCallback(@RequestHeader("token") String token) throws IOException {
+       String email = oauthService.createKakaoUser(token);
        try {
     	   User user = userService.getUserByEmail(email);
     	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
@@ -98,9 +100,8 @@ public class UserController {
     }
 	
 	@GetMapping("/login-naver")
-    public ResponseEntity<LoginResponseDto> naverCallback(@RequestParam String code) throws IOException {
-       String access_Token = oauthService.getNaverAccessToken(code);
-       String email = oauthService.createNaverUser(access_Token);
+    public ResponseEntity<LoginResponseDto> naverCallback(@RequestHeader("token") String token) throws IOException {
+       String email = oauthService.createNaverUser(token);
        try {
     	   User user = userService.getUserByEmail(email);
     	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
@@ -151,6 +152,21 @@ public class UserController {
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
+	}
+	
+	@GetMapping("/userInfo")
+	@ApiOperation(value = "회원 이메일 조회", notes = "로그인한 회원 본인의 이메일을 응답한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> getUserInfo(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		return ResponseEntity.status(200).body(UserResponseDto.of(200, "Success", email));
 	}
 	
 	@PostMapping("/email")
@@ -280,6 +296,21 @@ public class UserController {
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		userService.modifypassword(user.getNo(), passwordRequestDto.getPassword());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+    }
+	
+	@PutMapping("/password/noAuth")
+	@ApiOperation(value = "인증없이 비밀번호 변경", notes = "비밀번호를 잊은 경우 새로운 비밀번호를 발급")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "비밀번호 변경 실패"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> modifypassword(
+            @RequestBody @ApiParam(value="비밀번호", required = true) UserAccountRequestDto userAccountRequestDto) throws Exception {
+		User user = userService.getUserByEmail(userAccountRequestDto.getEmail());
+		userService.modifypassword(user.getNo(), userAccountRequestDto.getPassword());
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
     }
 	

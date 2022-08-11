@@ -38,7 +38,7 @@ const userStore = {
         loginInfo,
         (response) => {
           if (response.data.statusCode === 200) {
-            const token = response.data.accessToken // 이걸 Authorization으로 바꿔주면 다됨!
+            const token = response.data.authorization // 이걸 Authorization으로 바꿔주면 다됨!
             commit('SET_IS_LOGIN', true)
             console.log('로그인 성공!')
             sessionStorage.setItem('Authorization', token)
