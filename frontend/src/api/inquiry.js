@@ -14,18 +14,18 @@ function inquiryRegist(inquiry, success, fail) {
 }
 
 function inquiryDetail(inquiryNo, success, fail) {
-  return api.get('/inquiries/${inquiryNo}').success(success).fail(fail)
+  return api.get(`/inquiries/${inquiryNo}`).success(success).fail(fail)
 }
 
 function inquiryModify(inquiry, inquiryNo, success, fail) {
   return api
-    .put('inquiries/${inquiryNo}', JSON.stringify(inquiry))
+    .put(`inquiries/${inquiryNo}`, JSON.stringify(inquiry))
     .success(success)
     .fail(fail)
 }
 
 function inquiryDelete(inquiryNo, success, fail) {
-  return api.delete('inquiryies/${inquiryNo}').success(success).fail(fail)
+  return api.delete(`inquiryies/${inquiryNo}`).success(success).fail(fail)
 }
 
 export {
