@@ -63,22 +63,32 @@ export default {
     goDetail(no) {
       this.noticeDetail(no)
     },
-    nextPage() {
+    async nextPage() {
       this.pageNum += 1
-      this.noticeList(this.pageNum)
+      await this.noticeList(this.pageNum)
+      this.time()
     },
-    prevPage() {
+    async prevPage() {
       this.pageNum -= 1
-      this.noticeList(this.pageNum)
+      await this.noticeList(this.pageNum)
+      this.time()
     },
-    movePage(num) {
+    async movePage(num) {
       this.pageNum = num
-      this.noticeList(this.pageNum)
+      await this.noticeList(this.pageNum)
+      this.time()
       console.log(this.pageNum + 1)
+    },
+    time() {
+      for (let i = 0; i < this.notices.content.length; i++) {
+        this.notices.content[i].createdTime = this.notices.content[i].createdTime.split(' ')[0]
+        console.log(this.notices.content[i].createdTime)
+      }
     }
   },
   async created() {
     await this.noticeList(0)
+    this.time()
   }
 }
 </script>
