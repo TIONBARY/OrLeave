@@ -324,13 +324,15 @@
         <q-btn label="다음" type="submit" class="primary q-mt-md" />
       </q-form>
     </section>
+    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
   </div>
 </template>
 
 <script>
 import { ref, reactive } from 'vue'
-import { checkNicknameExist } from '@/api/user'
-import { mapState, mapActions } from 'vuex'
+import { checkNicknameExist, trySignup } from '@/api/user'
+import { mapState } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
 
 export default {
@@ -392,6 +394,10 @@ export default {
       { key: 9, name: '온화한', value: false },
       { key: 10, name: '소박한', value: false }
     ])
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
 
     return {
       imageNo,
@@ -454,6 +460,10 @@ export default {
       religionSelected,
       interests,
       personalities,
+      showModal,
+      modalContent,
+      willPageMove,
+      path,
 
       imgSelect(n) {
         imageNo.value = n
@@ -467,6 +477,9 @@ export default {
         item[key].value = !item[key].value
       }
     }
+  },
+  components: {
+    ConfirmModal
   },
   computed: {
     ...mapState(userStore, ['signupInfo']),
@@ -487,11 +500,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['signup']),
-
     async onSubmit(e) {
       e.preventDefault()
-      await this.signup({
+      trySignup({
         ...this.signupInfo,
         imageNo: this.imageNo,
         nickname: this.nickname,
@@ -503,12 +514,26 @@ export default {
         personalities: this.personalitySelected,
         gender: this.gender,
         birthDay: this.birthday.replaceAll('/', '-')
+      }, ({ data }) => {
+        if (data.statusCode === 200) {
+          this.showModal = true
+          this.modalContent = '회원가입을 완료했습니다.'
+          this.willPageMove = true
+          this.path = '/'
+        }
+      }, () => {
+        this.showModal = true
+        this.modalContent = '회원가입에 실패했습니다.'
+        this.willPageMove = true
+        this.path = '/user/signup/account'
       })
-      this.$router.push('/')
     },
 
     checkNickname(nickname) {
       if (nickname === null) {
+        this.showModal = true
+        this.modalContent = '닉네임을 입력해주세요.'
+        this.willPageMove = false
         this.nicknameValid = false
         return
       }
@@ -516,19 +541,28 @@ export default {
         nickname,
         (response) => {
           if (response.data.statusCode === 200) {
-            console.log('해당 닉네임은 사용 가능합니다.')
+            this.showModal = true
+            this.modalContent = '해당 닉네임은 사용 가능합니다.'
+            this.willPageMove = false
             this.nicknameValid = true
           }
         },
         (error) => {
           if (error.response.data.message === 'Duplicate Nickname') {
-            console.log('이미 사용 중인 닉네임입니다.')
+            this.modalContent = '이미 사용 중인 닉네임입니다.'
           } else {
-            console.log('에러가 발생했습니다. 다시 시도해주세요.')
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
           }
+          this.showModal = true
+          this.willPageMove = false
           this.nicknameValid = false
         }
       )
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }

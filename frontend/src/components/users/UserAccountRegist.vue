@@ -92,6 +92,7 @@
         <q-btn label="다음" type="submit" class="primary" />
       </q-form>
     </section>
+    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
   </div>
 </template>
 
@@ -99,6 +100,7 @@
 import { ref, reactive, computed } from 'vue'
 import { confirmEmailCode, checkEmailExist } from '@/api/user'
 import { mapActions } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
 
 export default {
@@ -113,6 +115,10 @@ export default {
     const intervalId = ref(0)
     const minutes = ref('03')
     const seconds = ref('00')
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
     const pwState = reactive(
       computed(() => {
         if (password.value === null) return 0
@@ -139,8 +145,15 @@ export default {
       pwMsg,
       intervalId,
       minutes,
-      seconds
+      seconds,
+      showModal,
+      modalContent,
+      willPageMove,
+      path
     }
+  },
+  components: {
+    ConfirmModal
   },
   methods: {
     ...mapActions(userStore, [
@@ -150,24 +163,31 @@ export default {
     ]),
     async sendEmail() {
       if (this.email < 3 || !this.email.includes('@')) {
+        this.showModal = true
+        this.modalContent = '이메일 형식이 올바르지 않습니다.'
+        this.willPageMove = false
         return
       }
       checkEmailExist(
         this.email,
         ({ data }) => {
-          console.log('valid')
           if (data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '인증번호가 전송되었습니다.'
+            this.willPageMove = false
             this.sendConfirmKey(this.email)
             this.startTimer(60 * 3)
             this.isReadonly = true
           }
         },
         ({ response: { data } }) => {
-          console.log('invalid')
+          this.showModal = true
+          this.modalContent = '인증번호를 전송하지 못했습니다. 다시 시도해보세요.'
+          this.willPageMove = false
           this.isReadonly = false
+          clearInterval(this.intervalId)
         }
       )
-      console.log('END')
     },
     checkReadonly() {
       return this.emailCheck || '이메일을 인증해주세요'
@@ -208,7 +228,9 @@ export default {
         },
         (response) => {
           if (response.data.statusCode === 200) {
-            console.log('인증되었습니다.')
+            this.showModal = true
+            this.modalContent = '인증되었습니다.'
+            this.willPageMove = false
             this.emailCheck = true
             clearInterval(this.intervalId)
             this.timer = null
@@ -216,18 +238,25 @@ export default {
         },
         (error) => {
           if (error.response.data.message === 'Wrong Code') {
-            console.log('코드를 잘못 입력하셨습니다.')
+            this.modalContent = '코드를 잘못 입력하셨습니다.'
           } else if (error.response.data.message === 'Email Confirm Time Out') {
-            console.log('인증코드 입력 시간이 초과되었습니다.')
+            this.modalContent = '인증코드 입력 시간이 초과되었습니다.'
             clearInterval(this.intervalId)
           } else if (error.response.data.message === 'Code Not Sent') {
-            console.log('인증코드를 전송해주세요.')
+            this.modalContent = '인증코드를 전송해주세요.'
           } else {
-            console.log('에러가 발생했습니다. 다시 시도해주세요.')
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
           }
+          this.showModal = true
+          this.willPageMove = false
           this.emailCheck = false
         }
       )
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }

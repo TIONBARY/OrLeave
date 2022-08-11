@@ -113,7 +113,7 @@
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { confirmEmailCode, getEmail, modifyPassword } from '@/api/user'
+import { confirmEmailCode, getEmail, modifyPassword, setConfirmKey } from '@/api/user'
 import { mapActions } from 'vuex'
 import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
@@ -178,8 +178,8 @@ export default {
       if (data.statusCode === 200) {
         this.userEmail = data.email
       }
-    }, ({ response: { data } }) => {
-      if (data.statusCode === 401) {
+    }, ({ response }) => {
+      if (response.status === 401) {
         this.showModal = true
         this.modalContent = '로그인이 필요합니다.'
         this.willPageMove = true
@@ -193,17 +193,29 @@ export default {
     })
   },
   methods: {
-    ...mapActions(userStore, ['sendConfirmKey', 'modifyAccountInfo']),
+    ...mapActions(userStore, ['modifyAccountInfo']),
     sendEmail() {
       if (this.checkingEmail < 3 || !this.checkingEmail.includes('@')) {
+        this.showModal = true
+        this.modalContent = '이메일 형식이 올바르지 않습니다.'
+        this.willPageMove = false
         return
       }
-      this.sendConfirmKey(this.checkingEmail)
-      this.isReadonly = true
-      this.showModal = true
-      this.modalContent = '인증번호가 전송되었습니다.'
-      this.willPageMove = false
-      this.startTimer(60 * 3)
+      setConfirmKey({ email: this.checkingEmail }, ({ data }) => {
+        if (data.statusCode === 200) {
+          this.isReadonly = true
+          this.showModal = true
+          this.modalContent = '인증번호가 전송되었습니다.'
+          this.willPageMove = false
+          this.startTimer(60 * 3)
+        }
+      }, ({ response: { data } }) => {
+        this.isReadonly = true
+        this.showModal = true
+        this.modalContent = '인증번호를 전송하지 못했습니다. 다시 시도해보세요.'
+        this.willPageMove = false
+        clearInterval(this.intervalId)
+      })
     },
     async onSubmit() {
       modifyPassword({

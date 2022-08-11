@@ -27,6 +27,7 @@ import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ProfileResponseDto;
+import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.EmailService;
@@ -150,6 +151,21 @@ public class UserController {
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
+	}
+	
+	@GetMapping("/userInfo")
+	@ApiOperation(value = "회원 이메일 조회", notes = "로그인한 회원 본인의 이메일을 응답한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> getUserInfo(@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String email = userDetails.getUsername();
+		return ResponseEntity.status(200).body(UserResponseDto.of(200, "Success", email));
 	}
 	
 	@PostMapping("/email")

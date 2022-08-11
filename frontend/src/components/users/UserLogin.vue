@@ -63,6 +63,7 @@
           </div>
         </div>
       </section>
+      <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
     </div>
   </div>
 </template>
@@ -70,34 +71,49 @@
 <script>
 import { ref } from 'vue'
 // import { kakaoLogin } from '@/api/user'
-import { mapState, mapActions } from 'vuex'
+import { tryLogin } from '@/api/user'
 import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, KAKAO_REDIRECT_URI } from '@/config'
 import { naverService } from '@/api/auth'
-const userStore = 'userStore'
+import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
   setup() {
     const loginInfo = ref({ email: null, password: null })
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
     return {
-      loginInfo
+      loginInfo,
+      showModal,
+      modalContent,
+      willPageMove,
+      path
     }
+  },
+  components: {
+    ConfirmModal
   },
   mounted() {
     naverService().setNaver()
   },
-  computed: {
-    ...mapState(userStore, ['isLogin'])
-  },
   methods: {
-    ...mapActions(userStore, ['login', 'getUserInfo', 'logout']),
     async onSubmit() {
-      await this.login(this.loginInfo)
-      if (this.isLogin) {
-        console.log('로그인 성공')
+      tryLogin(this.loginInfo, ({ data }) => {
+        const token = data.authorization
+        sessionStorage.setItem('Authorization', token)
         this.$router.push({ path: '/' })
-      } else {
-        console.log('로그인 실패...ㅜㅜ')
-      }
+      }, ({ response }) => {
+        if (response.status === 401) {
+          this.modalContent = 'ID 또는 PW가 일치하지 않습니다.'
+        } else if (response.status === 403) {
+          this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
+        } else {
+          this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
+        }
+        this.showModal = true
+        this.willPageMove = false
+      })
     },
     printLog(msg) {
       console.log(msg)
@@ -110,6 +126,11 @@ export default {
     },
     async googleLoginBtn() {
       window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}`
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }
