@@ -1,9 +1,9 @@
 import {
   inquiryList,
   inquiryRegist,
-  inquiryDetail,
-  inquiryModify,
-  inquiryDelete
+  inquiryDetail
+  // inquiryModify,
+  // inquiryDelete
 } from '@/api/inquiry.js'
 
 const inquiryStore = {

@@ -21,7 +21,7 @@
               <td>
                 <q-input
                   outlined
-                  v-model="boardTitle"
+                  v-model="inquiryTitle"
                   style="background-color: white"
                   dense
                 />
@@ -65,23 +65,39 @@
 
 <script>
 import { ref } from 'vue'
+import { mapActions } from 'vuex'
+
+const inquiryStore = 'inquiryStore'
 
 export default {
   setup() {
-    const boardTitle = ref(null)
-    const boardContent = ref(null)
-
+    const inquiryTitle = ref(null)
+    const inquiryContent = ref(null)
     return {
-      boardTitle,
-      boardContent,
+      inquiryTitle,
+      inquiryContent,
 
-      editor: ref(null),
+      editor: ref(null)
 
-      onSubmit() {
-        // console.log(boardImage)
-        // 채워주삼
-        // 아니면 q-form에 action method로 되면 이거 지우삼
-      }
+      // onSubmit(event) {
+      //   event.preventDefault()
+
+      //   inquiry.title = inquiryTitle
+      //   inquiry.content = inquiryContent
+      //   this.inquiryRegist(this.inquiry)
+      //   // console.log(inquiryImage)
+      //   // 채워주삼
+      //   // 아니면 q-form에 action method로 되면 이거 지우삼
+      // }
+    }
+  },
+  methods: {
+    ...mapActions(inquiryStore, ['inquiryRegist']),
+    onSubmit() {
+      return this.inquiryRegist({
+        title: this.inquiryTitle,
+        content: this.editor
+      })
     }
   }
 }
