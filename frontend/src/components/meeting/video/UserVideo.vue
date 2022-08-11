@@ -30,8 +30,12 @@ export default {
 
   methods: {
     getConnectionData() {
+      console.log(this.streamManager.stream)
       const { connection } = this.streamManager.stream
-      return JSON.parse(connection.data)
+      const bracketIdx = connection.data.indexOf('}')
+      const data = connection.data.substring(0, bracketIdx + 1)
+      console.log(data)
+      return JSON.parse(data)
     }
   }
 }

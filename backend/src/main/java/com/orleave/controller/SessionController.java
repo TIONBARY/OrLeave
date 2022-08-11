@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiResponses;
 import springfox.documentation.annotations.ApiIgnore;
 import io.openvidu.java.client.ConnectionProperties;
 import io.openvidu.java.client.ConnectionType;
+import io.openvidu.java.client.KurentoOptions;
 
 @Api(value = "미팅 세션 API", tags = {"Session"})
 @RestController
@@ -82,7 +83,12 @@ public class SessionController {
 		String serverData = "{\"serverData\": \"" + nickname + "\"}";
 
 		// Build connectionProperties object with the serverData and the role
-		ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(role).build();
+		ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(role)
+				.kurentoOptions(
+						new KurentoOptions.Builder().allowedFilters(
+								new String[]{"GStreamerFilter","FaceOverlayFilter"}
+								).build()
+						).build();
 
 		if (this.mapSessions.get(sessionName) != null) {
 			// Session already exists
