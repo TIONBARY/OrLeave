@@ -93,6 +93,13 @@ async function modifyPassword(REQUEST, success, fail) {
     .then(success)
     .catch(fail)
 }
+
+async function modifyPasswordWithoutAuth(REQUEST, success, fail) {
+  await api
+    .put('/users/password/noAuth', JSON.stringify(REQUEST))
+    .then(success)
+    .catch(fail)
+}
 // ? 비밀번호 검사 무슨 용도였지?
 async function checkPassword(REQUEST, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
@@ -155,6 +162,7 @@ export {
   // 로그아웃
   withdrawal, // 회원탈퇴
   modifyPassword, // 비밀번호 재설정
+  modifyPasswordWithoutAuth,
   checkPassword, // 비밀번호 검사
   requestModifyProfile,
   requestProfile,

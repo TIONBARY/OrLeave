@@ -13,6 +13,7 @@ import GoogleLogin from '../components/users/GoogleLogin.vue'
 import UserAccountRegist from '../components/users/UserAccountRegist.vue'
 import UserProfileRegist from '../components/users/UserProfileRegist.vue'
 import UserAccountModify from '../components/users/UserAccountModify.vue'
+import UserPasswordForget from '../components/users/UserPasswordForget.vue'
 import UserProfileModify from '../components/users/UserProfileModify.vue'
 import MeetingLobby from '../components/meeting/MeetingLobby.vue'
 import MeetingRoom from '../components/meeting/MeetingRoom.vue'
@@ -59,8 +60,6 @@ const routes = [
         path: 'signup/profile',
         component: UserProfileRegist
       },
-
-      // 추가
       {
         path: 'modify/password',
         component: UserAccountModify
@@ -68,8 +67,11 @@ const routes = [
       {
         path: 'modify/profile',
         component: UserProfileModify
+      },
+      {
+        path: 'forget/password',
+        component: UserPasswordForget
       }
-      // 추가
     ]
   },
   {

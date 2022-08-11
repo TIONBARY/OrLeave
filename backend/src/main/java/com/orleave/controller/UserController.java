@@ -24,6 +24,7 @@ import com.orleave.dto.request.LoginRequestDto;
 import com.orleave.dto.request.PasswordRequestDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
+import com.orleave.dto.request.UserAccountRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ProfileResponseDto;
@@ -295,6 +296,21 @@ public class UserController {
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		userService.modifypassword(user.getNo(), passwordRequestDto.getPassword());
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+    }
+	
+	@PutMapping("/password/noAuth")
+	@ApiOperation(value = "인증없이 비밀번호 변경", notes = "비밀번호를 잊은 경우 새로운 비밀번호를 발급")
+	@ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 400, message = "비밀번호 변경 실패"),
+        @ApiResponse(code = 404, message = "사용자 없음"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<? extends BaseResponseDto> modifypassword(
+            @RequestBody @ApiParam(value="비밀번호", required = true) UserAccountRequestDto userAccountRequestDto) throws Exception {
+		User user = userService.getUserByEmail(userAccountRequestDto.getEmail());
+		userService.modifypassword(user.getNo(), userAccountRequestDto.getPassword());
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
     }
 	

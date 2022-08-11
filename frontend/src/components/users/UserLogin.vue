@@ -45,7 +45,7 @@
           <div class="q-gutter-md">
             <router-link to="/user/signup/account">회원가입</router-link>
             <br />
-            <router-link to="/user/signup/account">비밀번호찾기</router-link>
+            <router-link to="/user/forget/password">비밀번호찾기</router-link>
             <div @click="googleLoginBtn">
               <img style="width: 285px" src="@/assets/main/google_login.png" />
             </div>
