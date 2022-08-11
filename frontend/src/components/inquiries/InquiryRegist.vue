@@ -16,20 +16,6 @@
             </th>
             <tr>
               <td class="q-pa-md" style="width: 20%; text-align: start">
-                문의 분류
-              </td>
-              <td>
-                <q-select
-                  outlined
-                  v-model="boardSelected"
-                  :options="boardOptions"
-                  style="background-color: white"
-                  dense
-                />
-              </td>
-            </tr>
-            <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
                 문의 제목
               </td>
               <td>
@@ -67,20 +53,6 @@
                 />
               </td>
             </tr>
-            <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
-                이미지 첨부
-              </td>
-              <td>
-                <q-file
-                  v-model="file"
-                  label="파일을 선택하세요."
-                  filled
-                  style="max-width: 300px; background-color: white"
-                  dense
-                />
-              </td>
-            </tr>
           </table>
           <q-btn label="문의 접수" type="submit" color="primary" />
         </q-form>
@@ -98,25 +70,15 @@ export default {
   setup() {
     const boardTitle = ref(null)
     const boardContent = ref(null)
-    const boardImage = ref(null)
-
-    const boardSelected = ref(null)
-    const boardOptions = ref(['버그 수정', '계정 문의', '건의 사항'])
 
     return {
       boardTitle,
       boardContent,
-      boardImage,
-
-      boardSelected,
-      boardOptions,
 
       editor: ref(null),
 
-      file: ref(null),
-
       onSubmit() {
-        console.log(boardImage)
+        // console.log(boardImage)
         // 채워주삼
         // 아니면 q-form에 action method로 되면 이거 지우삼
       }
