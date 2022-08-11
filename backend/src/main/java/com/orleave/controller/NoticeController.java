@@ -38,7 +38,6 @@ public class NoticeController {
         @ApiResponse(code = 500, message = "서버 오류")
     })
 	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
-		System.out.println(page+" "+size);
 		Page<NoticeListDto> noticeList = noticeService.getNotices(PageRequest.of(page, size, Sort.by("no").descending()));
 		
 		return ResponseEntity.status(200).body(NoticeListResponseDto.of(200, "Success", noticeList));
