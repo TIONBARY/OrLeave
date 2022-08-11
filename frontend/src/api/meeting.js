@@ -3,7 +3,7 @@ import { apiInstance } from './index.js'
 const api = apiInstance()
 
 function enterMeeting(sessionId) {
-  const authorization = 'Bearer ' + sessionStorage.getItem('authorization')
+  const authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   console.log(authorization)
   const sessionObject = { sessionName: sessionId }
   console.log(sessionId)
