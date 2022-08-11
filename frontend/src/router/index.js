@@ -61,7 +61,7 @@ const routes = [
         component: UserProfileRegist
       },
       {
-        path: 'modify/password',
+        path: 'modify/account',
         component: UserAccountModify
       },
       {

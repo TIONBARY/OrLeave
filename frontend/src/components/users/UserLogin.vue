@@ -105,9 +105,11 @@ export default {
         this.$router.push({ path: '/' })
       }, ({ response }) => {
         if (response.status === 401) {
-          this.modalContent = 'ID 또는 PW가 일치하지 않습니다.'
-        } else if (response.status === 403) {
+          this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
+        } else if (response.data && response.data.message && response.data.message === 'Login Prohibited') {
           this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
+        } else if (response.status === 403) {
+          this.modalContent = '회원가입하지 않은 계정입니다.'
         } else {
           this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
         }

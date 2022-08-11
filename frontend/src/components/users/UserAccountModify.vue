@@ -2,7 +2,7 @@
   <div>
     <br />
     <br />
-    <h1>비밀번호 변경</h1>
+    <h1>계정정보 수정</h1>
     <section class="basic-container" v-if="!emailCheck">
       <q-form class="q-gutter-md row justify-center">
         <section class="q-gutter-sm" style="width: 85%">
@@ -104,18 +104,21 @@
             required
           />
         </section>
-        <q-btn label="다음" type="submit" class="primary" />
+        <q-btn label="완료" type="submit" class="primary" />
+        <q-btn label="회원탈퇴" @click="withdraw" class="negative" />
       </q-form>
     </section>
     <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
+    <ChoiceModal v-model="this.showChoiceModal" @confirm="deleteUser" :modalContent="this.modalContent" />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { confirmEmailCode, getEmail, modifyPassword, setConfirmKey } from '@/api/user'
+import { confirmEmailCode, getEmail, modifyPassword, setConfirmKey, withdrawal } from '@/api/user'
 import { mapActions } from 'vuex'
 import ConfirmModal from '../ConfirmModal.vue'
+import ChoiceModal from '../ChoiceModal.vue'
 const userStore = 'userStore'
 
 export default {
@@ -135,6 +138,7 @@ export default {
     const minutes = ref('03')
     const seconds = ref('00')
     const modalContent = 'ID 또는 PW가 일치하지 않습니다'
+    const showChoiceModal = ref(false)
     const pwState = reactive(
       computed(() => {
         if (password.value === null) return 0
@@ -162,6 +166,7 @@ export default {
       pwState,
       pwMsg,
       showModal,
+      showChoiceModal,
       modalContent,
       willPageMove,
       path,
@@ -171,7 +176,8 @@ export default {
     }
   },
   components: {
-    ConfirmModal
+    ConfirmModal,
+    ChoiceModal
   },
   created() {
     getEmail(({ data }) => {
@@ -201,7 +207,7 @@ export default {
         this.willPageMove = false
         return
       }
-      setConfirmKey({ email: this.checkingEmail }, ({ data }) => {
+      setConfirmKey(this.checkingEmail, ({ data }) => {
         if (data.statusCode === 200) {
           this.isReadonly = true
           this.showModal = true
@@ -302,6 +308,33 @@ export default {
         }
         this.emailCheck = false
         this.willPageMove = false
+      })
+    },
+    withdraw() {
+      this.showChoiceModal = true
+      this.modalContent = '정말로 탈퇴하시겠습니까?'
+    },
+    deleteUser() {
+      this.showChoiceModal = false
+      withdrawal(({ data }) => {
+        if (data.statusCode === 200) {
+          sessionStorage.removeItem('Authorization')
+          this.showModal = true
+          this.modalContent = '회원탈퇴가 완료되었습니다.'
+          this.willPageMove = true
+          this.path = '/'
+        }
+      }, ({ response }) => {
+        if (response.status === 401) {
+          this.showModal = true
+          this.modalContent = '로그인이 만료되었습니다. 다시 로그인해주세요.'
+          this.willPageMove = true
+          this.path = '/user/login'
+        } else {
+          this.showModal = true
+          this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
+          this.willPageMove = false
+        }
       })
     },
     movePage() {
