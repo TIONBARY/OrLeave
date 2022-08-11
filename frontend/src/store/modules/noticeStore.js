@@ -20,7 +20,7 @@ const noticeStore = {
       return noticeList(
         page,
         (response) => {
-          commit('setNotices', response.data.noticeList.content)
+          commit('setNotices', response.data.noticeList)
           console.log(response.data)
         },
         (error) => {

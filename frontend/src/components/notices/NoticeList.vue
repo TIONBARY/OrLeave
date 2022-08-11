@@ -13,7 +13,7 @@
           <th colspan="2" class="q-pa-md" style="text-align: start">
             공지사항
           </th>
-          <tr :key="noticeList" v-for="noticeList in notices">
+          <tr :key="noticeList" v-for="noticeList in notices.content">
             <td class="q-pa-md" style="text-align: start" >
               <router-link :to="`/notice/${noticeList.no}`" @click="goDetail(noticeList.no)"   >{{
                 noticeList.title
@@ -26,11 +26,14 @@
         </table>
       </section>
       <br />
-      <div>
-        <q-btn>이전</q-btn>
-        <q-btn>1</q-btn>
-        <q-btn>2</q-btn>
-        <q-btn>다음</q-btn>
+      <div class="btn-cover">
+        <q-btn :disabled="pageNum===0" @click="prevPage">이전</q-btn>
+        <span :key="num" v-for="num in 3" >
+        <q-btn  v-if="pageNum+num <= this.notices.totalPages"  @click="movePage(pageNum+num-1)" >
+          {{pageNum+num}}
+          </q-btn>
+        </span>
+        <q-btn :disabled="pageNum >= this.notices.totalPages-1" @click="nextPage">다음</q-btn>
       </div>
     </div>
   </div>
@@ -48,7 +51,8 @@ export default {
     const size = ref(5)
     return {
       page,
-      size
+      size,
+      pageNum: 0
     }
   },
   computed: {
@@ -58,10 +62,23 @@ export default {
     ...mapActions(noticeStore, ['noticeList', 'noticeDetail']),
     goDetail(no) {
       this.noticeDetail(no)
+    },
+    nextPage() {
+      this.pageNum += 1
+      this.noticeList(this.pageNum)
+    },
+    prevPage() {
+      this.pageNum -= 1
+      this.noticeList(this.pageNum)
+    },
+    movePage(num) {
+      this.pageNum = num
+      this.noticeList(this.pageNum)
+      console.log(this.pageNum + 1)
     }
   },
   async created() {
-    await this.noticeList(this.page)
+    await this.noticeList(0)
   }
 }
 </script>
