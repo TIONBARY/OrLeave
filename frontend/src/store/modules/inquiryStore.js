@@ -19,12 +19,11 @@ const inquiryStore = {
     }
   },
   actions: {
-    inquiryList: ({ commit }, page, size) => {
+    inquiryList: ({ commit }, page) => {
       return inquiryList(
         page,
-        size,
-        ({ data }) => {
-          commit('setInquiries', data)
+        (response) => {
+          commit('setInquiries', response.data.inquiryList.content)
         },
         (error) => {
           console.log(error)
@@ -34,8 +33,8 @@ const inquiryStore = {
     inquiryDetail: ({ commit }, inquiryNo) => {
       return inquiryDetail(
         inquiryNo,
-        ({ data }) => {
-          commit('setInquiry', data)
+        (response) => {
+          commit('setInquiry', response.data.inquiry)
         },
         (error) => {
           console.log(error)

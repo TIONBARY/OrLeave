@@ -16,9 +16,9 @@
               {{ inquiry.no }}
             </td>
             <td class="q-pa-md" style="text-align: start">
-              <router-link to="/inquiry/detail/1">{{
-                inquiry.title
-              }}</router-link>
+              <router-link to="/inquiry/${inquiry.no}">
+              {{ inquiry.title }}
+              </router-link>
             </td>
             <td class="q-pa-md" style="text-align: end">
               {{ inquiry.created_time }}
@@ -49,6 +49,7 @@ export default {
     return {
       perPage,
       currentPage
+      // inquiries: []
     }
   },
   computed: {
@@ -64,13 +65,17 @@ export default {
     rows() {
       return this.inquiries.length
     }
+    // goDetail(no) {
+    //   return this.inquiryDetail(no)
+    // }
   },
   created() {
-    console.log('InquiryList Comp.')
-    this.inquiryList(currentPage, perPage)
+    this.inquiryList(0)
+    // this.inquiries = this.getinquiries
+    // console.log(this.getinquiries)
   },
   methods: {
-    ...mapActions(inquiryStore, ['getinquiries']),
+    ...mapActions(inquiryStore, ['getinquiries', 'inquiryDetail', 'inquiryList']),
     moveRegist() {
       this.$router.push('/inquiry/regist')
     }
