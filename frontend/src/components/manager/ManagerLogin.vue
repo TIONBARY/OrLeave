@@ -78,7 +78,7 @@ export default {
           this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
         } else if (response.data && response.data.message && response.data.message === 'Login Prohibited') {
           this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
-        } else if (response.data && response.data.message && response.data.message === 'Unauthorized') {
+        } else if (response.data && response.data.message && response.data.message === 'Not Manager') {
           this.modalContent = '관리자 계정이 아닙니다.'
         } else if (response.status === 403) {
           this.modalContent = '회원가입하지 않은 계정입니다.'
