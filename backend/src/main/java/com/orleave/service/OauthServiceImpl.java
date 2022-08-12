@@ -108,7 +108,8 @@ public class OauthServiceImpl implements OauthService {
 
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-
+            conn.setRequestProperty("content-type", "application/x-www-form-urlencoded");
+            
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
@@ -118,7 +119,8 @@ public class OauthServiceImpl implements OauthService {
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
-
+            
+            
             int responseCode = conn.getResponseCode();
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
