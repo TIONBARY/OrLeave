@@ -35,6 +35,7 @@ import com.orleave.dto.response.ReportDetailResponseDto;
 import com.orleave.dto.response.UserListResponseDto;
 import com.orleave.dto.response.UserReportListResponseDto;
 import com.orleave.entity.User;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.service.ManagerService;
 import com.orleave.service.UserService;
 import com.orleave.util.JwtTokenUtil;
@@ -92,7 +93,7 @@ public class ManagerController {
 		// 로그인 요청한 유저로부터 입력된 패스워드 와 디비에 저장된 유저의 암호화된 패스워드가 같은지 확인.(유효한 패스워드인지 여부 확인)
 		if(passwordEncoder.matches(password, user.getPassword())) {
 			if (!userType.equals("MANAGER")) {
-				return ResponseEntity.status(403).body(LoginResponseDto.of(403, "Unauthorized", null));
+				return ResponseEntity.status(403).body(LoginResponseDto.of(403, "Not Manager", null));
 			}
 			// 유효한 패스워드가 맞는 경우, 로그인 성공으로 응답.(액세스 토큰을 포함하여 응답값 전달)
 			return ResponseEntity.ok(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(userNo,userType,imageNo,nickname,gender)));
@@ -115,7 +116,7 @@ public class ManagerController {
 		if (authentication == null) return ResponseEntity.status(401).body(UserListResponseDto.of(401, "Unauthorized",null));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(UserListResponseDto.of(403, "failed", null));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(UserListResponseDto.of(403, "Not Manager", null));
 		
 		Page<UserListDto> userList = managerService.getUsers(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(UserListResponseDto.of(200, "Success", userList));
@@ -136,7 +137,7 @@ public class ManagerController {
 		if (authentication == null) return ResponseEntity.status(401).body(UserReportListResponseDto.of(401, "Unauthorized",null));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(UserReportListResponseDto.of(403, "failed", null));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(UserReportListResponseDto.of(403, "Not Manager", null));
 		
 		Page<UserReportListDto> userReportList = managerService.getUserReports(PageRequest.of(page, size, Sort.by("no").descending()),no);
 		return ResponseEntity.status(200).body(UserReportListResponseDto.of(200, "Success", userReportList));
@@ -157,7 +158,7 @@ public class ManagerController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		ReportDetailDto report = managerService.getReportDetail(no);
 		if (report == null) return ResponseEntity.status(404).body(BaseResponseDto.of(404, "Not Found"));
@@ -180,7 +181,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		
 		managerService.BanUser(userNoRequestDto.getNo());
@@ -205,11 +206,14 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
-		
-		
-		managerService.ModifyNickname(nicknameModifyRequestDto);
-		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
+		try {
+			userService.getUserByNickname(nicknameModifyRequestDto.getNickname());
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
+		} catch (UserNotFoundException e) {
+			managerService.ModifyNickname(nicknameModifyRequestDto);
+			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		}
 	}
 	
 	@PutMapping("/inquiry/answer")
@@ -228,7 +232,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		
 		managerService.InquiryAnswer(inquiryAnswerRequestDto);
@@ -250,7 +254,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		managerService.CreateNotices(noticeRequestDto);
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
@@ -272,7 +276,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		managerService.ModifyNotices(noticeModifyRequestDto);
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
@@ -293,7 +297,7 @@ public class ManagerController {
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
-		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Found"));
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
 		managerService.DeleteNotices(no);
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
