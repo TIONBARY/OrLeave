@@ -45,8 +45,8 @@
         </table>
         <br />
         <div>
-          <q-btn>수정</q-btn>
-          <q-btn>삭제</q-btn>
+          <q-btn @click="modifyInquiry(this.inquiry.no)">수정</q-btn>
+          <q-btn @click="deleteInquiry(this.inquiry.no)">삭제</q-btn>
         </div>
       </section>
       <br />
@@ -74,7 +74,11 @@ export default {
     ...mapState(inquiryStore, ['inquiry'])
   },
   methods: {
-    ...mapActions(inquiryStore, ['inquiryDetail'])
+    ...mapActions(inquiryStore, ['inquiryDetail', 'inquiryDelete']),
+    deleteInquiry(no) {
+      this.inquiryDelete(no)
+      this.$router.go(-1)
+    }
   }
 }
 </script>

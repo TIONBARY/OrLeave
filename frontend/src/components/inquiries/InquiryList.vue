@@ -16,7 +16,7 @@
               {{ inquiry.no }}
             </td>
             <td class="q-pa-md" style="text-align: start">
-              <router-link to="/inquiry/${inquiry.no}">
+              <router-link to="/inquiry/${inquiry.no}" @click="goDetail(inquiry.no)">
               {{ inquiry.title }}
               </router-link>
             </td>
@@ -65,9 +65,6 @@ export default {
     rows() {
       return this.inquiries.length
     }
-    // goDetail(no) {
-    //   return this.inquiryDetail(no)
-    // }
   },
   created() {
     this.inquiryList(0)
@@ -78,6 +75,10 @@ export default {
     ...mapActions(inquiryStore, ['getinquiries', 'inquiryDetail', 'inquiryList']),
     moveRegist() {
       this.$router.push('/inquiry/regist')
+    },
+    goDetail(no) {
+      console.log(no)
+      this.inquiryDetail(no)
     }
   }
 }

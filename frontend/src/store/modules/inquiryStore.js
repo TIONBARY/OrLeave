@@ -1,9 +1,9 @@
 import {
   inquiryList,
   inquiryRegist,
-  inquiryDetail
-  // inquiryModify,
-  // inquiryDelete
+  inquiryDetail,
+  inquiryDelete
+  // inquiryModify
 } from '@/api/inquiry.js'
 
 const inquiryStore = {
@@ -44,6 +44,15 @@ const inquiryStore = {
     inquiryRegist: (context, inquiry) => {
       return inquiryRegist(
         inquiry,
+        () => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    inquiryDelete: (context, inquiryNo) => {
+      return inquiryDelete(
+        inquiryNo,
         () => {},
         (error) => {
           console.log(error)

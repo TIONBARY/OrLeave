@@ -42,7 +42,7 @@ function inquiryModify(inquiry, inquiryNo, success, fail) {
 
 function inquiryDelete(inquiryNo, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  return api.delete(`inquiryies/${inquiryNo}`, {
+  return api.delete(`inquiries/${inquiryNo}`, {
     headers: {
       Authorization: Authorization
     }
