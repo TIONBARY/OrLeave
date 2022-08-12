@@ -55,9 +55,7 @@ export default {
       'logout'
     ]),
     movePage(name) {
-      if (this.willPageMove) {
-        this.$router.push({ name })
-      }
+      this.$router.push({ name })
     }
   }
 }

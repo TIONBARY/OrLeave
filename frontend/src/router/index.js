@@ -26,6 +26,7 @@ import InquiryDetail from '../components/inquiries/InquiryDetail.vue'
 import InquiryRegist from '../components/inquiries/InquiryRegist.vue'
 import ManagerLogin from '../components/manager/ManagerLogin.vue'
 import ManagerMain from '../components/manager/ManagerMain.vue'
+import ManagerUsers from '../components/manager/ManagerUsers.vue'
 
 import jwtDecode from 'jwt-decode'
 
@@ -158,6 +159,12 @@ const routes = [
         name: 'managerMain',
         beforeEnter: onlyAuthManager,
         component: ManagerMain
+      },
+      {
+        path: 'users',
+        name: 'managerUsers',
+        beforeEnter: onlyAuthManager,
+        component: ManagerUsers
       }
     ]
   },
