@@ -39,7 +39,7 @@
               <td class="text-center">{{ changeGender(user.gender) }}</td>
               <td class="text-center">{{ user.birthDay }}</td>
               <td class="text-left">{{ user.matchcount }}</td>
-              <td class="text-left">{{ user.reportcount }} <q-icon class="cursor-pointer" name="dangerous" color="danger" size="2rem" @click="showReportList(user.no, user.email)"/> </td>
+              <td class="text-left">{{ user.reportcount }} <q-icon class="cursor-pointer report-icon" name="dangerous" size="2rem" @click="showReportList(user.no, user.email)"/> </td>
               <td class="text-center isBanned">{{ checkingUserType(user.userType) }}</td>
             </tr>
           </tbody>
@@ -229,5 +229,8 @@ export default {
 .isBanned {
   color: #6b7a16 !important;
   font-size: 1.5rem;
+}
+.report-icon {
+  color: red;
 }
 </style>
