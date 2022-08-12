@@ -182,7 +182,7 @@ export default {
         },
         ({ response: { data } }) => {
           this.showModal = true
-          this.modalContent = '인증번호를 전송하지 못했습니다. 다시 시도해보세요.'
+          this.modalContent = '이미 사용 중인 이메일입니다.'
           this.willPageMove = false
           this.isReadonly = false
           clearInterval(this.intervalId)
