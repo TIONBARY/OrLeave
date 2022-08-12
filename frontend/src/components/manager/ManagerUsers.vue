@@ -36,7 +36,7 @@
                   />
                 </q-popup-edit>
               </td>
-              <td class="text-center">{{ user.gender }}</td>
+              <td class="text-center">{{ changeGender(user.gender) }}</td>
               <td class="text-center">{{ user.birthDay }}</td>
               <td class="text-left">{{ user.matchcount }}</td>
               <td class="text-left">{{ user.reportcount }} <q-icon class="cursor-pointer" name="dangerous" color="danger" size="2rem" @click="showReportList(user.no, user.email)"/> </td>
@@ -206,6 +206,13 @@ export default {
         return '■'
       } else {
         return '□'
+      }
+    },
+    changeGender(gender) {
+      if (gender === 'M') {
+        return '남'
+      } else {
+        return '여'
       }
     }
   }
