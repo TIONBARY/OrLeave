@@ -6,7 +6,7 @@ import noticeStore from '@/store/modules/noticeStore.js'
 import meetingStore from '@/store/modules/meetingStore.js'
 
 export default createStore({
-  modules: { userStore, noticeStore, meetingStore  },
+  modules: { userStore, noticeStore, meetingStore },
 
   plugins: [
     createPersistedState({
