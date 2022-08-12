@@ -15,13 +15,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel("UserResponse")
-public class UserResponseDto{
+public class UserResponseDto extends BaseResponseDto {
 	@ApiModelProperty(name="User Email")
 	String email;
 	
-	public static UserResponseDto of(User user) {
+	public static UserResponseDto of(int statusCode, String message, String email) {
 		UserResponseDto res = new UserResponseDto();
-		res.setEmail(user.getEmail());
+		res.setStatusCode(statusCode);
+		res.setMessage(message);
+		res.setEmail(email);
 		return res;
 	}
 }

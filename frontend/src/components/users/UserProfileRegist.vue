@@ -97,7 +97,64 @@
                 </q-input>
               </td>
             </tr>
-
+            <tr>
+              <td class="q-pa-xs" style="width: 100%" colspan="2">
+                <q-field
+                  label="성별"
+                  stack-label
+                  outlined
+                  bg-color="white"
+                  :rules="[() => gender !== null || '성별을 선택해주세요']"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
+                  <div class="row justify-center q-gutter-md">
+                    <q-radio dense v-model="gender" val="M" label="남" />
+                    <q-radio dense v-model="gender" val="F" label="여" />
+                  </div>
+                </q-field>
+              </td>
+              </tr>
+              <tr>
+              <td class="q-pa-xs" style="width: 100%" colspan="2">
+                <q-input
+                  label="생년월일"
+                  outlined
+                  v-model="birthday"
+                  bg-color="white"
+                  mask="date"
+                  :rules="[
+                    () =>
+                      parseInt(birthday.substring(0, 4)) <
+                        new Date().getFullYear() - 18 ||
+                      '생년월일을 확인해주세요'
+                  ]"
+                  lazy-rules="ondemand"
+                  hide-bottom-space
+                >
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date v-model="birthday">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </td>
+            </tr>
             <tr>
               <td class="q-pa-xs" style="width: 50%">
                 <q-select
@@ -267,13 +324,15 @@
         <q-btn label="다음" type="submit" class="primary q-mt-md" />
       </q-form>
     </section>
+    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
   </div>
 </template>
 
 <script>
 import { ref, reactive } from 'vue'
-
-import { mapState, mapActions } from 'vuex'
+import { checkNicknameExist, trySignup } from '@/api/user'
+import { mapState } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
 
 export default {
@@ -283,6 +342,8 @@ export default {
     const popupProfile = ref(false)
     const nickname = ref(null)
     const nicknameValid = ref(false)
+    const gender = ref(null)
+    const birthday = ref('2022/01/01')
     const mbtiOptions = ref([
       '모름',
       'INFP',
@@ -333,6 +394,10 @@ export default {
       { key: 9, name: '온화한', value: false },
       { key: 10, name: '소박한', value: false }
     ])
+    const showModal = ref(false)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const modalContent = 'ID 또는 PW가 일치하지 않습니다'
 
     return {
       imageNo,
@@ -340,6 +405,8 @@ export default {
       popupProfile,
       nickname,
       nicknameValid,
+      gender,
+      birthday,
       drinkOptions: [
         {
           label: '안함',
@@ -393,6 +460,10 @@ export default {
       religionSelected,
       interests,
       personalities,
+      showModal,
+      modalContent,
+      willPageMove,
+      path,
 
       imgSelect(n) {
         imageNo.value = n
@@ -404,13 +475,11 @@ export default {
         if (num === 1) item = interests
         else item = personalities
         item[key].value = !item[key].value
-      },
-
-      checkNickname(nickname) {
-        if (nickname !== null) nicknameValid.value = true
-        console.log(nicknameValid.value)
       }
     }
+  },
+  components: {
+    ConfirmModal
   },
   computed: {
     ...mapState(userStore, ['signupInfo']),
@@ -431,10 +500,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions(userStore, ['signup']),
-
-    async onSubmit() {
-      await this.signup({
+    async onSubmit(e) {
+      e.preventDefault()
+      trySignup({
         ...this.signupInfo,
         imageNo: this.imageNo,
         nickname: this.nickname,
@@ -443,8 +511,58 @@ export default {
         mbti: this.mbtiSelected,
         religion: this.religionSelected,
         interests: this.interestSelected,
-        personalities: this.personalitySelected
+        personalities: this.personalitySelected,
+        gender: this.gender,
+        birthDay: this.birthday.replaceAll('/', '-')
+      }, ({ data }) => {
+        if (data.statusCode === 200) {
+          this.showModal = true
+          this.modalContent = '회원가입을 완료했습니다.'
+          this.willPageMove = true
+          this.path = '/'
+        }
+      }, () => {
+        this.showModal = true
+        this.modalContent = '회원가입에 실패했습니다.'
+        this.willPageMove = true
+        this.path = '/user/signup/account'
       })
+    },
+
+    checkNickname(nickname) {
+      if (nickname === null) {
+        this.showModal = true
+        this.modalContent = '닉네임을 입력해주세요.'
+        this.willPageMove = false
+        this.nicknameValid = false
+        return
+      }
+      checkNicknameExist(
+        nickname,
+        (response) => {
+          if (response.data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '해당 닉네임은 사용 가능합니다.'
+            this.willPageMove = false
+            this.nicknameValid = true
+          }
+        },
+        (error) => {
+          if (error.response.data.message === 'Duplicate Nickname') {
+            this.modalContent = '이미 사용 중인 닉네임입니다.'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          }
+          this.showModal = true
+          this.willPageMove = false
+          this.nicknameValid = false
+        }
+      )
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }
