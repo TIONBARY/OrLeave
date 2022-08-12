@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.orleave.dto.response.BaseResponseDto;
+import com.orleave.exception.BanDuplicationException;
 import com.orleave.exception.BanNotFoundException;
 import com.orleave.exception.EmailConfirmNotFoundException;
 import com.orleave.exception.EmailTimeoutException;
@@ -39,6 +40,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BanNotFoundException.class)
     protected ResponseEntity<BaseResponseDto> handleBanNotFoundException(BanNotFoundException e) {
         return ResponseEntity.status(404).body(BaseResponseDto.of(404, "Ban Not Found"));
+    }
+	
+	@ExceptionHandler(BanDuplicationException.class)
+    protected ResponseEntity<BaseResponseDto> handleBanDuplicationException(BanDuplicationException e) {
+        return ResponseEntity.status(404).body(BaseResponseDto.of(400, "exist ban"));
     }
 	
 	@ExceptionHandler(EmailConfirmNotFoundException.class)
