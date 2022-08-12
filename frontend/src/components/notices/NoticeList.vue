@@ -26,14 +26,13 @@
         </table>
       </section>
       <br />
-      <div class="btn-cover">
-        <q-btn :disabled="pageNum===0" @click="prevPage">이전</q-btn>
-        <span :key="num" v-for="num in 3" >
-        <q-btn  v-if="pageNum+num <= this.notices.totalPages"  @click="movePage(pageNum+num-1)" >
-          {{pageNum+num}}
-          </q-btn>
-        </span>
-        <q-btn :disabled="pageNum >= this.notices.totalPages-1" @click="nextPage">다음</q-btn>
+      <div class="q-pa-lg flex flex-center" @click="movePage">
+        <q-pagination
+          v-model="current"
+          :max="this.notices.totalPages"
+          :max-pages="3"
+          boundary-numbers="false"
+        />
       </div>
     </div>
   </div>
@@ -48,11 +47,10 @@ const noticeStore = 'noticeStore'
 export default {
   setup() {
     const page = ref(0)
-    const size = ref(5)
     return {
       page,
-      size,
-      pageNum: 0
+      pageNum: 0,
+      current: ref(1)
     }
   },
   computed: {
@@ -63,27 +61,20 @@ export default {
     goDetail(no) {
       this.noticeDetail(no)
     },
-    async nextPage() {
-      this.pageNum += 1
-      await this.noticeList(this.pageNum)
+    async movepage(num) {
+      await this.noticeList(num - 1)
       this.time()
-    },
-    async prevPage() {
-      this.pageNum -= 1
-      await this.noticeList(this.pageNum)
-      this.time()
-    },
-    async movePage(num) {
-      this.pageNum = num
-      await this.noticeList(this.pageNum)
-      this.time()
-      console.log(this.pageNum + 1)
     },
     time() {
       for (let i = 0; i < this.notices.content.length; i++) {
         this.notices.content[i].createdTime = this.notices.content[i].createdTime.split(' ')[0]
         console.log(this.notices.content[i].createdTime)
       }
+    }
+  },
+  watch: {
+    current: function(num) {
+      this.movepage(num)
     }
   },
   async created() {

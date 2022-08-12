@@ -3,7 +3,7 @@ import { apiInstance } from './index.js'
 const api = apiInstance()
 
 async function noticeList(page, success, fail) {
-  const params = { page: page, size: 3 }
+  const params = { page: page, size: 5 }
   await api
     .get('/notices', { params })
     .then(success)
