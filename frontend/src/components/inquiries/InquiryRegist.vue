@@ -94,6 +94,7 @@ export default {
   methods: {
     ...mapActions(inquiryStore, ['inquiryRegist']),
     onSubmit() {
+      this.$router.go(-1)
       return this.inquiryRegist({
         title: this.inquiryTitle,
         content: this.editor
