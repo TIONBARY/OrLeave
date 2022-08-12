@@ -13,24 +13,26 @@
           <th colspan="2" class="q-pa-md" style="text-align: start">
             공지사항
           </th>
-          <tr :key="noticeList" v-for="noticeList in noticeLists">
-            <td class="q-pa-md" style="text-align: start">
-              <router-link to="/notice/detail/1">{{
-                noticeList.noticeTitle
+          <tr :key="noticeList" v-for="noticeList in notices.content">
+            <td class="q-pa-md" style="text-align: start" >
+              <router-link :to="`/notice/${noticeList.no}`" @click="goDetail(noticeList.no)"   >{{
+                noticeList.title
               }}</router-link>
             </td>
             <td class="q-pa-md" style="text-align: end">
-              {{ noticeList.noticeDate }}
+              {{ noticeList.createdTime }}
             </td>
           </tr>
         </table>
       </section>
       <br />
-      <div>
-        <q-btn>이전</q-btn>
-        <q-btn>1</q-btn>
-        <q-btn>2</q-btn>
-        <q-btn>다음</q-btn>
+      <div class="q-pa-lg flex flex-center" @click="movePage">
+        <q-pagination
+          v-model="current"
+          :max="this.notices.totalPages"
+          :max-pages="3"
+          boundary-numbers="false"
+        />
       </div>
     </div>
   </div>
@@ -39,26 +41,45 @@
 <script>
 import { ref } from 'vue'
 
+import { mapState, mapActions } from 'vuex'
+const noticeStore = 'noticeStore'
+
 export default {
   setup() {
-    const noticeLists = ref([
-      {
-        noticeTitle: '시스템 점검 안내',
-        noticeDate: '2022/08/02'
-      },
-      {
-        noticeTitle: 'Internet Explorer 11 지원 종료 안내',
-        noticeDate: '2022/07/02'
-      },
-      {
-        noticeTitle: '서비스 이용 약관 개정 안내',
-        noticeDate: '2022/06/02'
-      }
-    ])
-
+    const page = ref(0)
     return {
-      noticeLists
+      page,
+      pageNum: 0,
+      current: ref(1)
     }
+  },
+  computed: {
+    ...mapState(noticeStore, ['notices'])
+  },
+  methods: {
+    ...mapActions(noticeStore, ['noticeList', 'noticeDetail']),
+    goDetail(no) {
+      this.noticeDetail(no)
+    },
+    async movepage(num) {
+      await this.noticeList(num - 1)
+      this.time()
+    },
+    time() {
+      for (let i = 0; i < this.notices.content.length; i++) {
+        this.notices.content[i].createdTime = this.notices.content[i].createdTime.split(' ')[0]
+        console.log(this.notices.content[i].createdTime)
+      }
+    }
+  },
+  watch: {
+    current: function(num) {
+      this.movepage(num)
+    }
+  },
+  async created() {
+    await this.noticeList(0)
+    this.time()
   }
 }
 </script>

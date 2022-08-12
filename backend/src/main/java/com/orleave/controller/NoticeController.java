@@ -39,6 +39,7 @@ public class NoticeController {
     })
 	public ResponseEntity<NoticeListResponseDto> getAllNotices(@RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
 		Page<NoticeListDto> noticeList = noticeService.getNotices(PageRequest.of(page, size, Sort.by("no").descending()));
+		
 		return ResponseEntity.status(200).body(NoticeListResponseDto.of(200, "Success", noticeList));
 	}
 	
