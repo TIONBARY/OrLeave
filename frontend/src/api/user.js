@@ -149,6 +149,54 @@ async function getEmail(success, fail) {
     .catch(fail)
 }
 
+async function getBanuser(success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .get('/ban', {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
+
+async function deleteBanuser(no, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .delete(`/ban/${no}`, {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
+
+async function addBanuser(bannedNo, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .post('/ban', JSON.stringify(bannedNo), {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
+
+async function getmeetinglog(success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .get('/meeting/recent-call', {
+      headers: {
+        Authorization: Authorization
+      }
+    })
+    .then(success)
+    .catch(fail)
+}
+
 export {
   trySignup,
   setConfirmKey,
@@ -166,5 +214,9 @@ export {
   checkPassword, // 비밀번호 검사
   requestModifyProfile,
   requestProfile,
-  getEmail
+  getEmail,
+  getBanuser, // 차단 목록 가져오기
+  deleteBanuser, // 차단 해제
+  getmeetinglog,
+  addBanuser
 }

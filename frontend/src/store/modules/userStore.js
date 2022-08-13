@@ -4,7 +4,11 @@ import {
   setConfirmKey,
   trySignup,
   requestProfile,
-  requestModifyProfile
+  requestModifyProfile,
+  getBanuser,
+  deleteBanuser,
+  getmeetinglog,
+  addBanuser
 } from '@/api/user.js'
 
 const userStore = {
@@ -12,15 +16,14 @@ const userStore = {
   state: {
     isLogin: false,
     signupInfo: null,
-    profile: null
+    profile: null,
+    banuserlist: [],
+    meetinguserlist: []
   },
   getters: {},
   mutations: {
     SET_IS_LOGIN: (state, isLogin) => {
       state.isLogin = isLogin
-    },
-    SET_LOGOUT: (state) => {
-      state.isLogin = false
     },
     SET_SIGNUP_INFO: (state, signupInfo) => {
       state.signupInfo = signupInfo
@@ -30,6 +33,12 @@ const userStore = {
     },
     SET_DUPLICATED: (state, value) => {
       state.isDuplicated = value
+    },
+    SET_BANUSER_LIST: (state, payload) => {
+      state.banuserlist = payload
+    },
+    SET_MEETINGUSER_LIST: (state, payload) => {
+      state.meetinguserlist = payload
     }
   },
   actions: {
@@ -40,7 +49,6 @@ const userStore = {
           if (response.data.statusCode === 200) {
             const token = response.data.authorization
             commit('SET_IS_LOGIN', true)
-            console.log('로그인 성공!')
             console.log(token)
             sessionStorage.setItem('Authorization', token)
           } else {
@@ -55,9 +63,10 @@ const userStore = {
     },
 
     // 메뉴바에 버튼을 만들어서 연결해야 함
-    logout({ commit }) {
+    async logout({ commit }) {
       commit('SET_LOGOUT')
-      sessionStorage.removeItem('Authorization')
+      commit('SET_IS_LOGIN', false)
+      await sessionStorage.removeItem('Authorization')
       location.reload()
     },
 
@@ -128,6 +137,54 @@ const userStore = {
         this.profile,
         (response) => {
           console.log(response.data)
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+
+    async getBanuser({ commit }) {
+      await getBanuser(
+        (response) => {
+          commit('SET_BANUSER_LIST', response.data.banList)
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+
+    async addBanuser({ commit }, bannedNo) {
+      await addBanuser(
+        bannedNo,
+        (response) => {
+          console.log(response)
+        },
+        (error) => {
+          if (error.response.data.statusCode === 400) {
+            console.log('이미 차단된 사용자 입니다.')
+          }
+        }
+      )
+    },
+
+    async deleteBanuser({ commit }, no) {
+      await deleteBanuser(
+        no,
+        (response) => {
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+
+    async getmeetinglog({ commit }) {
+      await getmeetinglog(
+        (response) => {
+          commit('SET_MEETINGUSER_LIST', response.data.meetingLogList)
+          console.log(response)
         },
         (error) => {
           console.log(error)

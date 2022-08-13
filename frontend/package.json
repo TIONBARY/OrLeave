@@ -17,6 +17,7 @@
     "openvidu-browser": "2.22.0",
     "quasar": "^2.0.0",
     "vue": "^3.2.13",
+    "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.0.3",
     "vue-scroll-snap": "^0.1.11",
     "vue-uuid": "^3.0.0",
