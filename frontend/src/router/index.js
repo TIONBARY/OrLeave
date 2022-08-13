@@ -4,6 +4,7 @@ import UserView from '../views/UserView.vue'
 import MeetingView from '../views/MeetingView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import InquiryView from '../views/InquiryView.vue'
+import ManagerView from '../views/ManagerView.vue'
 import ErrorView from '../views/ErrorView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
@@ -23,11 +24,31 @@ import NoticeDetail from '../components/notices/NoticeDetail.vue'
 import InquiryList from '../components/inquiries/InquiryList.vue'
 import InquiryDetail from '../components/inquiries/InquiryDetail.vue'
 import InquiryRegist from '../components/inquiries/InquiryRegist.vue'
+import ManagerLogin from '../components/manager/ManagerLogin.vue'
+import ManagerMain from '../components/manager/ManagerMain.vue'
+import ManagerUsers from '../components/manager/ManagerUsers.vue'
+
+import jwtDecode from 'jwt-decode'
+
+const onlyAuthManager = async (to, from, next) => {
+  const token = sessionStorage.getItem('Authorization')
+  if (!token) {
+    next({ name: 'managerLogin' })
+  }
+  const userType = jwtDecode(token).userType
+  if (userType === 'MANAGER') {
+    next()
+  } else if (userType === 'USER') {
+    alert('관리자만 접근할 수 있는 페이지입니다.')
+    next({ name: 'main' })
+  }
+}
 
 const routes = [
   {
     path: '/',
-    component: MainView
+    component: MainView,
+    name: 'main'
   },
   {
     path: '/user',
@@ -121,6 +142,29 @@ const routes = [
       {
         path: 'regist',
         component: InquiryRegist
+      }
+    ]
+  },
+  {
+    path: '/manager',
+    component: ManagerView,
+    children: [
+      {
+        path: 'login',
+        name: 'managerLogin',
+        component: ManagerLogin
+      },
+      {
+        path: 'main',
+        name: 'managerMain',
+        beforeEnter: onlyAuthManager,
+        component: ManagerMain
+      },
+      {
+        path: 'users',
+        name: 'managerUsers',
+        beforeEnter: onlyAuthManager,
+        component: ManagerUsers
       }
     ]
   },

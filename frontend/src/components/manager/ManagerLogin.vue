@@ -2,7 +2,7 @@
   <div>
     <br />
     <br />
-    <h1>로그인</h1>
+    <h1>관리자 로그인</h1>
     <!-- Content -->
     <!-- Login -->
     <div>
@@ -37,31 +37,6 @@
             </div>
           </section>
         </q-form>
-
-        <!-- Signup & Find PW -->
-        <br />
-        <div class="q-gutter-md">
-          <!-- Auth Login -->
-          <div class="q-gutter-md">
-            <router-link to="/user/signup/account">회원가입</router-link>
-            <br />
-            <router-link to="/user/forget/password">비밀번호찾기</router-link>
-            <div @click="googleLoginBtn">
-              <img style="width: 285px" src="@/assets/main/google_login.png" />
-            </div>
-            <div id="my-signin2" style="display: none"></div>
-            <div id="naverIdLogin"></div>
-            <!-- <q-btn @click="kakaoLogin()"> -->
-            <img
-              class="kakao"
-              :src="require('../../assets/main/kakao_login_large_narrow.png')"
-              alt="kakao_login"
-              style="width: 277px"
-              @click="kakaoLogin()"
-            />
-            <!-- </q-btn> -->
-          </div>
-        </div>
       </section>
       <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
     </div>
@@ -71,10 +46,7 @@
 <script>
 import { ref } from 'vue'
 // import { kakaoLogin } from '@/api/user'
-import { tryLogin } from '@/api/user'
-import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, KAKAO_REDIRECT_URI } from '@/config'
-import { naverService } from '@/api/auth'
-import jwtDecode from 'jwt-decode'
+import { managerLogin } from '@/api/manager'
 import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
@@ -95,27 +67,19 @@ export default {
   components: {
     ConfirmModal
   },
-  mounted() {
-    naverService().setNaver()
-  },
   methods: {
     async onSubmit() {
-      tryLogin(this.loginInfo, ({ data }) => {
+      managerLogin(this.loginInfo, ({ data }) => {
         const token = data.authorization
-        const userType = jwtDecode(token).userType
-        if (userType === 'Banned') {
-          this.showModal = true
-          this.modalContent = '해당 계정은 정지되어 사용할 수 없습니다.'
-          this.willPageMove = false
-          return
-        }
         sessionStorage.setItem('Authorization', token)
-        this.$router.push({ path: '/' })
+        this.$router.push({ name: 'managerMain' })
       }, ({ response }) => {
         if (response.status === 401) {
           this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
         } else if (response.data && response.data.message && response.data.message === 'Login Prohibited') {
           this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
+        } else if (response.data && response.data.message && response.data.message === 'Not Manager') {
+          this.modalContent = '관리자 계정이 아닙니다.'
         } else if (response.status === 403) {
           this.modalContent = '회원가입하지 않은 계정입니다.'
         } else {
@@ -127,15 +91,6 @@ export default {
     },
     printLog(msg) {
       console.log(msg)
-    },
-    kakaoLogin() {
-      window.Kakao.Auth.authorize({
-        scope: 'account_email',
-        redirectUri: KAKAO_REDIRECT_URI
-      })
-    },
-    async googleLoginBtn() {
-      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.email&response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}`
     },
     movePage() {
       if (this.willPageMove) {
@@ -149,13 +104,5 @@ export default {
 <style scoped>
 .basic-container {
   width: 400px;
-}
-.google {
-  background: #4285f4;
-  color: white;
-}
-
-img:hover {
-  cursor: pointer;
 }
 </style>
