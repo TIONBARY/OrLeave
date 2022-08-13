@@ -74,6 +74,7 @@ import { ref } from 'vue'
 import { tryLogin } from '@/api/user'
 import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, KAKAO_REDIRECT_URI } from '@/config'
 import { naverService } from '@/api/auth'
+import jwtDecode from 'jwt-decode'
 import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
@@ -101,6 +102,13 @@ export default {
     async onSubmit() {
       tryLogin(this.loginInfo, ({ data }) => {
         const token = data.authorization
+        const userType = jwtDecode(token).userType
+        if (userType === 'Banned') {
+          this.showModal = true
+          this.modalContent = '해당 계정은 정지되어 사용할 수 없습니다.'
+          this.willPageMove = false
+          return
+        }
         sessionStorage.setItem('Authorization', token)
         this.$router.push({ path: '/' })
       }, ({ response }) => {

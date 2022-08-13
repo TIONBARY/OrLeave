@@ -14,6 +14,7 @@ import { googleLogin } from '@/api/user'
 import { uuid } from 'vue-uuid'
 import { mapActions } from 'vuex'
 import ConfirmModal from '../ConfirmModal.vue'
+import jwtDecode from 'jwt-decode'
 const userStore = 'userStore'
 
 export default {
@@ -44,6 +45,14 @@ export default {
       googleLogin(
         this.$route.query.code,
         ({ data }) => {
+          const token = data.authorization
+          const userType = jwtDecode(token).userType
+          if (userType === 'Banned') {
+            this.showModal = true
+            this.modalContent = '해당 계정은 정지되어 사용할 수 없습니다.'
+            this.willPageMove = false
+            return
+          }
           if (data.statusCode === 200) {
             sessionStorage.setItem('Authorization', data.authorization)
             this.$router.push('/')
