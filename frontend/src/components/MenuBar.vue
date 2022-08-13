@@ -152,7 +152,7 @@
 <script>
 import { ref } from 'vue'
 import { mapState, mapActions } from 'vuex'
-import VueJwtDecode from 'vue-jwt-decode'
+import jwtdecode from 'jwt-decode'
 const userStore = 'userStore'
 
 export default {
@@ -189,9 +189,8 @@ export default {
   },
   async created() {
     if (sessionStorage.getItem('Authorization') != null) {
-      const info = VueJwtDecode.decode(sessionStorage.getItem('Authorization'))
+      const info = jwtdecode(sessionStorage.getItem('Authorization'))
       this.nickname = info.NickName
-      console.log(this.nickname)
       this.imageno = info.imageNo
       await this.getBanuser()
       this.getmeetinglog()
