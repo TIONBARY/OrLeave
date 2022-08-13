@@ -42,7 +42,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="report in reportlist" :key="report.no">
+              <tr
+                v-for="report in reportlist"
+                :key="report.no"
+                @click="showReportDetail(report.no)"
+                class="cursor-pointer"
+              >
                 <td class="text-center">{{ report.no }}</td>
                 <td class="text-left">{{ report.user_email }}</td>
                 <td class="text-center">
@@ -81,6 +86,10 @@
       :modalContent="this.confirmModalContent"
       class="modalToFront"
     />
+    <ReportDetailModal
+      v-model="this.showReportDetailModal"
+      :reportNo="this.reportNo"
+    />
   </q-dialog>
 </template>
 <script>
@@ -88,11 +97,13 @@ import { ref } from 'vue'
 import { getUserReportList, BanUser } from '@/api/manager'
 import ChoiceModal from '../ChoiceModal.vue'
 import ConfirmModal from '../ConfirmModal.vue'
+import ReportDetailModal from './ReportDetailModal.vue'
 
 export default {
   setup() {
     const showChoiceModal = ref(false)
     const showConfirmModal = ref(false)
+    const showReportDetailModal = ref(false)
     const choiceModalContent = ref(null)
     const confirmModalContent = ref(null)
     const willPageMove = ref(false)
@@ -117,6 +128,7 @@ export default {
     return {
       showChoiceModal,
       showConfirmModal,
+      showReportDetailModal,
       choiceModalContent,
       confirmModalContent,
       willPageMove,
@@ -139,7 +151,8 @@ export default {
   },
   components: {
     ChoiceModal,
-    ConfirmModal
+    ConfirmModal,
+    ReportDetailModal
   },
   created() {
     this.getReportList()
@@ -225,6 +238,10 @@ export default {
           this.willPageMove = true
         }
       )
+    },
+    showReportDetail(reportNo) {
+      this.showReportDetailModal = true
+      this.reportNo = reportNo
     },
     movePage() {
       if (this.willPageMove) {
