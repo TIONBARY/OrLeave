@@ -1,5 +1,3 @@
-import { enterMeeting } from '@/api/meeting.js'
-
 const meetingStore = {
   namespaced: true,
   state: {
@@ -24,9 +22,6 @@ const meetingStore = {
     }
   },
   actions: {
-    enterSession({ commit }, sessionId) {
-      return enterMeeting(sessionId)
-    },
     setPublisher({ commit }, payload) {
       commit('SET_PUBLISHER', payload)
     }
