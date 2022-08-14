@@ -2,9 +2,9 @@ import { apiInstance } from './index.js'
 
 const api = apiInstance()
 
-function getMeetingSetting(success, fail) {
+async function getMeetingSetting(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .get('/meeting/setting', {
       headers: {
         Authorization: Authorization
@@ -14,9 +14,9 @@ function getMeetingSetting(success, fail) {
     .catch(fail)
 }
 
-function setMeetingSetting(setting, success, fail) {
+async function setMeetingSetting(setting, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .put('/meeting/setting', JSON.stringify(setting), {
       headers: {
         Authorization: Authorization
@@ -27,6 +27,7 @@ function setMeetingSetting(setting, success, fail) {
 }
 
 function startMatching(location, success, fail) {
+  console.log('매칭 시작...')
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   api
     .post('/matching', JSON.stringify(location), {
@@ -40,7 +41,7 @@ function startMatching(location, success, fail) {
 
 function checkMatching(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  return api
     .get('/matching', {
       headers: {
         Authorization: Authorization
@@ -50,9 +51,10 @@ function checkMatching(success, fail) {
     .catch(fail)
 }
 
-function successMatching(userNo, success, fail) {
+async function successMatching(userNo, success, fail) {
+  console.log('매칭 성공!')
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .get('/matching/success/' + userNo, {
       headers: {
         Authorization: Authorization
@@ -62,9 +64,9 @@ function successMatching(userNo, success, fail) {
     .catch(fail)
 }
 
-function stopMatching(success, fail) {
+async function stopMatching(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .get('/matching/stop', {
       headers: {
         Authorization: Authorization
@@ -85,14 +87,14 @@ function enterMeeting(sessionId) {
   })
 }
 
-function leaveMeeting(sessionId, sessionToken, success, fail) {
+async function leaveMeeting(sessionId, sessionToken, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
 
   const requestBody = {
     sessionName: sessionId,
     token: sessionToken
   }
-  api
+  await api
     .post('/session/leave', JSON.stringify(requestBody), {
       headers: {
         Authorization: Authorization
@@ -102,9 +104,9 @@ function leaveMeeting(sessionId, sessionToken, success, fail) {
     .catch(fail)
 }
 
-function getBanList(success, fail) {
+async function getBanList(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .get('/ban', {
       headers: {
         Authorization: Authorization
@@ -114,9 +116,9 @@ function getBanList(success, fail) {
     .catch(fail)
 }
 
-function getRecentCall(success, fail) {
+async function getRecentCall(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .get('/meeting/recent-call', {
       headers: {
         Authorization: Authorization
@@ -126,12 +128,12 @@ function getRecentCall(success, fail) {
     .catch(fail)
 }
 
-function addBanList(bannedNo, success, fail) {
+async function addBanList(bannedNo, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   const requestBody = {
     bannedNo: bannedNo
   }
-  api
+  await api
     .post('/ban', JSON.stringify(requestBody), {
       headers: {
         Authorization: Authorization
@@ -141,9 +143,9 @@ function addBanList(bannedNo, success, fail) {
     .catch(fail)
 }
 
-function deleteBanUser(bannedNo, success, fail) {
+async function deleteBanUser(bannedNo, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .delete('/ban/' + bannedNo, {
       headers: {
         Authorization: Authorization
@@ -158,9 +160,9 @@ function deleteBanUser(bannedNo, success, fail) {
 //   category: num,
 //   content: 'msg'
 // }
-function reportUser(report, success, fail) {
+async function reportUser(report, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  await api
     .post('/meeting/recent-call', JSON.stringify(report), {
       headers: {
         Authorization: Authorization

@@ -135,26 +135,129 @@
       <q-btn label="매칭 취소" color="secondary"></q-btn>
     </div>
     <button @click="savePublisher()">SAVE SETTING</button>
+    <ChoiceModal
+      v-model="this.showChoiceModal"
+      @confirm="this.confirm()"
+      @close="this.close()"
+      :modalContent="this.modalContent"
+    />
   </div>
 </template>
 
 <script>
 import { OpenVidu } from 'openvidu-browser'
 import { onMounted } from 'vue'
-
+import {
+  enterMeeting,
+  startMatching,
+  checkMatching
+  // successMatching,
+  // stopMatching
+} from '@/api/meeting.js'
+import jwtDecode from 'jwt-decode'
 import { mapState, mapActions } from 'vuex'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+import ChoiceModal from '../ChoiceModal.vue'
+
 const meetingStore = 'meetingStore'
+
+const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
+const stompClient = Stomp.over(socket)
 
 export default {
   name: 'App',
 
-  components: {},
+  components: { ChoiceModal },
 
   data() {
     onMounted(() => {
-      if (this.OV === undefined) this.joinSession()
+      if (this.OV === undefined) {
+        // 현재 위치 설정
+        navigator.geolocation.getCurrentPosition((loc) => {
+          this.location.lat = loc.coords.latitude
+          this.location.lng = loc.coords.longitude
+        })
+        // 세션 입장
+        this.joinSession()
+        // 매칭 시작
+        startMatching(this.location)
+
+        stompClient.connect({}, (frame) => {
+          stompClient.subscribe('/sub/match', (msg) => {
+            // const data = JSON.parse(msg)
+            // const roomId = msg.data.roomId
+            // const maleNo = msg.data.maleNo
+            // const female = msg.data.female
+            const response = JSON.parse(msg.body)
+            const myInfo = this.myProfile()
+            if (
+              myInfo.gender === 'M' &&
+              response.maleNo === parseInt(myInfo.sub)
+            ) {
+              this.opponentInfo = response.female
+              this.modalContent =
+                response.female.nickname + '님과 매칭되었습니다.'
+              this.showChoiceModal = true
+              console.log(response)
+              this.newSessionId = response.roomId
+              this.subscribeSession()
+              // 11초
+            }
+          })
+        })
+
+        // 여자라면 보내기
+        if (this.myProfile().gender === 'F') {
+          const interval = setInterval(
+            checkMatching,
+            5000,
+            (res) => {
+              console.log(res.data.user)
+              if (res.data.user !== null) {
+                this.opponentInfo = res.data.user
+                this.modalContent =
+                  res.data.user.nickname + '님과 매칭되었습니다.'
+                this.showChoiceModal = true
+
+                clearInterval(interval)
+                // 웹소켓으로 보내기...
+
+                console.log(res.data.user.no)
+                console.log(this.myProfile())
+                this.newSessionId =
+                  this.myProfile().NickName + new Date().toISOString()
+                this.subscribeSession()
+                // 11초
+
+                stompClient.send(
+                  '/pub/match',
+                  {},
+                  JSON.stringify({
+                    roomId: this.newSessionId,
+                    maleNo: res.data.user.no,
+                    femaleNo: this.myProfile().sub
+                  })
+                )
+              }
+            },
+            () => console.log('매칭에 실패했습니다.')
+          )
+        }
+      }
     })
     return {
+      location: { lat: 0, lng: 0 },
+
+      // modal ~
+      newSessionId: null,
+      showChoiceModal: false,
+      modalContent: null,
+
+      // ~ modal
+
+      opponentInfo: null,
+
       OV: undefined,
       session: undefined,
       mainStreamManager: undefined,
@@ -183,7 +286,28 @@ export default {
     ...mapState(meetingStore, ['myPublisher'])
   },
   methods: {
-    ...mapActions(meetingStore, ['enterSession', 'setPublisher']),
+    ...mapActions(meetingStore, ['setPublisher']),
+
+    // modal ~
+    // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
+    subscribeSession() {
+      stompClient.subscribe('/sub/chat/' + this.newSessionId, (res) => {
+        console.log('연결됨')
+        console.log(res)
+      })
+    },
+
+    confirm() {},
+
+    close() {},
+
+    // ~ modal
+
+    myProfile() {
+      const token = sessionStorage.getItem('Authorization')
+      const profile = jwtDecode(token)
+      return profile
+    },
 
     // 오디오 비디오 장치 배열로 가져오기
     getVideoDevices() {
@@ -340,7 +464,7 @@ export default {
       return this.createSession(mySessionId)
     },
     createSession(sessionId) {
-      return this.enterSession(sessionId)
+      return enterMeeting(sessionId)
     }
   }
 }
