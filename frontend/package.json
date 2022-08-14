@@ -16,13 +16,15 @@
     "jwt-decode": "^3.1.2",
     "openvidu-browser": "2.22.0",
     "quasar": "^2.0.0",
+    "sockjs-client": "^1.6.1",
     "vue": "^3.2.13",
     "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.0.3",
     "vue-scroll-snap": "^0.1.11",
     "vue-uuid": "^3.0.0",
     "vuex": "^4.0.0",
-    "vuex-persistedstate": "^4.1.0"
+    "vuex-persistedstate": "^4.1.0",
+    "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
