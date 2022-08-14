@@ -24,6 +24,7 @@ import NoticeDetail from '../components/notices/NoticeDetail.vue'
 import InquiryList from '../components/inquiries/InquiryList.vue'
 import InquiryDetail from '../components/inquiries/InquiryDetail.vue'
 import InquiryRegist from '../components/inquiries/InquiryRegist.vue'
+import InquiryModify from '../components/inquiries/InquiryModify.vue'
 import ManagerLogin from '../components/manager/ManagerLogin.vue'
 import ManagerMain from '../components/manager/ManagerMain.vue'
 import ManagerUsers from '../components/manager/ManagerUsers.vue'
@@ -136,12 +137,16 @@ const routes = [
         component: InquiryList
       },
       {
-        path: ':articleno',
+        path: ':inquiryNo',
         component: InquiryDetail
       },
       {
         path: 'regist',
         component: InquiryRegist
+      },
+      {
+        path: 'modify/:inquiryNo',
+        component: InquiryModify
       }
     ]
   },
