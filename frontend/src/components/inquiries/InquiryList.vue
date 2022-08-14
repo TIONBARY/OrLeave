@@ -16,9 +16,9 @@
               {{ inquiry.no }}
             </td>
             <td class="q-pa-md" style="text-align: start">
-              <router-link to="/inquiry/${inquiry.no}" @click="goDetail(inquiry.no)">
+              <div class="cursor-pointer" @click="goDetail(inquiry.no)">
               {{ inquiry.title }}
-              </router-link>
+              </div>
             </td>
             <td class="q-pa-md" style="text-align: end">
               {{ inquiry.created_time }}
@@ -28,7 +28,7 @@
       </section>
       <br />
       <q-btn @click="moveRegist()">문의하기</q-btn>
-      <div class="q-pa-lg flex flex-center">
+      <div class="q-pa-lg flex flex-center" @click="movePage">
         <q-pagination v-model="currentPage" :max="5" input />
       </div>
     </div>
@@ -77,8 +77,11 @@ export default {
       this.$router.push('/inquiry/regist')
     },
     goDetail(no) {
-      console.log(no)
       this.inquiryDetail(no)
+      this.$router.push('/inquiry/' + no)
+    },
+    async movepage(num) {
+      await this.noticeList(num - 1)
     }
   }
 }

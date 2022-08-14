@@ -78,6 +78,11 @@ export default {
     deleteInquiry(no) {
       this.inquiryDelete(no)
       this.$router.go(-1)
+    },
+    modifyInquiry(no) {
+      console.log(no)
+      this.inquiryDetail(no)
+      this.$router.push('/inquiry/modify/' + no)
     }
   }
 }

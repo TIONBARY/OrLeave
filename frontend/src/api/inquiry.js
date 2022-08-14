@@ -31,7 +31,7 @@ function inquiryDetail(inquiryNo, success, fail) {
   }).then(success).catch(fail)
 }
 
-function inquiryModify(inquiry, inquiryNo, success, fail) {
+function inquiryModify(inquiryNo, inquiry, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   return api.put(`inquiries/${inquiryNo}`, JSON.stringify(inquiry), {
     headers: {
