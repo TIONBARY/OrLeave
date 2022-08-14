@@ -2,8 +2,8 @@ import {
   inquiryList,
   inquiryRegist,
   inquiryDetail,
-  inquiryModify,
-  inquiryDelete
+  inquiryDelete,
+  inquiryModify
 } from '@/api/inquiry.js'
 
 const inquiryStore = {
@@ -19,12 +19,11 @@ const inquiryStore = {
     }
   },
   actions: {
-    inquiryList: ({ commit }, page, size) => {
+    inquiryList: ({ commit }, page) => {
       return inquiryList(
         page,
-        size,
-        ({ data }) => {
-          commit('setInquiries', data)
+        (response) => {
+          commit('setInquiries', response.data.inquiryList.content)
         },
         (error) => {
           console.log(error)
@@ -34,8 +33,8 @@ const inquiryStore = {
     inquiryDetail: ({ commit }, inquiryNo) => {
       return inquiryDetail(
         inquiryNo,
-        ({ data }) => {
-          commit('setInquiry', data)
+        (response) => {
+          commit('setInquiry', response.data.inquiry)
         },
         (error) => {
           console.log(error)
@@ -44,6 +43,26 @@ const inquiryStore = {
     },
     inquiryRegist: (context, inquiry) => {
       return inquiryRegist(
+        inquiry,
+        () => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    inquiryDelete: (context, inquiryNo) => {
+      return inquiryDelete(
+        inquiryNo,
+        () => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    inquiryModify: (context, inquiry) => {
+      console.log(inquiry)
+      return inquiryModify(
+        inquiry.no,
         inquiry,
         () => {},
         (error) => {

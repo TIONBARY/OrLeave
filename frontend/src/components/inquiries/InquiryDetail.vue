@@ -19,23 +19,34 @@
               class="q-pa-md"
               style="text-align: start; background-color: white"
             >
-              {{ boardDetail.boardTitle }}
+              {{ this.inquiry.title }}
             </td>
           </tr>
           <tr>
+            <td class="q-pa-md" style="width: 10%">내용</td>
             <td
               colspan="2"
               class="q-pa-md"
               style="text-align: start; background-color: white"
             >
-              {{ boardDetail.boardContent }}
+              {{ this.inquiry.content }}
+            </td>
+          </tr>
+          <tr>
+            <td class="q-pa-md" style="width: 10%">답변</td>
+            <td
+              colspan="2"
+              class="q-pa-md"
+              style="text-align: start; background-color: white"
+            >
+              {{ this.inquiry.answer }}
             </td>
           </tr>
         </table>
         <br />
         <div>
-          <q-btn>수정</q-btn>
-          <q-btn>삭제</q-btn>
+          <q-btn @click="modifyInquiry(this.inquiry.no)">수정</q-btn>
+          <q-btn @click="deleteInquiry(this.inquiry.no)">삭제</q-btn>
         </div>
       </section>
       <br />
@@ -47,18 +58,31 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+// import { ref } from 'vue'
+import { mapState, mapActions } from 'vuex'
+const inquiryStore = 'inquiryStore'
 
 export default {
   setup() {
-    const boardDetail = ref({
-      boardTitle: '매칭이 잘 안됩니다.',
-      boardContent:
-        '안녕하세요! 올리브 서비스를 2년째 이용중인 정승욱이라고 합니다. 일반 매칭은 매칭성사가 잘 되는데, 맞춤매칭으로 조건을 설정하면 매칭이 이상하게 잘 안되고 오래 걸리는 현상이 있는 것 같습니다. 혹시 이게 기술적인 문제인지 궁금해서 문의 남깁니다. 답변 주시면 감사하겠습니다!'
-    })
-
-    return {
-      boardDetail
+    // const inquiryDetail = ref({
+    //   inquiryTitle: '',
+    //   inquiryContent: '',
+    //   inquiryAnswer: ''
+    // })
+  },
+  computed: {
+    ...mapState(inquiryStore, ['inquiry'])
+  },
+  methods: {
+    ...mapActions(inquiryStore, ['inquiryDetail', 'inquiryDelete']),
+    deleteInquiry(no) {
+      this.inquiryDelete(no)
+      this.$router.go(-1)
+    },
+    modifyInquiry(no) {
+      console.log(no)
+      this.inquiryDetail(no)
+      this.$router.push('/inquiry/modify/' + no)
     }
   }
 }

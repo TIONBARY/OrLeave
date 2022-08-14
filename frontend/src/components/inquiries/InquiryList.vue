@@ -16,9 +16,9 @@
               {{ inquiry.no }}
             </td>
             <td class="q-pa-md" style="text-align: start">
-              <router-link to="/inquiry/detail/1">{{
-                inquiry.title
-              }}</router-link>
+              <div class="cursor-pointer" @click="goDetail(inquiry.no)">
+              {{ inquiry.title }}
+              </div>
             </td>
             <td class="q-pa-md" style="text-align: end">
               {{ inquiry.created_time }}
@@ -28,7 +28,7 @@
       </section>
       <br />
       <q-btn @click="moveRegist()">문의하기</q-btn>
-      <div class="q-pa-lg flex flex-center">
+      <div class="q-pa-lg flex flex-center" @click="movePage">
         <q-pagination v-model="currentPage" :max="5" input />
       </div>
     </div>
@@ -49,6 +49,7 @@ export default {
     return {
       perPage,
       currentPage
+      // inquiries: []
     }
   },
   computed: {
@@ -66,13 +67,21 @@ export default {
     }
   },
   created() {
-    console.log('InquiryList Comp.')
-    this.inquiryList(currentPage, perPage)
+    this.inquiryList(0)
+    // this.inquiries = this.getinquiries
+    // console.log(this.getinquiries)
   },
   methods: {
-    ...mapActions(inquiryStore, ['getinquiries']),
+    ...mapActions(inquiryStore, ['getinquiries', 'inquiryDetail', 'inquiryList']),
     moveRegist() {
       this.$router.push('/inquiry/regist')
+    },
+    goDetail(no) {
+      this.inquiryDetail(no)
+      this.$router.push('/inquiry/' + no)
+    },
+    async movepage(num) {
+      await this.noticeList(num - 1)
     }
   }
 }

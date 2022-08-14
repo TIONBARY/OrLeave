@@ -21,7 +21,7 @@
               <td>
                 <q-input
                   outlined
-                  v-model="inquiryTitle"
+                  v-model="inquiry.title"
                   style="background-color: white"
                   dense
                 />
@@ -33,7 +33,7 @@
               </td>
               <td>
                 <q-editor
-                  v-model="editor"
+                  v-model="inquiry.content"
                   ref="editorRef"
                   toolbar-text-color="white"
                   toolbar-toggle-color="yellow-8"
@@ -65,40 +65,34 @@
 
 <script>
 import { ref } from 'vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 const inquiryStore = 'inquiryStore'
 
 export default {
   setup() {
-    const inquiryTitle = ref(null)
-    const inquiryContent = ref(null)
+    const inquiryTest = ref({ no: null, title: null, content: null })
     return {
-      inquiryTitle,
-      inquiryContent,
-
-      editor: ref(null)
-
-      // onSubmit(event) {
-      //   event.preventDefault()
-
-      //   inquiry.title = inquiryTitle
-      //   inquiry.content = inquiryContent
-      //   this.inquiryRegist(this.inquiry)
-      //   // console.log(inquiryImage)
-      //   // 채워주삼
-      //   // 아니면 q-form에 action method로 되면 이거 지우삼
-      // }
+      inquiryTest
     }
   },
+  created() {
+    console.log(this.$route.params.inquiryNo)
+    this.inquiryDetail(this.$route.params.inquiryNo)
+    this.inquiryTest.title = this.inquiry.title
+    this.inquiryTest.content = this.inquiry.content
+    this.inquiryTest.no = this.$route.params.inquiryNo
+  },
+  computed: {
+    ...mapState(inquiryStore, ['inquiry'])
+  },
   methods: {
-    ...mapActions(inquiryStore, ['inquiryRegist']),
+    ...mapActions(inquiryStore, ['inquiryModify', 'inquiryDetail']),
     onSubmit() {
       this.$router.go(-1)
-      return this.inquiryRegist({
-        title: this.inquiryTitle,
-        content: this.editor
-      })
+      return this.inquiryModify(
+        this.inquiry
+      )
     }
   }
 }
