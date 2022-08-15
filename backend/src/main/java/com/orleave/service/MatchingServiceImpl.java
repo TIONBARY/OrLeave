@@ -45,11 +45,16 @@ public class MatchingServiceImpl implements MatchingService {
 	
 	private Map<Integer, WaitingUserDto> males;
 	private Map<Integer, WaitingUserDto> females;
+	private Map<Integer, Integer> distanceMap;
 	
 	@Autowired
 	public MatchingServiceImpl() {
 		males = new ConcurrentHashMap<>();
 		females = new ConcurrentHashMap<>();
+		distanceMap = new ConcurrentHashMap<>();
+		distanceMap.put(0, 10); distanceMap.put(1, 20);
+		distanceMap.put(2, 50); distanceMap.put(3, 100);
+		distanceMap.put(4, Integer.MAX_VALUE);
 	}
 	
 	@Override
@@ -151,7 +156,7 @@ public class MatchingServiceImpl implements MatchingService {
 		double lat2 = second.getLat();
 		double lng2 = second.getLng();
 		double distance = distance(lat1, lng1, lat2, lng2);
-		if (distance > ms.getDistance()) return false;
+		if (distance > distanceMap.get(ms.getDistance())) return false;
 		int drink = second.getDrink();
 		if (drink < ms.getDrinkMin() || drink > ms.getDrinkMax()) return false;
 		int smoke = second.getSmoke();
