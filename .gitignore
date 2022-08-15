@@ -49,4 +49,4 @@ out/
 node_modules/
 .metadata
 /.recommenders/
-src/config/index.js
+frontend/src/config/index.js
