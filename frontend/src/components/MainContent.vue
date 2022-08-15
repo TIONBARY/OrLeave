@@ -13,12 +13,12 @@
             class="primary q-px-xl"
             label="시작하기"
             size="lg"
-            to="/user/login"
+            @click="startMatching"
             style="margin: auto"
           />
           <q-btn
             color="primary"
-            @click="alert = true"
+            @click="checkMeetingSetting"
             icon="arrow_drop_down"
             class="q-ma-sm"
             flat
@@ -40,8 +40,8 @@
                           color="primary"
                           markers
                           :marker-labels="ages"
-                          :min="0"
-                          :max="3"
+                          :min="20"
+                          :max="50"
                           style="width: 80%"
                         />
                       </td>
@@ -52,12 +52,12 @@
                       <td>
                         <q-slider
                           class="q-mt-sm"
-                          v-model="distance"
+                          v-model="this.meetingSetting.distance"
                           color="primary"
                           markers
                           :marker-labels="distances"
                           :min="0"
-                          :max="3"
+                          :max="4"
                           style="width: 80%"
                         />
                       </td>
@@ -80,23 +80,23 @@
                     <tr>
                       <td>흡연</td>
                       <td>
-                        <q-radio v-model="smoke" val="0" label="상관없음" />
-                        <q-radio v-model="smoke" val="1" label="비흡연" />
-                        <q-radio v-model="smoke" val="2" label="흡연" />
+                        <q-radio v-model="this.meetingSetting.smoke" :val="0" label="상관없음" />
+                        <q-radio v-model="this.meetingSetting.smoke" :val="1" label="비흡연" />
+                        <q-radio v-model="this.meetingSetting.smoke" :val="2" label="흡연" />
                       </td>
                     </tr>
                     <tr>
                       <td>종교</td>
                       <td>
-                        <q-radio v-model="religion" val="0" label="상관없음" />
-                        <q-radio v-model="religion" val="1" label="같은 종교" />
+                        <q-radio v-model="this.meetingSetting.religion" :val="0" label="상관없음" />
+                        <q-radio v-model="this.meetingSetting.religion" :val="1" label="같은 종교" />
                       </td>
                     </tr>
                   </table>
                 </q-card-section>
 
                 <q-card-actions align="center">
-                  <q-btn flat label="OK" color="primary" v-close-popup />
+                  <q-btn flat label="OK" color="primary" v-close-popup @click="setMeetingSetting" />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -194,53 +194,127 @@
         </div>
       </div>
     </div>
+    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
   </vue-scroll-snap>
 </template>
 <script>
 import { ref } from 'vue'
-import { onMounted } from '@vue/runtime-core'
+import { getMeetingSetting, modifyMeetingSetting } from '@/api/meeting'
+import { getEmail } from '@/api/user'
 import VueScrollSnap from 'vue-scroll-snap'
+import ConfirmModal from './ConfirmModal.vue'
 
 export default {
-  components: { VueScrollSnap },
+  components: { VueScrollSnap, ConfirmModal },
   data() {
     return {
       sampleData: ''
     }
   },
   setup() {
-    onMounted(() => {})
-
     const index = ref(2)
     const popupMeetingsetting = ref(false)
     const distance = ref(1)
     const age = ref({
-      min: 0,
-      max: 1
+      min: 20,
+      max: 20
     })
     const drink = ref({
       min: 0,
       max: 1
     })
-
+    const showModal = ref(false)
+    const modalContent = ref(null)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const meetingSetting = ref({
+      religion: 0,
+      smoke: 0,
+      drink_min: 0,
+      drink_max: 2,
+      distance: 4,
+      age_min: 20,
+      age_max: 50
+    })
     return {
       index,
       popupMeetingsetting,
       age,
       alert: ref(false),
-      ages: { 0: '20', 1: '30', 2: '40', 3: '50' },
       distance,
-      distances: { 0: '10km', 1: '20km', 2: '50km', 3: '100km' },
+      ages: { 20: '20', 30: '30', 40: '40', 50: '50' },
+      distances: { 0: '10km', 1: '20km', 2: '50km', 3: '100km', 4: 'anywhere' },
       drink,
       drinks: { 0: '안함', 1: '가끔', 2: '자주' },
       smoke: ref(null),
-      religion: ref(null)
+      religion: ref(null),
+      showModal,
+      modalContent,
+      willPageMove,
+      path,
+      meetingSetting
     }
   },
-  created() {},
-  mounted() {},
-  unmounted() {},
-  methods: {}
+  methods: {
+    checkMeetingSetting() {
+      this.alert = true
+      getMeetingSetting(({ data }) => {
+        if (data.statusCode === 200) {
+          this.meetingSetting = data.meetingsetting
+          this.age = {
+            min: this.meetingSetting.age_min,
+            max: this.meetingSetting.age_max
+          }
+          this.drink = {
+            min: this.meetingSetting.drink_min,
+            max: this.meetingSetting.drink_max
+          }
+        }
+      }, ({ response }) => {
+        if (response.status === 401) {
+          this.modalContent = '로그인이 필요합니다.'
+          this.path = '/user/login'
+        } else {
+          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          this.path = '/'
+        }
+        this.willPageMove = true
+        this.showModal = true
+      })
+    },
+    setMeetingSetting() {
+      this.meetingSetting.age_min = this.age.min
+      this.meetingSetting.age_max = this.age.max
+      this.meetingSetting.drink_min = this.drink.min
+      this.meetingSetting.drink_max = this.drink.max
+      modifyMeetingSetting(this.meetingSetting, () => {}, ({ response }) => {
+        if (response.status === 401) {
+          this.modalContent = '로그인이 만료되었습니다. 로그인해주세요.'
+          this.path = '/user/login'
+        } else {
+          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          this.path = '/'
+        }
+        this.willPageMove = true
+        this.showModal = true
+      })
+    },
+    startMatching() {
+      getEmail(() => {
+        this.$router.push('/meeting/lobby')
+      }, () => {
+        this.showModal = true
+        this.modalContent = '로그인이 필요합니다.'
+        this.willPageMove = true
+        this.path = '/user/login'
+      })
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
+    }
+  }
 }
 </script>
 <style scoped>
