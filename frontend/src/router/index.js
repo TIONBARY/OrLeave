@@ -5,7 +5,7 @@ import MeetingView from '../views/MeetingView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import InquiryView from '../views/InquiryView.vue'
 import ManagerView from '../views/ManagerView.vue'
-import ErrorView from '../views/ErrorView.vue'
+// import ErrorView from '../views/ErrorView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import KakaoLogin from '../components/users/KakaoLogin.vue'
@@ -30,6 +30,8 @@ import ManagerMain from '../components/manager/ManagerMain.vue'
 import ManagerUsers from '../components/manager/ManagerUsers.vue'
 import ManagerNoticeList from '../components/manager/ManagerNoticeList.vue'
 import ManagerNoticeRegist from '../components/manager/ManagerNoticeRegist.vue'
+import ManagerNoticeDetail from '../components/manager/ManagerNoticeDetail.vue'
+import ManagerNoticeModify from '../components/manager/ManagerNoticeModify.vue'
 
 import jwtDecode from 'jwt-decode'
 
@@ -174,7 +176,7 @@ const routes = [
         component: ManagerUsers
       },
       {
-        path: 'notice',
+        path: 'notice/list',
         name: 'managerNotice',
         beforeEnter: onlyAuthManager,
         component: ManagerNoticeList
@@ -183,17 +185,27 @@ const routes = [
         path: 'notice/regist',
         name: 'managerNoticeRegist',
         component: ManagerNoticeRegist
+      },
+      {
+        path: 'notice/:noticeNo',
+        name: 'managerNoticeDetail',
+        component: ManagerNoticeDetail
+      },
+      {
+        path: 'notice/modify/:noticeNo',
+        name: 'managerNoticeModify',
+        component: ManagerNoticeModify
       }
     ]
-  },
-  {
-    path: '/404',
-    component: ErrorView
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404'
   }
+  // {
+  //   path: '/404',
+  //   component: ErrorView
+  // },
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   redirect: '/404'
+  // }
 ]
 
 const router = createRouter({

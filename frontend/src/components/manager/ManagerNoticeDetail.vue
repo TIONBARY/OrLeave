@@ -32,10 +32,12 @@
             </td>
           </tr>
         </table>
+          <q-btn @click="modifynotice(this.notice.no)">수정</q-btn>
+          <q-btn @click="deletenotice(this.notice.no)">삭제</q-btn>
       </section>
       <br />
       <div>
-        <router-link to="/notice/list">목록으로</router-link>
+        <router-link to="../notice/list">목록으로</router-link>
       </div>
     </div>
   </div>
@@ -43,12 +45,26 @@
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 const noticeStore = 'noticeStore'
 
 export default {
   computed: {
     ...mapState(noticeStore, ['notice'])
+  },
+  methods: {
+    ...mapActions(noticeStore, ['noticeDetail', 'noticeDelete', 'noticeList']),
+
+    modifynotice(no) {
+      this.$router.push('../notice/modify/' + no)
+    },
+    async deletenotice(no) {
+      await this.noticeDelete(no)
+      this.$router.push('../notice/list')
+    }
+  },
+  created() {
+    this.noticeDetail(this.notice.no)
   }
 }
 </script>

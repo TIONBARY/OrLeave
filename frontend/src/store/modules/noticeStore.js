@@ -1,7 +1,9 @@
 import {
   noticeList,
   noticeDetail,
-  noticeRegist
+  noticeRegist,
+  noticeModify,
+  noticeDelete
 } from '@/api/notice.js'
 
 const noticeStore = {
@@ -42,9 +44,27 @@ const noticeStore = {
         }
       )
     },
-    noticeRegist: (context, notice) => {
+    noticeRegist: ({ commit }, notice) => {
       return noticeRegist(
         notice,
+        () => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    noticeModify: ({ commit }, notice) => {
+      return noticeModify(
+        notice,
+        () => {},
+        (error) => {
+          console.log(error)
+        }
+      )
+    },
+    noticeDelete: ({ commit }, no) => {
+      return noticeDelete(
+        no,
         () => {},
         (error) => {
           console.log(error)

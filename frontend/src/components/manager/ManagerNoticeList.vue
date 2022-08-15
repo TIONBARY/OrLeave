@@ -14,8 +14,8 @@
             공지사항
           </th>
           <tr :key="noticeList" v-for="noticeList in notices.content">
-            <td class="q-pa-md" style="text-align: start" >
-              <router-link :to="`/notice/${noticeList.no}`" @click="goDetail(noticeList.no)"   >{{
+            <td class="q-pa-md" style="text-align: start" @click="goDetail(noticeList.no)" >
+              <router-link :to="`${noticeList.no}`"   >{{
                 noticeList.title
               }}</router-link>
             </td>

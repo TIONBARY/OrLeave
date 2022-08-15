@@ -26,8 +26,28 @@ function noticeRegist(notice, success, fail) {
   }).then(success).catch(fail)
 }
 
+function noticeModify(notice, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  return api.put('manager/notices', JSON.stringify(notice), {
+    headers: {
+      Authorization: Authorization
+    }
+  }).then(success).catch(fail)
+}
+
+function noticeDelete(noticeno, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  return api.delete(`manager/notices/${noticeno}`, {
+    headers: {
+      Authorization: Authorization
+    }
+  }).then(success).catch(fail)
+}
+
 export {
   noticeList,
   noticeDetail,
-  noticeRegist
+  noticeRegist,
+  noticeModify,
+  noticeDelete
 }
