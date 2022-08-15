@@ -59,13 +59,15 @@
         <br />
       </section>
       <br />
+    <ConfirmModal v-model="this.show" @close="movePage" :modalContent="this.content" />
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 
 const noticeStore = 'noticeStore'
 
@@ -73,22 +75,36 @@ export default {
   setup() {
     const noticeTitle = ref(null)
     const noticeContent = ref(null)
+    const show = ref(false)
+    const content = ref(null)
     return {
       noticeTitle,
       noticeContent,
+      show,
+      content,
 
       editor: ref(null)
 
     }
   },
+  components: {
+    ConfirmModal
+  },
+  computed: {
+    ...mapState(noticeStore, ['showModal', 'modalContent'])
+  },
   methods: {
     ...mapActions(noticeStore, ['noticeRegist']),
-    onSubmit() {
-      this.$router.push('../notice')
-      this.noticeRegist({
+    async onSubmit() {
+      await this.noticeRegist({
         title: this.noticeTitle,
         content: this.editor
       })
+      this.show = this.showModal
+      this.content = this.modalContent
+    },
+    movePage() {
+      this.$router.push('../notice/list')
     }
   }
 }

@@ -33,24 +33,42 @@
           </tr>
         </table>
           <q-btn @click="modifynotice(this.notice.no)">수정</q-btn>
-          <q-btn @click="deletenotice(this.notice.no)">삭제</q-btn>
+          <q-btn @click="asknotice()">삭제</q-btn>
       </section>
       <br />
       <div>
         <router-link to="../notice/list">목록으로</router-link>
       </div>
+    <ConfirmModal v-model="this.show" @close="movePage" :modalContent="this.content" />
+    <ChoiceModal v-model="this.Cshow" @confirm="deletenotice(this.notice.no)" :modalContent="this.content" />
     </div>
   </div>
 </template>
 
 <script>
-
+import { ref } from 'vue'
 import { mapState, mapActions } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
+import ChoiceModal from '../ChoiceModal.vue'
 const noticeStore = 'noticeStore'
 
 export default {
+  setup() {
+    const Cshow = ref(false)
+    const show = ref(false)
+    const content = ref(null)
+    return {
+      Cshow,
+      show,
+      content
+    }
+  },
+  components: {
+    ConfirmModal,
+    ChoiceModal
+  },
   computed: {
-    ...mapState(noticeStore, ['notice'])
+    ...mapState(noticeStore, ['notice', 'showModal', 'modalContent'])
   },
   methods: {
     ...mapActions(noticeStore, ['noticeDetail', 'noticeDelete', 'noticeList']),
@@ -58,8 +76,16 @@ export default {
     modifynotice(no) {
       this.$router.push('../notice/modify/' + no)
     },
+    asknotice() {
+      this.Cshow = true
+      this.content = '정말로 삭제하시겠습니까?'
+    },
     async deletenotice(no) {
       await this.noticeDelete(no)
+      this.show = this.showModal
+      this.content = this.modalContent
+    },
+    movePage() {
       this.$router.push('../notice/list')
     }
   },

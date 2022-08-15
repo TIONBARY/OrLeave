@@ -59,6 +59,7 @@
         <br />
       </section>
       <br />
+      <ConfirmModal v-model="this.show" @close="movePage" :modalContent="this.content" />
     </div>
   </div>
 </template>
@@ -66,15 +67,23 @@
 <script>
 import { ref } from 'vue'
 import { mapActions, mapState } from 'vuex'
+import ConfirmModal from '../ConfirmModal.vue'
 
 const noticeStore = 'noticeStore'
 
 export default {
   setup() {
     const noticemod = ref({ no: null, title: null, content: null })
+    const show = ref(false)
+    const content = ref(null)
     return {
-      noticemod
+      noticemod,
+      show,
+      content
     }
+  },
+  components: {
+    ConfirmModal
   },
   created() {
     console.log(this.notice)
@@ -83,15 +92,18 @@ export default {
     this.noticemod.no = this.notice.no
   },
   computed: {
-    ...mapState(noticeStore, ['notice'])
+    ...mapState(noticeStore, ['notice', 'showModal', 'modalContent'])
   },
   methods: {
     ...mapActions(noticeStore, ['noticeModify']),
-    onSubmit() {
+    async onSubmit() {
+      await this.noticeModify(this.noticemod)
+      console.log(this.modalContent)
+      this.show = this.showModal
+      this.content = this.modalContent
+    },
+    movePage() {
       this.$router.push('../list')
-      return this.noticeModify(
-        this.noticemod
-      )
     }
   }
 }

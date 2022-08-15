@@ -8,7 +8,7 @@ import {
 
 const noticeStore = {
   namespaced: true,
-  state: { notices: [], notice: {} },
+  state: { notices: [], notice: {}, showModal: false, modalContent: null },
   getters: {},
   mutations: {
     setNotices(state, payload) {
@@ -16,6 +16,12 @@ const noticeStore = {
     },
     setNotice(state, payload) {
       state.notice = payload.notice
+    },
+    SetshowModal(state, value) {
+      state.showModal = value
+    },
+    SetmodalContent(state, payload) {
+      state.modalContent = payload
     }
   },
   actions: {
@@ -47,27 +53,39 @@ const noticeStore = {
     noticeRegist: ({ commit }, notice) => {
       return noticeRegist(
         notice,
-        () => {},
-        (error) => {
-          console.log(error)
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '공지사항이 작성되었습니다.')
+        },
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '작성에 실패 하였습니다.')
         }
       )
     },
     noticeModify: ({ commit }, notice) => {
       return noticeModify(
         notice,
-        () => {},
-        (error) => {
-          console.log(error)
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '공지사항이 수정되었습니다.')
+        },
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '수정에 실패 하였습니다.')
         }
       )
     },
     noticeDelete: ({ commit }, no) => {
       return noticeDelete(
         no,
-        () => {},
-        (error) => {
-          console.log(error)
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '공지사항이 삭제되었습니다.')
+        },
+        () => {
+          commit('SetshowModal', true)
+          commit('SetmodalContent', '삭제에 실패 하였습니다.')
         }
       )
     }
