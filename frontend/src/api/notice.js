@@ -17,7 +17,17 @@ async function noticeDetail(no, success, fail) {
     .catch(fail)
 }
 
+function noticeRegist(notice, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  return api.post('/manager/notices', JSON.stringify(notice), {
+    headers: {
+      Authorization: Authorization
+    }
+  }).then(success).catch(fail)
+}
+
 export {
   noticeList,
-  noticeDetail
+  noticeDetail,
+  noticeRegist
 }

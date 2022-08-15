@@ -1,6 +1,7 @@
 import {
   noticeList,
-  noticeDetail
+  noticeDetail,
+  noticeRegist
 } from '@/api/notice.js'
 
 const noticeStore = {
@@ -37,6 +38,15 @@ const noticeStore = {
         },
         (error) => {
           commit('setNotice', null)
+          console.log(error)
+        }
+      )
+    },
+    noticeRegist: (context, notice) => {
+      return noticeRegist(
+        notice,
+        () => {},
+        (error) => {
           console.log(error)
         }
       )

@@ -95,7 +95,7 @@
             <q-item-section>공지사항</q-item-section>
           </q-item>
           </router-link>
-           <router-link to="/inqiury/list">
+           <router-link to="/inquiry/list">
           <q-item clickable>
             <q-item-section>1:1문의</q-item-section>
           </q-item>
