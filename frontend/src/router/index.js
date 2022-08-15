@@ -32,6 +32,8 @@ import ManagerNoticeList from '../components/manager/ManagerNoticeList.vue'
 import ManagerNoticeRegist from '../components/manager/ManagerNoticeRegist.vue'
 import ManagerNoticeDetail from '../components/manager/ManagerNoticeDetail.vue'
 import ManagerNoticeModify from '../components/manager/ManagerNoticeModify.vue'
+import ManagerInquiries from '../components/manager/ManagerInquiries.vue'
+import ManagerInquiryDetail from '../components/manager/ManagerInquiryDetail.vue'
 
 import jwtDecode from 'jwt-decode'
 
@@ -195,6 +197,18 @@ const routes = [
         path: 'notice/modify/:noticeNo',
         name: 'managerNoticeModify',
         component: ManagerNoticeModify
+      },
+      {
+        path: 'inquiries',
+        name: 'managerInquiries',
+        beforeEnter: onlyAuthManager,
+        component: ManagerInquiries
+      },
+      {
+        path: 'inquiry/:inquiryNo',
+        name: 'managerInquiryDetail',
+        beforeEnter: onlyAuthManager,
+        component: ManagerInquiryDetail
       }
     ]
   }
