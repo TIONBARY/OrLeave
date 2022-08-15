@@ -4,84 +4,142 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 100%; max-width: 300px;"
     />
     <hr />
-    <div class="q-pa-xl">
+    <div>
       <section class="basic-container">
         <table>
-          <th colspan="2" class="q-pa-md" style="text-align: start">내 문의</th>
-          <tr :key="inquiry" v-for="inquiry in inquiries">
-            <td class="q-pa-md" style="text-align: start">
-              {{ inquiry.no }}
-            </td>
+          <th colspan="3" class="q-pa-md" style="text-align: start">내 문의</th>
+          <tr :key="inquiry.no" v-for="inquiry in inquiryList">
             <td class="q-pa-md" style="text-align: start">
               <div class="cursor-pointer" @click="goDetail(inquiry.no)">
-              {{ inquiry.title }}
+                {{ inquiry.title }}
               </div>
             </td>
             <td class="q-pa-md" style="text-align: end">
-              {{ inquiry.created_time }}
+              {{ changeToDate(inquiry.createdTime) }}
+            </td>
+            <td class="q-pa-md" style="text-align: end">
+              {{ changeToIcon(inquiry.answered) }}
             </td>
           </tr>
         </table>
       </section>
       <br />
-      <q-btn @click="moveRegist()">문의하기</q-btn>
-      <div class="q-pa-lg flex flex-center" @click="movePage">
-        <q-pagination v-model="currentPage" :max="5" input />
+      <div class="q-pa-lg flex flex-center">
+          <q-pagination
+            v-model="this.pageNum"
+            :max="this.totalPages"
+            :max-pages="this.maxPages"
+            direction-links
+            boundary-links
+            icon-first="skip_previous"
+            icon-last="skip_next"
+            icon-prev="fast_rewind"
+            icon-next="fast_forward"
+          />
       </div>
+      <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
     </div>
+    <ConfirmModal
+      v-model="this.showConfirmModal"
+      @close="movePage"
+      :modalContent="this.confirmModalContent"
+      class="modalToFront"
+    />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { mapState, mapActions } from 'vuex'
-
-const userStore = 'userStore'
-const inquiryStore = 'inquiryStore'
-const perPage = ref(10)
-const currentPage = ref(1)
+import { inquiryList } from '@/api/inquiry'
+import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
   setup() {
+    const showConfirmModal = ref(false)
+    const confirmModalContent = ref(null)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const pageNum = ref(1)
+    const pageSize = ref(10)
+    const totalPages = ref(0)
+    const maxPages = ref(10)
+    const inquiryList = ref([])
+    const inquiryNo = ref(0)
     return {
-      perPage,
-      currentPage
-      // inquiries: []
+      showConfirmModal,
+      confirmModalContent,
+      willPageMove,
+      path,
+      pageNum,
+      pageSize,
+      totalPages,
+      maxPages,
+      inquiryList,
+      inquiryNo
     }
   },
-  computed: {
-    ...mapState(userStore, ['userInfo']),
-    ...mapState(inquiryStore, ['inquiries']),
-    pagedInquiries() {
-      const items = this.inquiries
-      return items.slice(
-        (this.currentPage - 1) * this.perPage,
-        this.currentPage * this.perPage
-      )
-    },
-    rows() {
-      return this.inquiries.length
-    }
+  components: {
+    ConfirmModal
   },
   created() {
-    this.inquiryList(0)
-    // this.inquiries = this.getinquiries
-    // console.log(this.getinquiries)
+    this.getInquiryList()
   },
   methods: {
-    ...mapActions(inquiryStore, ['getinquiries', 'inquiryDetail', 'inquiryList']),
+    getInquiryList() {
+      console.log('check')
+      inquiryList(
+        this.pageNum - 1,
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.inquiryList = data.inquiryList.content
+            this.totalPages = data.inquiryList.totalPages
+          }
+        },
+        ({ response }) => {
+          if (response.status === 401) {
+            this.confirmModalContent =
+              '로그인이 만료되었습니다. 로그인해주세요.'
+            this.willPageMove = true
+            this.path = '/user/login'
+          } else {
+            this.confirmModalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.willPageMove = false
+          }
+          this.showConfirmModal = true
+        }
+      )
+    },
+    changeToDate(dateTime) {
+      const date = new Date(dateTime)
+      const year = date.getFullYear()
+      const month =
+        date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      return `${year}-${month}-${day}`
+    },
+    changeToIcon(isAnswered) {
+      console.log(isAnswered)
+      if (!isAnswered) {
+        return '□'
+      } else {
+        return '■'
+      }
+    },
     moveRegist() {
       this.$router.push('/inquiry/regist')
     },
     goDetail(no) {
-      this.inquiryDetail(no)
       this.$router.push('/inquiry/' + no)
     },
-    async movepage(num) {
-      await this.noticeList(num - 1)
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }
@@ -89,7 +147,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {
