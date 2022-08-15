@@ -2,9 +2,9 @@ import { apiInstance } from './index.js'
 
 const api = apiInstance()
 
-async function getMeetingSetting(success, fail) {
+function getMeetingSetting(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  await api
+  return api
     .get('/meeting/setting', {
       headers: {
         Authorization: Authorization
@@ -27,7 +27,6 @@ async function setMeetingSetting(setting, success, fail) {
 }
 
 function startMatching(location, success, fail) {
-  console.log('매칭 시작...')
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   api
     .post('/matching', JSON.stringify(location), {
@@ -51,10 +50,9 @@ function checkMatching(success, fail) {
     .catch(fail)
 }
 
-async function successMatching(userNo, success, fail) {
-  console.log('매칭 성공!')
+function successMatching(userNo, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  await api
+  return api
     .get('/matching/success/' + userNo, {
       headers: {
         Authorization: Authorization
@@ -79,7 +77,6 @@ async function stopMatching(success, fail) {
 function enterMeeting(sessionId) {
   const authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   const sessionObject = { sessionName: sessionId }
-  console.log('세션: ' + sessionId)
   return api.post('/session/enter', JSON.stringify(sessionObject), {
     headers: {
       authorization: authorization
