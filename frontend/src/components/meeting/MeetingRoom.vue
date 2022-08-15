@@ -151,7 +151,7 @@
                       <q-input
                         outlined
                         bg-color="white"
-                        v-model="opponent"
+                        v-model="reportedNo"
                         dense
                       />
                     </td>
@@ -160,7 +160,7 @@
                     <td>신고분류</td>
                     <td>
                       <q-option-group
-                        v-model="reportSelected"
+                        v-model="category"
                         :options="reportOptions"
                         type="checkbox"
                         color="primary"
@@ -175,7 +175,7 @@
                         autogrow
                         outlined
                         bg-color="white"
-                        v-model="reportMsg"
+                        v-model="content"
                         dense
                       />
                     </td>
@@ -186,7 +186,7 @@
                 <q-btn
                   class="negative"
                   label="신고하기"
-                  @click=";[leaveSession]"
+                  @click=";[reportUser(), leaveSession()]"
                   type="submit"
                 />
                 <q-btn class="secondary" label="취소" v-close-popup />
@@ -204,6 +204,7 @@ import { OpenVidu } from 'openvidu-browser'
 import UserVideo from './video/UserVideo.vue'
 import { ref } from 'vue'
 import { mapActions } from 'vuex'
+import { reportUser } from '@/api/meeting'
 
 const meetingStore = 'meetingStore'
 
@@ -220,9 +221,11 @@ export default {
     const level = ref(1)
     const popupMatching = ref(false)
     const popupReport = ref(false)
-    const reportSelected = ref([])
-    const reportMsg = ref('')
+    const category = ref(null)
+    const content = ref('')
+    const reportedNo = 0
     const skipDisable = ref(true)
+
     return {
       question,
       mute,
@@ -260,11 +263,11 @@ export default {
         { label: '혐오발언', value: 4 },
         { label: '기타', value: 5 }
       ],
-      reportSelected,
-      reportMsg,
+      reportedNo,
+      category,
+      content,
       popupMatching,
       popupReport,
-      opponent: '감자튀김',
 
       question_pick() {
         this.question = this.questions[this.level - 1].at(
@@ -284,6 +287,7 @@ export default {
         audio: true,
         video: true
       },
+      token: undefined,
 
       mySessionId: 'A',
       myUserName: Math.floor(Math.random() * 100)
@@ -294,7 +298,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(meetingStore, ['enterSession', 'leaveSession']),
+    ...mapActions(meetingStore, ['enterSession', 'leftMeeting']),
 
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
@@ -339,11 +343,11 @@ export default {
       // 'getToken' method is simulating what your server-side should do.
       // 'token' parameter should be retrieved and returned by your own backend
       this.getToken(this.mySessionId).then((response) => {
-        const token = response.data.token
+        this.token = response.data.token
         console.log('토큰')
-        console.log(token)
+        console.log(this.token)
         this.session
-          .connect(token, { clientData: this.myUserName })
+          .connect(this.token, { clientData: this.myUserName })
           .then(() => {
             // --- Get your own camera stream with the desired properties ---
 
@@ -391,7 +395,7 @@ export default {
       this.subscribers = []
       this.OV = undefined
 
-      // this.leaveSession({ sessionId: this.mySessionId, token: this.token })
+      this.leftMeeting({ sessionId: this.mySessionId, token: this.token })
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -450,6 +454,12 @@ export default {
       if (this.level === 2) {
         this.testStop()
       }
+    },
+    reportUser() {
+      const reportNo = this.reportNo
+      const category = this.category
+      const content = this.content
+      reportUser({ reportNo, category, content })
     }
   },
   watch: {},
