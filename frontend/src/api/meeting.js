@@ -14,4 +14,14 @@ function enterMeeting(sessionId) {
   })
 }
 
-export { enterMeeting }
+function leaveMeeting(sessionId, token) {
+  const authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  const sessionObject = { sessionName: sessionId, token }
+  return api.post('/session/leave', JSON.stringify(sessionObject), {
+    headers: {
+      authorization: authorization
+    }
+  })
+}
+
+export { enterMeeting, leaveMeeting }

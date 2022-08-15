@@ -83,9 +83,6 @@
           icon="videocam"
           label="비디오 중지"
         />
-
-        <button @click="testGo()">go</button>
-        <button @click="testStop()">stop</button>
       </div>
       <div id="session-header">
         <div>
@@ -297,18 +294,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(meetingStore, ['enterSession']),
-
-    // store에 저장해야된다..
-    // async onSubmit(e) {
-    //   e.preventDefault()
-    //   await this.bannedInfo({
-    //     reportSelected: this.reportSelected,
-    //     opponent: this.opponent,
-    //     reportMsg: this.reportMsg
-    //   })
-    //   this.$router.push('/')
-    // },
+    ...mapActions(meetingStore, ['enterSession', 'leaveSession']),
 
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
@@ -354,6 +340,7 @@ export default {
       // 'token' parameter should be retrieved and returned by your own backend
       this.getToken(this.mySessionId).then((response) => {
         const token = response.data.token
+        console.log('토큰')
         console.log(token)
         this.session
           .connect(token, { clientData: this.myUserName })
@@ -368,7 +355,13 @@ export default {
               resolution: '640x480', // The resolution of your video
               frameRate: 30, // The frame rate of your video
               insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
-              mirror: false // Whether to mirror your local video or not
+              mirror: false, // Whether to mirror your local video or not
+              filter: {
+                type: 'GStreamerFilter',
+                options: {
+                  command: 'pitch pitch=1.8'
+                }
+              }
             })
 
             this.mainStreamManager = publisher
@@ -397,6 +390,8 @@ export default {
       this.publisher = undefined
       this.subscribers = []
       this.OV = undefined
+
+      // this.leaveSession({ sessionId: this.mySessionId, token: this.token })
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -452,23 +447,15 @@ export default {
     levelUp() {
       this.level += 1
       // this.skipDisable = false
+      if (this.level === 2) {
+        this.testStop()
+      }
     }
   },
+  watch: {},
   beforeMount() {
     this.question_pick()
   }
-  // updated() {
-  //   const sd = setTimeout(() => {
-  //     console.log('s')
-  //     this.skipDisable = false
-  //   }, 5000)
-  //   if (this.level === 2) {
-  //     clearTimeout(sd)
-  //   }
-  //   setInterval(() => {
-  //     this.levelUp()
-  //   }, 10000)
-  // }
 }
 </script>
 
