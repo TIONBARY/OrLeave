@@ -24,24 +24,28 @@
                 <table width="100%" style="text-align: center">
                   <tr>
                     <td width="10%">나이</td>
-                    <td width="70%" class="q-px-ml">20 - 30</td>
+                    <td width="70%" class="q-px-ml">
+                      {{ setting.age_min }} - {{ setting.age_max }}
+                    </td>
                   </tr>
                   <q-separator inset />
                   <tr>
                     <td>거리</td>
-                    <td>10km - 20km</td>
+                    <td>{{ filtered_distance }}</td>
                   </tr>
                   <tr>
                     <td>음주</td>
-                    <td>안함</td>
+                    <td>
+                      {{ filtered_drink }}
+                    </td>
                   </tr>
                   <tr>
                     <td>흡연</td>
-                    <td>비흡연</td>
+                    <td>{{ filtered_smoke }}</td>
                   </tr>
                   <tr>
                     <td>종교</td>
-                    <td>상관없음</td>
+                    <td>{{ filtered_religion }}</td>
                   </tr>
                 </table>
               </q-card-section>
@@ -132,131 +136,100 @@
     </div>
     <br />
     <div>
-      <q-btn label="매칭 취소" color="secondary"></q-btn>
+      <q-btn label="매칭 취소" color="secondary" @click="stopMatch()"></q-btn>
     </div>
-    <button @click="savePublisher()">SAVE SETTING</button>
-    <ChoiceModal
+    <button @click="sendSetting()">SEND SETTING</button>
+    <MatchModal
       v-model="this.showChoiceModal"
-      @confirm="this.confirm()"
-      @close="this.close()"
+      @confirm="confirm"
+      @close="close"
+      @changeDisable="this.disable = true"
       :modalContent="this.modalContent"
+      :disable="this.disable"
+      @hide="this.disable = false"
     />
   </div>
 </template>
 
 <script>
 import { OpenVidu } from 'openvidu-browser'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import {
+  getMeetingSetting,
   enterMeeting,
   startMatching,
-  checkMatching
-  // successMatching,
-  // stopMatching
+  checkMatching,
+  successMatching,
+  stopMatching
 } from '@/api/meeting.js'
 import jwtDecode from 'jwt-decode'
 import { mapState, mapActions } from 'vuex'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
-import ChoiceModal from '../ChoiceModal.vue'
+import MatchModal from './MatchModal.vue'
 
 const meetingStore = 'meetingStore'
 
 const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
 const stompClient = Stomp.over(socket)
+stompClient.debug = null // disable stomp loggings
+
+let interval = null
 
 export default {
   name: 'App',
 
-  components: { ChoiceModal },
+  components: { MatchModal },
 
   data() {
     onMounted(() => {
-      if (this.OV === undefined) {
-        // 현재 위치 설정
-        navigator.geolocation.getCurrentPosition((loc) => {
-          this.location.lat = loc.coords.latitude
-          this.location.lng = loc.coords.longitude
-        })
-        // 세션 입장
-        this.joinSession()
-        // 매칭 시작
-        startMatching(this.location)
+      // 미팅 설정 가져오기
+      getMeetingSetting().then(
+        (res) => (this.setting = res.data.meetingsetting)
+      )
+      // 현재 위치 설정
+      navigator.geolocation.getCurrentPosition((loc) => {
+        this.location.lat = loc.coords.latitude
+        this.location.lng = loc.coords.longitude
+      })
+      // 로비 세션 입장
+      this.joinSession()
 
-        stompClient.connect({}, (frame) => {
-          stompClient.subscribe('/sub/match', (msg) => {
-            // const data = JSON.parse(msg)
-            // const roomId = msg.data.roomId
-            // const maleNo = msg.data.maleNo
-            // const female = msg.data.female
-            const response = JSON.parse(msg.body)
-            const myInfo = this.myProfile()
-            if (
-              myInfo.gender === 'M' &&
-              response.maleNo === parseInt(myInfo.sub)
-            ) {
-              this.opponentInfo = response.female
-              this.modalContent =
-                response.female.nickname + '님과 매칭되었습니다.'
-              this.showChoiceModal = true
-              console.log(response)
-              this.newSessionId = response.roomId
-              this.subscribeSession()
-              // 11초
-            }
-          })
-        })
+      // 매칭시작API 호출
+      startMatching(this.location)
+      // 공통 구독 (모든 회원이 구독함)
+      this.commonSubscribe('/sub/match')
 
-        // 여자라면 보내기
-        if (this.myProfile().gender === 'F') {
-          const interval = setInterval(
-            checkMatching,
-            5000,
-            (res) => {
-              console.log(res.data.user)
-              if (res.data.user !== null) {
-                this.opponentInfo = res.data.user
-                this.modalContent =
-                  res.data.user.nickname + '님과 매칭되었습니다.'
-                this.showChoiceModal = true
-
-                clearInterval(interval)
-                // 웹소켓으로 보내기...
-
-                console.log(res.data.user.no)
-                console.log(this.myProfile())
-                this.newSessionId =
-                  this.myProfile().NickName + new Date().toISOString()
-                this.subscribeSession()
-                // 11초
-
-                stompClient.send(
-                  '/pub/match',
-                  {},
-                  JSON.stringify({
-                    roomId: this.newSessionId,
-                    maleNo: res.data.user.no,
-                    femaleNo: this.myProfile().sub
-                  })
-                )
-              }
-            },
-            () => console.log('매칭에 실패했습니다.')
-          )
-        }
+      // 여자는 5초에 한 번씩 매칭확인API 호출
+      // (상대를 찾으면 공통 구독에 message를 보냄)
+      if (this.myProfile().gender === 'F') {
+        interval = this.intervalMatching()
       }
     })
+    onUnmounted(async () => {
+      // 여기서 clearInterval을 해야됨.
+      await clearInterval(interval)
+      this.leaveSession()
+    })
+
     return {
       location: { lat: 0, lng: 0 },
 
+      disable: false,
+
+      myInfo: null,
+      opponentInfo: null,
+
+      myGender: null,
+      myNo: null,
+      opponentNo: null,
       // modal ~
       newSessionId: null,
       showChoiceModal: false,
       modalContent: null,
-
+      mAccepted: 0,
+      fAccepted: 0,
       // ~ modal
-
-      opponentInfo: null,
 
       OV: undefined,
       session: undefined,
@@ -283,29 +256,192 @@ export default {
     }
   },
   computed: {
-    ...mapState(meetingStore, ['myPublisher'])
+    ...mapState(meetingStore, ['myPublisher']),
+
+    filtered_distance() {
+      if (this.setting.distance === 0) return '10km'
+      else if (this.setting.distance === 1) return '20km'
+      else if (this.setting.distance === 2) return '50km'
+      else if (this.setting.distance === 3) return '100km'
+      else if (this.setting.distance === 4) return 'anywhere'
+      else return 'unknown'
+    },
+    filtered_drink() {
+      let a = ''
+      let b = ''
+      if (this.setting.drink_min === 0) a = '안함'
+      else if (this.setting.drink_min === 1) a = '가끔'
+      else if (this.setting.drink_min === 2) a = '자주'
+      else a = 'unknown'
+      if (this.setting.drink_max === 0) b = '안함'
+      else if (this.setting.drink_max === 1) b = '가끔'
+      else if (this.setting.drink_max === 2) b = '자주'
+      else b = 'unknown'
+      return a + ' ~ ' + b
+    },
+    filtered_smoke() {
+      if (this.setting.smoke === 0) return '상관없음'
+      else if (this.setting.smoke === 1) return '비흡연'
+      else if (this.setting.smoke === 2) return '흡연'
+      else return 'unknown'
+    },
+    filtered_religion() {
+      if (this.setting.religion === 0) return '상관없음'
+      else if (this.setting.religion === 1) return '같은종교'
+      else return 'unknown'
+    }
   },
   methods: {
-    ...mapActions(meetingStore, ['setPublisher']),
+    ...mapActions(meetingStore, [
+      'setSessionId',
+      'setPublisher',
+      'setOpponentInfo'
+    ]),
+
+    intervalMatching() {
+      return setInterval(
+        checkMatching,
+        5000,
+        (res) => {
+          if (res.data.user !== null) {
+            this.opponentInfo = res.data.user
+            this.modalContent = res.data.user.nickname + '님과 매칭되었습니다.'
+            this.showChoiceModal = true
+            this.opponentInfo = { ...res.data.user } // 여자가 남자의 정보 저장
+            clearInterval(interval)
+
+            this.newSessionId =
+              this.myProfile().NickName + new Date().toISOString()
+            this.subscribeSession()
+            // 11초
+
+            stompClient.send(
+              '/pub/match',
+              {},
+              JSON.stringify({
+                roomId: this.newSessionId,
+                maleNo: res.data.user.no,
+                femaleNo: this.myProfile().sub
+              })
+            )
+          }
+        },
+        () => console.log('매칭에 실패했습니다.')
+      )
+    },
+
+    stopMatch() {
+      stopMatching()
+      this.$router.push('/')
+    },
+
+    // 모든 사용자는 구독을 시작
+    commonSubscribe(url) {
+      stompClient.connect({}, (frame) => {
+        stompClient.subscribe(url, (msg) => {
+          const response = JSON.parse(msg.body)
+          const myInfo = this.myProfile()
+          if (
+            myInfo.gender === 'M' &&
+            response.maleNo === parseInt(myInfo.sub)
+          ) {
+            this.opponentInfo = response.female
+            this.modalContent =
+              response.female.nickname + '님과 매칭되었습니다.'
+            this.showChoiceModal = true
+            this.newSessionId = response.roomId
+            this.subscribeSession()
+            // 11초
+          }
+        })
+      })
+    },
 
     // modal ~
     // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
     subscribeSession() {
-      stompClient.subscribe('/sub/chat/' + this.newSessionId, (res) => {
-        console.log('연결됨')
-        console.log(res)
+      stompClient.subscribe('/sub/chat/' + this.newSessionId, (msg) => {
+        const res = JSON.parse(msg.body)
+        if (res.nickname === 'M') {
+          this.mAccepted = res.content === 'true'
+        } else if (res.nickname !== null) {
+          this.fAccepted = res.content === 'true'
+          this.opponentNo = parseInt(res.nickname)
+        }
+        if (this.mAccepted && this.fAccepted) {
+          // 유일한 매칭 성공 조건
+          clearTimeout(timeout)
+          console.log('매칭에 성공했습니다!')
+          // 이하에서 location 정보가 비어있지만, 매칭이 성사된 후에는 의미 없으니 따로 추가해주지 않았음.
+          if (this.myGender === 'M') {
+            successMatching(this.opponentNo).then((res) => {
+              this.opponentInfo = res.data.user
+            }) // 매칭 성사 API 남자만 호출
+          }
+          // vuex에 상대 정보 저장해줌
+          this.setOpponentInfo(this.opponentInfo)
+
+          this.$router.push('/meeting/room')
+        }
+        // 매칭 실패 조건 1
+        if (this.mAccepted === false && this.fAccepted === false) {
+          clearTimeout(timeout)
+          this.showChoiceModal = false
+          console.log('매칭에 실패했습니다.')
+          if (this.myGender === 'F') interval = this.intervalMatching()
+          this.mAccepted = null
+          this.fAccepted = null
+        }
       })
+      const timeout = setTimeout(() => {
+        this.showChoiceModal = false
+        // 매칭 실패 조건 2
+        console.log('매칭에 실패했습니다.')
+        if (this.myGender === 'F') interval = this.intervalMatching()
+        this.mAccepted = null
+        this.fAccepted = null
+      }, 11000)
     },
 
-    confirm() {},
+    confirm() {
+      let request = {}
+      if (this.myGender === 'M') {
+        this.mAccepted = true
+        request = { nickname: 'M', content: true }
+      } else if (this.myGender === 'F') {
+        this.fAccepted = true
+        request = { nickname: this.myNo, content: true }
+      }
+      stompClient.send(
+        '/pub/chat/' + this.newSessionId,
+        {},
+        JSON.stringify(request)
+      )
+    },
 
-    close() {},
+    close() {
+      let request = {}
+      if (this.myGender === 'M') {
+        this.mAccepted = false
+        request = { nickname: 'M', content: false }
+      } else if (this.myGender === 'F') {
+        this.fAccepted = false
+        request = { nickname: this.myNo, content: false }
+      }
+      stompClient.send(
+        '/pub/chat/' + this.newSessionId,
+        {},
+        JSON.stringify(request)
+      )
+    },
 
     // ~ modal
 
     myProfile() {
       const token = sessionStorage.getItem('Authorization')
       const profile = jwtDecode(token)
+      this.myGender = profile.gender
+      this.myNo = profile.sub
       return profile
     },
 
@@ -343,10 +479,9 @@ export default {
             mirror: false
           })
           this.session.unpublish(this.publisher).then(() => {
-            console.log('Old publisher unpublished')
             this.publisher = newPublisher
             this.session.publish(this.publisher).then(() => {
-              console.log('New publisher published')
+              console.log('오디오 장치 전환')
             })
           })
           this.audioId = audioDevices[index].deviceId
@@ -368,10 +503,9 @@ export default {
             mirror: false
           })
           this.session.unpublish(this.publisher).then(() => {
-            console.log('Old publisher unpublished')
             this.publisher = newPublisher
             this.session.publish(this.publisher).then(() => {
-              console.log('New publisher published')
+              console.log('비디오 장치 전환')
             })
           })
           this.videoId = videoDevices[index].deviceId
@@ -390,14 +524,9 @@ export default {
     },
 
     // 미팅 룸으로 넘어가기 전에 내 오디오 비디오 상태를 전달하기 위해 vuex에 저장하는 함수
-    savePublisher() {
+    sendSetting() {
+      this.setSessionId(this.newSessionId)
       this.setPublisher({
-        audioSource: this.audioId,
-        videoSource: this.videoId,
-        publishAudio: this.isOn.audio,
-        publishVideo: this.isOn.video
-      })
-      console.log({
         audioSource: this.audioId,
         videoSource: this.videoId,
         publishAudio: this.isOn.audio,
@@ -408,6 +537,7 @@ export default {
     // 로비 입장시 실행돼야 하는 함수
     joinSession() {
       this.OV = new OpenVidu()
+      this.OV.enableProdMode() // @ disable all logging except error level
       this.session = this.OV.initSession()
       this.session.on('streamCreated', ({ stream }) => {
         const subscriber = this.session.subscribe(stream)

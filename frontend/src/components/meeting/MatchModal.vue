@@ -1,0 +1,60 @@
+<template>
+  <q-dialog persistent>
+    <q-card class="popup">
+      <q-bar class="popup-bar"> </q-bar>
+      <q-card-section class="popup-text"
+        ><q-circular-progress
+          indeterminate
+          size="40px"
+          :thickness="0.4"
+          font-size="50px"
+          color="lime"
+          track-color="grey-3"
+          center-color="grey-8"
+          class="q-ma-md"
+          animation-speed="1"
+        />
+        <br />{{ modalContent }}</q-card-section
+      >
+      <div class="full-width row justify-evenly q-mb-lg">
+        <q-btn
+          class="primary"
+          :disable="this.disable"
+          @click="$emit('confirm'), $emit('changeDisable')"
+          >확인</q-btn
+        >
+        <q-btn
+          class="secondary"
+          :disable="this.disable"
+          v-close-popup
+          @click="$emit('close')"
+          >취소</q-btn
+        >
+      </div>
+    </q-card>
+  </q-dialog>
+</template>
+<script>
+export default {
+  props: {
+    modalContent: String,
+    disable: Boolean
+  },
+  emits: ['confirm', 'close', 'changeDisable']
+}
+</script>
+<style scoped>
+.popup {
+  background: #f3f1eb;
+  width: 20%;
+  min-width: 350px;
+  max-width: 500px;
+}
+.popup-bar {
+  background: #b3a286;
+}
+.popup-text {
+  font-size: 150%;
+  text-align: center;
+}
+</style>
