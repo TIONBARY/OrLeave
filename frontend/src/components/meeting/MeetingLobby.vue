@@ -1,12 +1,12 @@
 <template>
   <div>
     <br />
-    <div>매 칭 중 ...</div>
+    <h2>매칭 중 ...</h2>
     <br />
     <div class="row q-gutter-md justify-center items-center">
       <div id="user-video" class="video-container"></div>
       <div>
-        <q-img src="../../assets/profile/4.png" width="30%" />
+        <q-img :src="require('../../assets/profile/' + imageNo + '.png')" width="30%" />
         <q-btn
           color="primary"
           @click="alert = true"
@@ -68,7 +68,7 @@
               <template v-if="isOn.audio">
                 <div class="row items-center no-wrap" style="width: 100px">
                   <q-icon left name="mic" />
-                  <div class="text-center">음소거</div>
+                  <div class="text-center">음소거 시작</div>
                 </div>
               </template>
               <template v-else>
@@ -107,13 +107,13 @@
               <template v-if="isOn.video">
                 <div class="row items-center no-wrap" style="width: 100px">
                   <q-icon left name="videocam" />
-                  <div class="text-center">비디오 끄기</div>
+                  <div class="text-center">비디오 중지</div>
                 </div>
               </template>
               <template v-else>
                 <div class="row items-center no-wrap" style="width: 100px">
                   <q-icon left name="videocam_off" />
-                  <div class="text-center">비디오 켜기</div>
+                  <div class="text-center">비디오 시작</div>
                 </div>
               </template>
             </div>
@@ -143,6 +143,7 @@
       @confirm="confirm"
       @close="close"
       @changeDisable="this.disable = true"
+      :imageNo="opponentInfo.imageNo+''"
       :modalContent="this.modalContent"
       :disable="this.disable"
       @hide="this.disable = false"
@@ -181,6 +182,7 @@ export default {
 
   data() {
     onMounted(() => {
+      this.imageNo = this.myProfile().imageNo
       // 미팅 설정 가져오기
       getMeetingSetting().then(
         (res) => (this.setting = res.data.meetingsetting)
@@ -215,9 +217,9 @@ export default {
       location: { lat: 0, lng: 0 },
 
       disable: false,
-
+      imageNo: 1,
       myInfo: null,
-      opponentInfo: null,
+      opponentInfo: { imageNo: 1 },
 
       myGender: null,
       myNo: null,
