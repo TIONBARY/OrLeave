@@ -53,9 +53,11 @@ const onlyAuthManager = async (to, from, next) => {
 
 const onlyNotUser = async (to, from, next) => {
   const token = sessionStorage.getItem('Authorization')
-  if (token) {
+  if (token !== null) {
     alert(' 비정상적인 접근입니다.')
     next({ name: 'main' })
+  } else {
+    next()
   }
 }
 
