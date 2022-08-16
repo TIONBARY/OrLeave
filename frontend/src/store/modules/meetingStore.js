@@ -1,7 +1,7 @@
 const meetingStore = {
   namespaced: true,
   state: {
-    sessionId: '',
+    sessionId: 'TEST',
     myPublisher: {
       audioSource: undefined, // The source of audio. If undefined default microphone
       videoSource: undefined, // The source of video. If undefined default webcam
@@ -12,7 +12,8 @@ const meetingStore = {
       insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
       mirror: false // Whether to mirror your local video or not}
     },
-    opponentInfo: {}
+    opponentInfo: {},
+    isMatched: false
   },
   getters: {},
   mutations: {
@@ -27,6 +28,9 @@ const meetingStore = {
     },
     SET_OPPONENT_INFO(state, payload) {
       state.opponentInfo = payload
+    },
+    SET_IS_MATCHED(state, payload) {
+      state.isMatched = payload
     }
   },
   actions: {
@@ -38,6 +42,11 @@ const meetingStore = {
     },
     setOpponentInfo({ commit }, payload) {
       commit('SET_OPPONENT_INFO', payload)
+    },
+    setIsMatched({ commit }, payload) {
+      console.log('hi')
+      commit('SET_IS_MATCHED', payload)
+      console.log(this.isMatched)
     }
   }
 }
