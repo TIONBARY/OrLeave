@@ -5,7 +5,7 @@ import MeetingView from '../views/MeetingView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import InquiryView from '../views/InquiryView.vue'
 import ManagerView from '../views/ManagerView.vue'
-// import ErrorView from '../views/ErrorView.vue'
+import ErrorView from '../views/ErrorView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import KakaoLogin from '../components/users/KakaoLogin.vue'
@@ -51,6 +51,41 @@ const onlyAuthManager = async (to, from, next) => {
   }
 }
 
+const onlyNotUser = async (to, from, next) => {
+  const token = sessionStorage.getItem('Authorization')
+  if (token !== null) {
+    alert(' 비정상적인 접근입니다.')
+    next({ name: 'main' })
+  } else {
+    next()
+  }
+}
+
+const onlyUser = async (to, from, next) => {
+  const token = sessionStorage.getItem('Authorization')
+  if (!token) {
+    alert(' 회원가입을 한 유저만 사용할 수 있습니다.')
+    next({ name: 'main' })
+  }
+  const userType = jwtDecode(token).userType
+  if (userType === 'BANNED') {
+    alert('금지당한 유저입니다.')
+    next({ name: 'main' })
+  } else if (userType === 'USER' || userType === 'MANAGER') {
+    next()
+  } else {
+    alert('권한이 없습니다 다시 확인해주세요')
+    next({ name: 'main' })
+  }
+}
+
+const onlyfromAccount = async (to, from, next) => {
+  if (from.name !== 'UserAccountRegist') {
+    alert('계정 정보를 먼저 입력해주세요')
+    next({ name: 'UserAccountRegist' })
+  }
+}
+
 const routes = [
   {
     path: '/',
@@ -63,41 +98,54 @@ const routes = [
     children: [
       {
         path: 'login',
+        beforeEnter: onlyNotUser,
         component: UserLogin
       },
       {
         path: 'login-kakao',
         name: 'kakaoAuth',
+        beforeEnter: onlyNotUser,
         component: KakaoLogin
       },
       {
         path: 'login-naver',
         name: 'NaverAuth',
+        beforeEnter: onlyNotUser,
         component: NaverLogin
       },
       {
         path: 'login-google',
         name: 'GoogleAuth',
+        beforeEnter: onlyNotUser,
         component: GoogleLogin
       },
       {
         path: 'signup/account',
+        name: 'UserAccountRegist',
+        beforeEnter: onlyNotUser,
         component: UserAccountRegist
       },
       {
         path: 'signup/profile',
+        name: 'UserProfileRegist',
+        beforeEnter: onlyfromAccount,
         component: UserProfileRegist
       },
       {
         path: 'modify/account',
+        name: 'UserAccountModify',
+        beforeEnter: onlyUser,
         component: UserAccountModify
       },
       {
         path: 'modify/profile',
+        name: 'UserProfileModify',
+        beforeEnter: onlyUser,
         component: UserProfileModify
       },
       {
         path: 'forget/password',
+        beforeEnter: onlyUser,
         component: UserPasswordForget
       }
     ]
@@ -211,15 +259,15 @@ const routes = [
         component: ManagerInquiryDetail
       }
     ]
+  },
+  {
+    path: '/404',
+    component: ErrorView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
-  // {
-  //   path: '/404',
-  //   component: ErrorView
-  // },
-  // {
-  //   path: '/:pathMatch(.*)*',
-  //   redirect: '/404'
-  // }
 ]
 
 const router = createRouter({
