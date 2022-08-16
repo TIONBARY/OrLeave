@@ -333,6 +333,7 @@ export default {
 
     stopMatch() {
       stopMatching()
+      this.stompClient.disconnect()
       this.$router.push('/')
     },
 
@@ -366,7 +367,6 @@ export default {
     // modal ~
     // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
     subscribeSession() {
-      stopMatching()
       this.stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
         const res = JSON.parse(msg.body)
         console.log('res')

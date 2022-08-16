@@ -270,7 +270,7 @@ export default {
             ) {
               // 팝업을 띄워도 되고... 나가기 전에 알려주는 어떤 그런거
               console.log('5초 후 방에서 나갑니다.')
-              setTimeout(this.leaveSession, 5000)
+              this.autoExit = setTimeout(this.leaveSession, 5000)
               return
             }
             if (msgNickname === this.myNickname) {
@@ -302,7 +302,7 @@ export default {
     return {
       socket: null,
       stompClient: null,
-
+      autoExit: null,
       question: null,
       camera: false,
       level: 1,
@@ -471,7 +471,8 @@ export default {
         {},
         JSON.stringify(msg)
       )
-
+      this.stompClient.disconnect()
+      clearTimeout(this.autoExit)
       // --- Leave the session by calling 'disconnect' method over the Session object ---
       if (this.session) this.session.disconnect()
 
