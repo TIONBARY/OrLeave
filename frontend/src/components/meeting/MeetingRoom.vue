@@ -207,10 +207,11 @@ import { onMounted } from 'vue'
 import { mapState } from 'vuex'
 import { reportUser, enterMeeting, leaveMeeting } from '@/api/meeting'
 import jwtDecode from 'jwt-decode'
+import { WEBSOCKET_URL } from '@/config/index'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 
-const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
+const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
 const stompClient = Stomp.over(socket)
 // stompClient.debug = null // disable stomp loggings
 
