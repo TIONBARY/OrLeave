@@ -80,9 +80,11 @@ const onlyUser = async (to, from, next) => {
 }
 
 const onlyfromAccount = async (to, from, next) => {
-  if (from.name !== 'UserAccountRegist') {
+  if (from.name !== 'UserAccountRegist' && from.name !== 'kakaoAuth' && from.name !== 'NaverAuth' && from.name !== 'GoogleAuth') {
     alert('계정 정보를 먼저 입력해주세요')
     next({ name: 'UserAccountRegist' })
+  } else {
+    next()
   }
 }
 
