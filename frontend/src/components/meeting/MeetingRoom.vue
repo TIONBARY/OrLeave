@@ -1,6 +1,6 @@
 <template>
   <div id="main-container" class="container">
-    <div id="join" v-if="!session">
+    <!-- <div id="join" v-if="!session">
       <div id="join-dialog" class="jumbotron vertical-center">
         <h1>Join a video session</h1>
         <div class="form-group">
@@ -29,9 +29,9 @@
           </p>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- 사이트 디버깅 막기 -->
-    <div id="session" v-if="session">
+    <div id="session">
       <h1>{{ level }}단계</h1>
 
       <div id="session-header" class="m-ma-lg row justify-around">
@@ -205,7 +205,7 @@
 import { OpenVidu } from 'openvidu-browser'
 import UserVideo from './video/UserVideo.vue'
 import { onMounted } from 'vue'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { reportUser, enterMeeting, leaveMeeting } from '@/api/meeting'
 import jwtDecode from 'jwt-decode'
 import { WEBSOCKET_URL } from '@/config/index'
@@ -213,8 +213,6 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import MeetingChat from './MeetingChat.vue'
 
-const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
-const stompClient = Stomp.over(socket)
 // stompClient.debug = null // disable stomp loggings
 
 const meetingStore = 'meetingStore'
@@ -227,48 +225,84 @@ export default {
     MeetingChat
   },
   computed: {
-    ...mapState(meetingStore, ['sessionId', 'myPublisher', 'opponentInfo'])
+    ...mapState(meetingStore, [
+      'sessionId',
+      'myPublisher',
+      'opponentInfo',
+      'isMatched'
+    ])
   },
   data() {
     onMounted(() => {
+      console.log('!!!' + this.sessionId)
+      if (this.sessionId === '' || this.isMatched === false) {
+        this.$router.push('/404')
+        return
+      }
+
       const token = jwtDecode(sessionStorage.getItem('Authorization'))
+
+      const myGender = token.gender
+      if (myGender === 'M') {
+        setTimeout(this.joinSession, 3000)
+      } else {
+        this.joinSession()
+      }
       console.log(token.NickName)
       this.myNickname = token.NickName
+
+      this.socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
+      this.stompClient = Stomp.over(this.socket)
 
       this.skip1 = setTimeout(() => {
         this.skipDisable = false
       }, 6000)
-      stompClient.connect({}, () => {
-        stompClient.subscribe('/sub/chat/' + this.sessionId + 's', (msg) => {
-          // 메세지를 받았을 때 실행하는 부분
-          const response = JSON.parse(msg.body)
-          const msgNickname = response.nickname
-          if (msgNickname === this.myNickname) {
-            this.mySkip = true
-          } else {
-            this.yourSkip = true
-          }
-          console.log('my:' + this.mySkip)
-          console.log('your:' + this.yourSkip)
-
-          if (this.mySkip && this.yourSkip) {
-            this.level++
-            this.mySkip = false
-            this.yourSkip = false
-            this.question_pick(this.level)
-            if (this.level === 2) {
-              this.skipDisable = true
-              this.skip2 = setTimeout(() => {
-                this.skipDisable = false
-              }, 6000)
+      this.stompClient.connect({}, () => {
+        this.stompClient.subscribe(
+          '/sub/chat/' + this.sessionId + 's',
+          (msg) => {
+            // 메세지를 받았을 때 실행하는 부분
+            const response = JSON.parse(msg.body)
+            const msgNickname = response.nickname
+            if (
+              response.content !== 'true' &&
+              msgNickname !== this.myNickname
+            ) {
+              // 팝업을 띄워도 되고... 나가기 전에 알려주는 어떤 그런거
+              console.log('5초 후 방에서 나갑니다.')
+              setTimeout(this.leaveSession, 5000)
+              return
+            }
+            if (msgNickname === this.myNickname) {
+              this.mySkip = true
             } else {
-              this.skipDisable = true
+              this.yourSkip = true
+            }
+            console.log('my:' + this.mySkip)
+            console.log('your:' + this.yourSkip)
+
+            if (this.mySkip && this.yourSkip) {
+              this.level++
+              this.mySkip = false
+              this.yourSkip = false
+              this.question_pick(this.level)
+              if (this.level === 2) {
+                this.skipDisable = true
+                this.skip2 = setTimeout(() => {
+                  this.skipDisable = false
+                }, 6000)
+              } else {
+                this.skipDisable = true
+              }
             }
           }
-        })
+        )
       })
     })
     return {
+      socket: null,
+      stompClient: null,
+
       question: null,
       camera: false,
       level: 1,
@@ -326,15 +360,14 @@ export default {
       },
       token: undefined,
 
-      mySessionId: 'A',
       myUserName: Math.floor(Math.random() * 100)
-      // mySessionId: vuex에서 가져온다
       // myUserName: 비디오 아래에 들어갈 유저 닉네임 (jwt 디코드)
       // 사진도 넣어야한다
     }
   },
 
   methods: {
+    ...mapActions(meetingStore, ['setSessionId', 'setIsMatched']),
     question_pick() {
       this.question = this.questions[this.level - 1].at(
         Math.floor(Math.random() * this.questions.length)
@@ -361,7 +394,6 @@ export default {
       this.session.on('streamCreated', ({ stream }) => {
         const subscriber = this.session.subscribe(stream)
         this.subscribers.push(subscriber)
-        console.log('ssdfsdfssd')
         console.log(stream)
       })
 
@@ -382,7 +414,8 @@ export default {
 
       // 'getToken' method is simulating what your server-side should do.
       // 'token' parameter should be retrieved and returned by your own backend
-      this.getToken(this.mySessionId).then((response) => {
+      this.getToken(this.sessionId).then((response) => {
+        console.log(this.sessionId)
         this.token = response.data.token
         console.log('토큰')
         console.log(this.token)
@@ -424,11 +457,21 @@ export default {
       })
       window.addEventListener('beforeunload', (e) => {
         e.preventDefault()
+
+        this.setIsMatched(false)
         this.leaveSession()
       })
     },
 
     leaveSession() {
+      const msg = { nickname: this.myNickname, content: false }
+      console.log(msg)
+      this.stompClient.send(
+        '/pub/chat/' + this.sessionId + 's',
+        {},
+        JSON.stringify(msg)
+      )
+
       // --- Leave the session by calling 'disconnect' method over the Session object ---
       if (this.session) this.session.disconnect()
 
@@ -438,7 +481,7 @@ export default {
       this.subscribers = []
       this.OV = undefined
 
-      leaveMeeting(this.mySessionId, this.token)
+      leaveMeeting(this.sessionId, this.token)
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -449,37 +492,12 @@ export default {
       this.mainStreamManager = stream
     },
 
-    /**
-     * --------------------------
-     * SERVER-SIDE RESPONSIBILITY
-     * --------------------------
-     * These methods retrieve the mandatory user token from OpenVidu Server.
-     * This behavior MUST BE IN YOUR SERVER-SIDE IN PRODUCTION (by using
-     * the API REST, openvidu-java-client or openvidu-node-client):
-     *   1) Initialize a Session in OpenVidu Server (POST /openvidu/api/sessions)
-     *   2) Create a Connection in OpenVidu Server (POST /openvidu/api/sessions/<SESSION_ID>/connection)
-     *   3) The Connection.token must be consumed in Session.connect() method
-     */
-
-    getToken(mySessionId) {
-      return this.createSession(mySessionId)
+    getToken(sessionId) {
+      return this.createSession(sessionId)
     },
-
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
       return enterMeeting(sessionId)
-    },
-    time() {
-      return String(Date.now())
-    },
-    testGo() {
-      this.publisher.stream
-        .applyFilter('GStreamerFilter', {
-          command: 'pitch pitch=1.8'
-        })
-        .then((filter) => {
-          console.log('필터~', filter)
-        })
     },
     levelUp() {
       console.log(this.skipDisable)
@@ -488,7 +506,7 @@ export default {
       }
       const msg = { nickname: this.myNickname, content: true }
       console.log(msg)
-      stompClient.send(
+      this.stompClient.send(
         '/pub/chat/' + this.sessionId + 's',
         {},
         JSON.stringify(msg)
@@ -511,7 +529,6 @@ export default {
       reportUser({ reportNo, category, content })
     }
   },
-  watch: {},
   beforeMount() {
     this.question_pick()
   }

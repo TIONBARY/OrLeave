@@ -5,7 +5,7 @@ import MeetingView from '../views/MeetingView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import InquiryView from '../views/InquiryView.vue'
 import ManagerView from '../views/ManagerView.vue'
-// import ErrorView from '../views/ErrorView.vue'
+import ErrorView from '../views/ErrorView.vue'
 
 import UserLogin from '../components/users/UserLogin.vue'
 import KakaoLogin from '../components/users/KakaoLogin.vue'
@@ -211,15 +211,15 @@ const routes = [
         component: ManagerInquiryDetail
       }
     ]
+  },
+  {
+    path: '/404',
+    component: ErrorView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
-  // {
-  //   path: '/404',
-  //   component: ErrorView
-  // },
-  // {
-  //   path: '/:pathMatch(.*)*',
-  //   redirect: '/404'
-  // }
 ]
 
 const router = createRouter({

@@ -138,7 +138,6 @@
     <div>
       <q-btn label="매칭 취소" color="secondary" @click="stopMatch()"></q-btn>
     </div>
-    <button @click="sendSetting()">SEND SETTING</button>
     <MatchModal
       v-model="this.showChoiceModal"
       @confirm="confirm"
@@ -171,9 +170,7 @@ import MatchModal from './MatchModal.vue'
 
 const meetingStore = 'meetingStore'
 
-const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
-const stompClient = Stomp.over(socket)
-stompClient.debug = null // disable stomp loggings
+// stompClient.debug = null // disable stomp loggings
 
 let interval = null
 
@@ -196,8 +193,6 @@ export default {
       // 로비 세션 입장
       this.joinSession()
 
-      // 매칭시작API 호출
-      startMatching(this.location)
       // 공통 구독 (모든 회원이 구독함)
       this.commonSubscribe('/sub/match')
 
@@ -207,13 +202,16 @@ export default {
         interval = this.intervalMatching()
       }
     })
-    onUnmounted(async () => {
+    onUnmounted(() => {
       // 여기서 clearInterval을 해야됨.
-      await clearInterval(interval)
+      clearInterval(interval)
       this.leaveSession()
     })
 
     return {
+      socket: null,
+      stompClient: null,
+
       location: { lat: 0, lng: 0 },
 
       disable: false,
@@ -257,7 +255,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(meetingStore, ['myPublisher']),
+    ...mapState(meetingStore, ['myPublisher', 'sessionId']),
 
     filtered_distance() {
       if (this.setting.distance === 0) return '10km'
@@ -296,7 +294,8 @@ export default {
     ...mapActions(meetingStore, [
       'setSessionId',
       'setPublisher',
-      'setOpponentInfo'
+      'setOpponentInfo',
+      'setIsMatched'
     ]),
 
     intervalMatching() {
@@ -313,10 +312,11 @@ export default {
 
             this.newSessionId =
               this.myProfile().NickName + new Date().toISOString()
+            this.setSessionId(this.newSessionId)
             this.subscribeSession()
             // 11초
 
-            stompClient.send(
+            this.stompClient.send(
               '/pub/match',
               {},
               JSON.stringify({
@@ -338,8 +338,11 @@ export default {
 
     // 모든 사용자는 구독을 시작
     commonSubscribe(url) {
-      stompClient.connect({}, (frame) => {
-        stompClient.subscribe(url, (msg) => {
+      this.socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
+      this.stompClient = Stomp.over(this.socket)
+      this.stompClient.connect({}, (frame) => {
+        startMatching(this.location)
+        this.stompClient.subscribe(url, (msg) => {
           const response = JSON.parse(msg.body)
           const myInfo = this.myProfile()
           if (
@@ -347,10 +350,12 @@ export default {
             response.maleNo === parseInt(myInfo.sub)
           ) {
             this.opponentInfo = response.female
+            console.log(this.opponentInfo)
             this.modalContent =
               response.female.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
-            this.newSessionId = response.roomId
+            this.setSessionId(response.roomId)
+            console.log('3' + response.roomId)
             this.subscribeSession()
             // 11초
           }
@@ -361,26 +366,43 @@ export default {
     // modal ~
     // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
     subscribeSession() {
-      stompClient.subscribe('/sub/chat/' + this.newSessionId, (msg) => {
+      stopMatching()
+      this.stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
         const res = JSON.parse(msg.body)
-        if (res.nickname === 'M') {
-          this.mAccepted = res.content === 'true'
-        } else if (res.nickname !== null) {
-          this.fAccepted = res.content === 'true'
+        console.log('res')
+        console.log(res)
+        console.log(parseInt(res.nickname) + '@' + this.myNo)
+        console.log(typeof parseInt(res.nickname) + '@' + typeof this.myNo)
+        if (parseInt(res.nickname) === this.myNo) {
+          if (this.myGender === 'M') this.mAccepted = res.content === 'true'
+          else this.fAccepted = res.content === 'true'
+        } else {
+          if (this.myGender === 'M') this.fAccepted = res.content === 'true'
+          else this.mAccepted = res.content === 'true'
           this.opponentNo = parseInt(res.nickname)
         }
+
+        console.log('m' + this.mAccepted + 'f' + this.fAccepted)
         if (this.mAccepted && this.fAccepted) {
           // 유일한 매칭 성공 조건
           clearTimeout(timeout)
           console.log('매칭에 성공했습니다!')
+          this.setIsMatched(true)
           // 이하에서 location 정보가 비어있지만, 매칭이 성사된 후에는 의미 없으니 따로 추가해주지 않았음.
           if (this.myGender === 'M') {
-            successMatching(this.opponentNo).then((res) => {
-              this.opponentInfo = res.data.user
-            }) // 매칭 성사 API 남자만 호출
+            successMatching(
+              this.opponentNo,
+              (res) => {
+                this.opponentInfo = res.data.user
+              },
+              (error) => {
+                console.log(error)
+              }
+            ) // 매칭 성사 API 남자만 호출
           }
           // vuex에 상대 정보 저장해줌
           this.setOpponentInfo(this.opponentInfo)
+          this.sendSetting()
 
           this.$router.push('/meeting/room')
         }
@@ -392,12 +414,14 @@ export default {
           if (this.myGender === 'F') interval = this.intervalMatching()
           this.mAccepted = null
           this.fAccepted = null
+          startMatching(this.location)
         }
       })
       const timeout = setTimeout(() => {
         this.showChoiceModal = false
         // 매칭 실패 조건 2
         console.log('매칭에 실패했습니다.')
+        startMatching(this.location)
         if (this.myGender === 'F') interval = this.intervalMatching()
         this.mAccepted = null
         this.fAccepted = null
@@ -405,32 +429,18 @@ export default {
     },
 
     confirm() {
-      let request = {}
-      if (this.myGender === 'M') {
-        this.mAccepted = true
-        request = { nickname: 'M', content: true }
-      } else if (this.myGender === 'F') {
-        this.fAccepted = true
-        request = { nickname: this.myNo, content: true }
-      }
-      stompClient.send(
-        '/pub/chat/' + this.newSessionId,
+      const request = { nickname: this.myNo, content: true }
+      this.stompClient.send(
+        '/pub/chat/' + this.sessionId,
         {},
         JSON.stringify(request)
       )
     },
 
     close() {
-      let request = {}
-      if (this.myGender === 'M') {
-        this.mAccepted = false
-        request = { nickname: 'M', content: false }
-      } else if (this.myGender === 'F') {
-        this.fAccepted = false
-        request = { nickname: this.myNo, content: false }
-      }
-      stompClient.send(
-        '/pub/chat/' + this.newSessionId,
+      const request = { nickname: this.myNo, content: false }
+      this.stompClient.send(
+        '/pub/chat/' + this.sessionId,
         {},
         JSON.stringify(request)
       )
@@ -442,7 +452,7 @@ export default {
       const token = sessionStorage.getItem('Authorization')
       const profile = jwtDecode(token)
       this.myGender = profile.gender
-      this.myNo = profile.sub
+      this.myNo = parseInt(profile.sub)
       return profile
     },
 
@@ -526,7 +536,6 @@ export default {
 
     // 미팅 룸으로 넘어가기 전에 내 오디오 비디오 상태를 전달하기 위해 vuex에 저장하는 함수
     sendSetting() {
-      this.setSessionId(this.newSessionId)
       this.setPublisher({
         audioSource: this.audioId,
         videoSource: this.videoId,
@@ -579,7 +588,10 @@ export default {
             )
           })
       })
-      window.addEventListener('beforeunload', this.leaveSession)
+      window.addEventListener('beforeunload', (e) => {
+        e.preventDefault()
+        this.leaveSession()
+      })
     },
     leaveSession() {
       // --- Leave the session by calling 'disconnect' method over the Session object ---

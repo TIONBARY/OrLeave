@@ -23,83 +23,9 @@
             :sent="chat.sent"
           />
         </q-scroll-area>
-        <input v-model="userName" type="text" />
-        <input v-model="message" type="text" @keyup="sendMessage" />
+        <input v-model="message" type="text" @keyup.enter="sendMessage" />
       </q-menu>
     </q-btn>
-
-    <!-- 임시 나가기 버튼 -->
-    <q-btn label="팝업을 띄워보자" @click="popupMatching = true" />
-    <!-- 임시 나가기 팝업 -->
-    <q-dialog v-model="popupMatching" persistent>
-      <q-card class="popup">
-        <q-bar class="popup-bar">
-          <q-space />
-          <q-btn color="red" dense icon="close" v-close-popup />
-        </q-bar>
-        <q-card-section class="popup-text">
-          정말 떠나시겠습니까?
-        </q-card-section>
-        <q-card-section class="q-gutter-sm text-right">
-          <q-btn class="primary" label="확인" />
-          <q-btn
-            class="negative"
-            label="신고"
-            @click="popupReport = true"
-            v-close-popup
-          />
-          <q-btn class="secondary" label="취소" v-close-popup />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-
-    <!-- 임시 신고 팝업 -->
-    <q-dialog v-model="popupReport" persistent>
-      <q-card class="report-popup" style="height: 500px">
-        <q-bar class="popup-bar">
-          <q-space />
-          <q-btn color="red" dense icon="close" v-close-popup />
-        </q-bar>
-        <q-card-section class="popup-text">
-          <table style="width: 100%">
-            <tr>
-              <td style="width: 20%">닉네임</td>
-              <td style="width: 40%">
-                <q-input outlined bg-color="white" v-model="opponent" dense />
-              </td>
-            </tr>
-            <tr>
-              <td>신고분류</td>
-              <td>
-                <q-option-group
-                  v-model="reportSelected"
-                  :options="reportOptions"
-                  type="checkbox"
-                  color="primary"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>신고내용</td>
-              <td>
-                <q-input
-                  type="text"
-                  autogrow
-                  outlined
-                  bg-color="white"
-                  v-model="reportMsg"
-                  dense
-                />
-              </td>
-            </tr>
-          </table>
-        </q-card-section>
-        <q-card-section class="q-gutter-sm text-right">
-          <q-btn class="negative" label="신고하기" />
-          <q-btn class="secondary" label="취소" />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -107,9 +33,14 @@
 import { ref } from 'vue'
 import Stomp from 'webstomp-client'
 import SockJS from 'sockjs-client'
+import jwtDecode from 'jwt-decode'
+import { mapState } from 'vuex'
+
+const myName = jwtDecode(sessionStorage.getItem('Authorization')).NickName
 
 export default {
   setup() {
+    const message = ref('')
     const showChat = ref(false)
     const popupMatching = ref(false)
     const popupReport = ref(false)
@@ -119,8 +50,8 @@ export default {
     const recvList = ref([])
     const chatLog = ref([])
     return {
-      userName: '',
-      message: '',
+      userName: myName,
+      message,
       recvList,
       showChat,
       chatLog,
@@ -143,9 +74,12 @@ export default {
   created() {
     this.connect()
   },
+  computed: {
+    ...mapState('meetingStore', ['sessionId'])
+  },
   methods: {
     sendMessage(e) {
-      if (e.keyCode === 13 && this.userName !== '' && this.message !== '') {
+      if (this.message !== '') {
         this.send()
         this.message = ''
       }
@@ -154,10 +88,14 @@ export default {
       console.log('Send message:' + this.message)
       if (this.stompClient && this.stompClient.connected) {
         const msg = {
-          userName: this.userName,
+          nickname: this.userName,
           content: this.message
         }
-        this.stompClient.send('/receive', JSON.stringify(msg), {})
+        this.stompClient.send(
+          '/pub/chat/' + this.sessionId,
+          JSON.stringify(msg),
+          {}
+        )
       }
     },
     connect() {
@@ -173,15 +111,17 @@ export default {
           console.log('소켓 연결 성공', frame)
           // 서버의 메시지 전송 endpoint를 구독합니다.
           // 이런형태를 pub sub 구조라고 합니다.
-          this.stompClient.subscribe('/send', (res) => {
+          this.stompClient.subscribe('/sub/chat/' + this.sessionId, (res) => {
             console.log('구독으로 받은 메시지 입니다.', res.body)
 
             // 받은 데이터를 json으로 파싱하고 리스트에 넣어줍니다.
             this.recvList.push(JSON.parse(res.body))
             const temp = this.recvList.pop()
-            if (temp.userName === '김시언') {
+            console.log(temp)
+            console.log(temp.nickname + ' ' + this.userName)
+            if (temp.nickname === this.userName) {
               this.chatLog.push({ text: temp.content, sent: true })
-            } else if (temp.userName === '정승욱') {
+            } else {
               this.chatLog.push({ text: temp.content, sent: false })
             }
           })
