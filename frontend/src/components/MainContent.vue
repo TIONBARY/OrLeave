@@ -1,5 +1,5 @@
 <template>
-  <vue-scroll-snap :fullscreen="true">
+  <vue-scroll-snap>
     <div class="item row items-center justify-center">
       <div>
         <q-img
@@ -422,4 +422,14 @@ export default {
   max-width: none;
   background-color: transparent;
 }
+/* scroll-snap에 필요한 css */
+.item {
+  /* Set the minimum height of the items to be the same as the height of the scroll-snap-container.*/
+  min-height: 100vh;
+}
+.scroll-snap-container {
+  height: 100vh;
+  width: 100vw;
+}
+/* scroll-snap에 필요한 css */
 </style>
