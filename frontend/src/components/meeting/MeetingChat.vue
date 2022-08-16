@@ -17,23 +17,14 @@
       >
         <q-scroll-area class="chat-log">
           <q-chat-message
-            v-for="chat in chat_log"
+            v-for="chat in chatLog"
             :key="chat"
             :text="[chat.text]"
             :sent="chat.sent"
-            :stamp="chat.time"
           />
         </q-scroll-area>
-        <q-input
-          outlined
-          autogrow
-          v-model="chatMsg"
-          @keypress.enter="sendChat(chatMsg)"
-        >
-          <template v-slot:append>
-            <q-btn label="전송" size="12px" @click="sendChat(chatMsg)" />
-          </template>
-        </q-input>
+        <input v-model="userName" type="text" />
+        <input v-model="message" type="text" @keyup="sendMessage" />
       </q-menu>
     </q-btn>
 
@@ -114,6 +105,9 @@
 
 <script>
 import { ref } from 'vue'
+import Stomp from 'webstomp-client'
+import SockJS from 'sockjs-client'
+
 export default {
   setup() {
     const showChat = ref(false)
@@ -121,40 +115,15 @@ export default {
     const popupReport = ref(false)
     const reportSelected = ref([])
     const reportMsg = ref('')
+    const chatMsg = ref(null)
+    const recvList = ref([])
+    const chatLog = ref([])
     return {
+      userName: '',
+      message: '',
+      recvList,
       showChat,
-      chat_log: [
-        {
-          text: 'How are you',
-          sent: false,
-          time: '10 minutes ago'
-        },
-        {
-          text: "I'm fine, and you?",
-          sent: true,
-          time: '9 minutes ago'
-        },
-        {
-          text: 'Me too~',
-          sent: false,
-          time: '9 minutes ago'
-        },
-        {
-          text: 'Me too~',
-          sent: true,
-          time: '7 minutes ago'
-        },
-        {
-          text: 'hello~',
-          sent: false,
-          time: '3 minutes ago'
-        },
-        {
-          text: '안농안농',
-          sent: true,
-          time: '1 minutes ago'
-        }
-      ],
+      chatLog,
       reportOptions: [
         { label: '폭언 및 욕설', value: 0 },
         { label: '부적절한 닉네임', value: 1 },
@@ -165,14 +134,64 @@ export default {
       ],
       reportSelected,
       reportMsg,
-      chatMsg: '',
-      sendChat(chatMsg) {
-        this.chat_log.push({ text: chatMsg, sent: true })
-        console.log(this.chat_log)
-      },
+      chatMsg,
       popupMatching,
       popupReport,
       opponent: '감자튀김'
+    }
+  },
+  created() {
+    this.connect()
+  },
+  methods: {
+    sendMessage(e) {
+      if (e.keyCode === 13 && this.userName !== '' && this.message !== '') {
+        this.send()
+        this.message = ''
+      }
+    },
+    send() {
+      console.log('Send message:' + this.message)
+      if (this.stompClient && this.stompClient.connected) {
+        const msg = {
+          userName: this.userName,
+          content: this.message
+        }
+        this.stompClient.send('/receive', JSON.stringify(msg), {})
+      }
+    },
+    connect() {
+      const serverURL = 'http://localhost:8080/api/v1/ws'
+      const socket = new SockJS(serverURL)
+      this.stompClient = Stomp.over(socket)
+      console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
+      this.stompClient.connect(
+        {},
+        (frame) => {
+          // 소켓 연결 성공
+          this.connected = true
+          console.log('소켓 연결 성공', frame)
+          // 서버의 메시지 전송 endpoint를 구독합니다.
+          // 이런형태를 pub sub 구조라고 합니다.
+          this.stompClient.subscribe('/send', (res) => {
+            console.log('구독으로 받은 메시지 입니다.', res.body)
+
+            // 받은 데이터를 json으로 파싱하고 리스트에 넣어줍니다.
+            this.recvList.push(JSON.parse(res.body))
+            const temp = this.recvList.pop()
+            if (temp.userName === '김시언') {
+              this.chatLog.push({ text: temp.content, sent: true })
+            } else if (temp.userName === '정승욱') {
+              this.chatLog.push({ text: temp.content, sent: false })
+            }
+          })
+        },
+        (error) => {
+          // 소켓 연결 실패
+          console.log('소켓 연결 실패', error)
+          this.connected = false
+        }
+      )
     }
   }
 }
