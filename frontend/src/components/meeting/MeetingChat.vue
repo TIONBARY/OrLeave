@@ -17,11 +17,10 @@
       >
         <q-scroll-area class="chat-log">
           <q-chat-message
-            v-for="chat in chat_log"
+            v-for="chat in chatLog"
             :key="chat"
             :text="[chat.text]"
             :sent="chat.sent"
-            :stamp="chat.time"
           />
         </q-scroll-area>
         <input v-model="userName" type="text" />
@@ -117,43 +116,14 @@ export default {
     const reportSelected = ref([])
     const reportMsg = ref('')
     const chatMsg = ref(null)
+    const recvList = ref([])
+    const chatLog = ref([])
     return {
       userName: '',
       message: '',
-      recvList: [],
+      recvList,
       showChat,
-      chat_log: [
-        {
-          text: 'How are you',
-          sent: false,
-          time: '10 minutes ago'
-        },
-        {
-          text: "I'm fine, and you?",
-          sent: true,
-          time: '9 minutes ago'
-        },
-        {
-          text: 'Me too~',
-          sent: false,
-          time: '9 minutes ago'
-        },
-        {
-          text: 'Me too~',
-          sent: true,
-          time: '7 minutes ago'
-        },
-        {
-          text: 'hello~',
-          sent: false,
-          time: '3 minutes ago'
-        },
-        {
-          text: '안농안농',
-          sent: true,
-          time: '1 minutes ago'
-        }
-      ],
+      chatLog,
       reportOptions: [
         { label: '폭언 및 욕설', value: 0 },
         { label: '부적절한 닉네임', value: 1 },
@@ -165,11 +135,6 @@ export default {
       reportSelected,
       reportMsg,
       chatMsg,
-      sendChat(chatMsg) {
-        this.chat_log.push({ text: chatMsg, sent: true })
-        console.log(this.chat_log)
-        chatMsg = ref(null)
-      },
       popupMatching,
       popupReport,
       opponent: '감자튀김'
@@ -196,7 +161,7 @@ export default {
       }
     },
     connect() {
-      const serverURL = 'http://localhost:8080'
+      const serverURL = 'http://localhost:8080/api/v1/ws'
       const socket = new SockJS(serverURL)
       this.stompClient = Stomp.over(socket)
       console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
@@ -215,9 +180,9 @@ export default {
             this.recvList.push(JSON.parse(res.body))
             const temp = this.recvList.pop()
             if (temp.userName === '김시언') {
-              this.chat_log.push({ text: temp.content, sent: true })
+              this.chatLog.push({ text: temp.content, sent: true })
             } else if (temp.userName === '정승욱') {
-              this.chat_log.push({ text: temp.content, sent: false })
+              this.chatLog.push({ text: temp.content, sent: false })
             }
           })
         },
