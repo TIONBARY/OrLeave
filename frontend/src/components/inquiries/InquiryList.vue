@@ -4,41 +4,49 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 100%; max-width: 300px;"
+      style="width: 100%; max-width: 300px"
+      @click="this.$router.push('/')"
     />
     <hr />
     <div>
       <section class="basic-container">
         <table>
           <th colspan="3" class="q-pa-md" style="text-align: start">내 문의</th>
-          <tr :key="inquiry.no" v-for="inquiry in inquiryList">
-            <td class="q-pa-md" style="text-align: start">
-              <div class="cursor-pointer" @click="goDetail(inquiry.no)">
-                {{ inquiry.title }}
-              </div>
-            </td>
-            <td class="q-pa-md" style="text-align: end">
-              {{ changeToDate(inquiry.createdTime) }}
-            </td>
-            <td class="q-pa-md" style="text-align: end">
-              {{ changeToIcon(inquiry.answered) }}
-            </td>
-          </tr>
+          <template v-if="inquiryList.length === 0">
+            <tr>
+              <td style="height: 150px">작성한 문의가 없습니다.</td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr :key="inquiry.no" v-for="inquiry in inquiryList">
+              <td class="q-pa-md" style="text-align: start">
+                <router-link :to="`/inquiry/${inquiry.no}`">
+                  {{ inquiry.title }}
+                </router-link>
+              </td>
+              <td class="q-pa-md" style="text-align: end">
+                {{ changeToDate(inquiry.createdTime) }}
+              </td>
+              <td class="q-pa-md" style="text-align: end">
+                <q-icon v-if="inquiry.answered" name="check_box" />
+                <q-icon v-else name="check_box_outline_blank" />
+              </td>
+            </tr>
+          </template>
         </table>
       </section>
-      <br />
       <div class="q-pa-lg flex flex-center">
-          <q-pagination
-            v-model="this.pageNum"
-            :max="this.totalPages"
-            :max-pages="this.maxPages"
-            direction-links
-            boundary-links
-            icon-first="skip_previous"
-            icon-last="skip_next"
-            icon-prev="fast_rewind"
-            icon-next="fast_forward"
-          />
+        <q-pagination
+          v-model="this.pageNum"
+          :max="this.totalPages"
+          :max-pages="this.maxPages"
+          direction-links
+          boundary-links
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+        />
       </div>
       <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
     </div>
@@ -87,9 +95,16 @@ export default {
   created() {
     this.getInquiryList()
   },
+  watch: {
+    pageNum: function () {
+      this.movepage()
+    }
+  },
   methods: {
+    movepage() {
+      this.getInquiryList()
+    },
     getInquiryList() {
-      console.log('check')
       inquiryList(
         this.pageNum - 1,
         ({ data }) => {
@@ -122,19 +137,8 @@ export default {
       const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
       return `${year}-${month}-${day}`
     },
-    changeToIcon(isAnswered) {
-      console.log(isAnswered)
-      if (!isAnswered) {
-        return '□'
-      } else {
-        return '■'
-      }
-    },
     moveRegist() {
       this.$router.push('/inquiry/regist')
-    },
-    goDetail(no) {
-      this.$router.push('/inquiry/' + no)
     },
     movePage() {
       if (this.willPageMove) {
@@ -164,5 +168,9 @@ th {
 
 tr {
   border-bottom: 1px solid #979797;
+}
+
+a {
+  color: black;
 }
 </style>

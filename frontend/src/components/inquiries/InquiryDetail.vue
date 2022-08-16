@@ -4,49 +4,76 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 100%; max-width: 300px;"
+      style="width: 100%; max-width: 300px"
+      @click="this.$router.push('/')"
     />
     <hr />
-    <div>
+    <div class="q-pa-xl">
       <section class="basic-container">
         <table class="inquiryTable">
-          <th colspan="2" class="q-pa-md" style="text-align: start">
+          <th colspan="2" class="q-pa-md header" style="text-align: start">
             1:1 문의
           </th>
           <tr>
-            <td class="q-pa-md" style="width: 80px">제목</td>
             <td
-              class="q-pa-md inquiryBox"
-              style="text-align: start; background-color: white"
+              class="q-pa-sm inquiryBox text-weight-bold"
+              style="text-align: start"
             >
               {{ this.inquiry.title }}
             </td>
           </tr>
+          <tr>
+            <td class="q-pl-sm text-left" style="font-size: 15px">
+              {{ this.inquiry.createdTime }}
+            </td>
+          </tr>
+          <q-separator size="2px" />
           <tr class="q-my-md">
             <td
               colspan="2"
-              class="q-pa-md inquiryBox vertical-top"
-              style="text-align: start; background-color: white; height: 200px"
+              class="q-pa-sm inquiryBox vertical-top"
+              style="text-align: start; height: 200px"
             >
-              {{ this.inquiry.content }}
+              <div v-html="this.inquiry.content" />
             </td>
           </tr>
           <tr style="margin: 10px 0">
             <td colspan="2" class="text-right">
-              <q-btn @click="modifyInquiry" class="primary" style="margin-right: 10px">수정</q-btn>
+              <q-btn
+                @click="modifyInquiry"
+                class="primary"
+                style="margin-right: 10px"
+                >수정</q-btn
+              >
               <q-btn @click="checkDelete" class="negative">삭제</q-btn>
             </td>
           </tr>
+        </table>
+      </section>
+      <br />
+      <section class="basic-container">
+        <table>
           <tr>
-            <td colspan="2" style="text-align: start; width: 80px">답변</td>
+            <td
+              colspan="2"
+              class="q-px-md q-pb-md header"
+              style="text-align: start; width: 80px"
+            >
+              <strong>답변</strong>
+            </td>
           </tr>
           <tr>
             <td
               colspan="2"
               class="q-pa-md inquiryBox vertical-top"
-              style="text-align: start; background-color: white; height: 100px;"
+              style="text-align: start"
             >
-              {{ this.inquiry.answer }}
+              <template v-if="this.inquiry.answer === ''">
+                <div class="text-center">답변이 없습니다.</div>
+              </template>
+              <template v-else>
+                <div>{{ this.inquiry.answer }}</div>
+              </template>
             </td>
           </tr>
         </table>
@@ -114,6 +141,7 @@ export default {
       ({ data }) => {
         if (data.statusCode === 200) {
           this.inquiry = data.inquiry
+          this.inquiry.createdTime = this.inquiry.createdTime.substring(0, 10)
         }
       },
       ({ response }) => {
@@ -194,7 +222,7 @@ table {
   border-spacing: 10px;
 }
 
-th {
+.header {
   border-bottom: 2px solid #000000;
 }
 

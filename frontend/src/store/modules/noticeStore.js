@@ -30,10 +30,9 @@ const noticeStore = {
         page,
         (response) => {
           commit('setNotices', response.data.noticeList)
-          console.log(response.data)
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -42,11 +41,10 @@ const noticeStore = {
         no,
         (response) => {
           commit('setNotice', response.data)
-          console.log(response)
         },
         (error) => {
           commit('setNotice', null)
-          console.log(error)
+          console.warn(error)
         }
       )
     },

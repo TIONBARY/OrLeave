@@ -49,15 +49,13 @@ const userStore = {
           if (response.data.statusCode === 200) {
             const token = response.data.authorization
             commit('SET_IS_LOGIN', true)
-            console.log(token)
             sessionStorage.setItem('Authorization', token)
           } else {
             commit('SET_IS_LOGIN', false)
-            console.log('로그인 실패!')
           }
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -96,7 +94,7 @@ const userStore = {
             console.log('failed to send confirm key')
           }
         },
-        (error) => console.log(error)
+        (error) => console.warn(error)
       )
     },
 
@@ -115,7 +113,7 @@ const userStore = {
           }
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -125,8 +123,6 @@ const userStore = {
       await requestProfile(
         (response) => {
           commit('SET_PROFILE', response.data.profile)
-          console.log(response.data.profile)
-          console.log('is it undefined?' + this.profile)
         },
         (error) => console.log(error)
       )
@@ -135,9 +131,7 @@ const userStore = {
     async modifyProfile({ commit }) {
       await requestModifyProfile(
         this.profile,
-        (response) => {
-          console.log(response.data)
-        },
+        (response) => {},
         (error) => {
           console.log(error)
         }
@@ -158,12 +152,10 @@ const userStore = {
     async addBanuser({ commit }, bannedNo) {
       await addBanuser(
         bannedNo,
-        (response) => {
-          console.log(response)
-        },
+        (response) => {},
         (error) => {
           if (error.response.data.statusCode === 400) {
-            console.log('이미 차단된 사용자 입니다.')
+            console.warn('이미 차단된 사용자 입니다.')
           }
         }
       )
@@ -172,8 +164,7 @@ const userStore = {
     async deleteBanuser({ commit }, no) {
       await deleteBanuser(
         no,
-        (response) => {
-        },
+        (response) => {},
         (error) => {
           console.log(error)
         }
@@ -184,7 +175,6 @@ const userStore = {
       await getmeetinglog(
         (response) => {
           commit('SET_MEETINGUSER_LIST', response.data.meetingLogList)
-          console.log(response)
         },
         (error) => {
           console.log(error)
