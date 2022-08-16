@@ -4,37 +4,38 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 100%; max-width: 300px;"
     />
     <hr />
-    <div class="q-pa-xl">
+    <div>
       <section class="basic-container">
-        <q-form @submit="onSubmit" class="q-gutter-md">
-          <table>
+        <q-form @submit="onSubmit">
+          <table class="inquiryTable">
             <th colspan="2" class="q-pa-md" style="text-align: start">
               문의하기
             </th>
             <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
-                문의 제목
+              <td class="q-pa-md" style="width: 80px; text-align: start">
+                제목
               </td>
               <td>
                 <q-input
                   outlined
-                  v-model="inquiryTitle"
+                  v-model="this.inquiry.title"
                   style="background-color: white"
                   dense
                 />
               </td>
             </tr>
             <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
-                문의 내용
+              <td class="q-pa-md" style="width: 80px; text-align: left">
+                내용
               </td>
               <td>
                 <q-editor
-                  v-model="editor"
+                  v-model="this.inquiry.content"
                   ref="editorRef"
+                  style="text-align: left;"
                   toolbar-text-color="white"
                   toolbar-toggle-color="yellow-8"
                   toolbar-bg="primary"
@@ -54,51 +55,77 @@
               </td>
             </tr>
           </table>
-          <q-btn label="문의 접수" type="submit" color="primary" />
+          <q-btn class="q-mt-lg" label="문의 접수" type="submit" color="primary"/>
         </q-form>
         <br />
       </section>
       <br />
     </div>
+    <ConfirmModal
+      v-model="this.showConfirmModal"
+      @close="movePage"
+      :modalContent="this.confirmModalContent"
+      class="modalToFront"
+    />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { mapActions } from 'vuex'
-
-const inquiryStore = 'inquiryStore'
+import { inquiryRegist } from '@/api/inquiry'
+import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
   setup() {
-    const inquiryTitle = ref(null)
-    const inquiryContent = ref(null)
+    const showConfirmModal = ref(false)
+    const confirmModalContent = ref(null)
+    const willPageMove = ref(false)
+    const path = ref(null)
+    const inquiry = ref({
+      title: '',
+      content: ''
+    })
     return {
-      inquiryTitle,
-      inquiryContent,
-
-      editor: ref(null)
-
-      // onSubmit(event) {
-      //   event.preventDefault()
-
-      //   inquiry.title = inquiryTitle
-      //   inquiry.content = inquiryContent
-      //   this.inquiryRegist(this.inquiry)
-      //   // console.log(inquiryImage)
-      //   // 채워주삼
-      //   // 아니면 q-form에 action method로 되면 이거 지우삼
-      // }
+      showConfirmModal,
+      confirmModalContent,
+      willPageMove,
+      path,
+      inquiry
     }
   },
+  components: {
+    ConfirmModal
+  },
   methods: {
-    ...mapActions(inquiryStore, ['inquiryRegist']),
     onSubmit() {
-      this.$router.go(-1)
-      return this.inquiryRegist({
-        title: this.inquiryTitle,
-        content: this.editor
-      })
+      inquiryRegist(
+        this.inquiry,
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.confirmModalContent = '문의 작성이 완료되었습니다.'
+            this.willPageMove = true
+            this.path = '/inquiry/list'
+            this.showConfirmModal = true
+          }
+        },
+        ({ response }) => {
+          if (response.status === 401) {
+            this.confirmModalContent =
+              '로그인이 만료되었습니다. 로그인해주세요.'
+            this.path = '/user/login'
+            this.willPageMove = true
+          } else {
+            this.confirmModalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.willPageMove = false
+          }
+          this.showConfirmModal = true
+        }
+      )
+    },
+    movePage() {
+      if (this.willPageMove) {
+        this.$router.push(this.path)
+      }
     }
   }
 }
@@ -106,7 +133,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;
@@ -30,6 +31,7 @@ import com.orleave.dto.request.NoticeModifyRequestDto;
 import com.orleave.dto.request.NoticeRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
+import com.orleave.dto.response.InquiryListResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ReportDetailResponseDto;
 import com.orleave.dto.response.UserListResponseDto;
@@ -229,7 +231,7 @@ public class ManagerController {
 			@RequestBody @ApiParam(value="문의 답변", required = true)InquiryAnswerRequestDto inquiryAnswerRequestDto
 			,@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
-		
+		System.out.println("asdf");
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
@@ -237,6 +239,27 @@ public class ManagerController {
 		
 		managerService.InquiryAnswer(inquiryAnswerRequestDto);
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+	}
+	
+	@GetMapping("/inquiries")
+	@ApiOperation(value = "문의 목록", notes = "문의 목록을 출력합니다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 403, message = "권한이 없는 사용자"),
+        @ApiResponse(code = 404, message = "실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> InquiryList(@RequestParam("page") int page, @RequestParam("size") int size,
+			@ApiIgnore Authentication authentication) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		String UserType = userDetails.getUser().getUserType();
+		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
+		
+		Page<InquiryListDto> inquiryList = managerService.getInquiries(PageRequest.of(page, size, Sort.by("no").descending()));
+		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
 	}
 	
 	@PostMapping("/notices")

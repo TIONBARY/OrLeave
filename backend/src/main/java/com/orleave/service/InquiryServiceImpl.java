@@ -33,11 +33,7 @@ public class InquiryServiceImpl implements InquiryService{
 	@Transactional
 	public Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable) throws Exception {
 		Page<InquiryListDto> inquiryList = inquiryRepository.findByUserNo(userNo, pageable)
-				.map(inquiry -> InquiryListDto.builder()
-						.no(inquiry.getNo())
-						.title(inquiry.getTitle())
-						.createdTime(inquiry.getCreatedTime())
-						.build());	
+				.map(inquiry -> InquiryListDto.of(inquiry));	
 		return inquiryList;
 	}
 

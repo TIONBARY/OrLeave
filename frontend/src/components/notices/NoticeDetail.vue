@@ -43,18 +43,12 @@
 
 <script>
 
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 const noticeStore = 'noticeStore'
 
 export default {
   computed: {
     ...mapState(noticeStore, ['notice'])
-  },
-  methods: {
-    ...mapActions(noticeStore, ['noticeDetail'])
-  },
-  created() {
-  //  this.noticeDetail(this.notice.no)
   }
 }
 </script>
