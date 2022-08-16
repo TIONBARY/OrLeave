@@ -102,6 +102,7 @@
             no-spinner
             class="absolute-bottom-left"
             @click="levelUp()"
+            v-if="this.level < 3"
           />
           <!-- <q-btn  flat :ripple="false" /> -->
 
@@ -251,12 +252,13 @@ export default {
             this.mySkip = false
             this.yourSkip = false
             this.question_pick(this.level)
-
-            if (this.level === 1) {
+            if (this.level === 2) {
               this.skipDisable = true
               this.skip2 = setTimeout(() => {
                 this.skipDisable = false
-              }, 60000)
+              }, 6000)
+            } else {
+              this.skipDisable = true
             }
           }
         })
