@@ -199,7 +199,7 @@
 </template>
 <script>
 import { ref } from 'vue'
-import { getMeetingSetting, modifyMeetingSetting } from '@/api/meeting'
+import { getMeetingSetting, setMeetingSetting } from '@/api/meeting'
 import { getEmail } from '@/api/user'
 import VueScrollSnap from 'vue-scroll-snap'
 import ConfirmModal from './ConfirmModal.vue'
@@ -287,7 +287,7 @@ export default {
       this.meetingSetting.age_max = this.age.max
       this.meetingSetting.drink_min = this.drink.min
       this.meetingSetting.drink_max = this.drink.max
-      modifyMeetingSetting(this.meetingSetting, () => {}, ({ response }) => {
+      setMeetingSetting(this.meetingSetting, () => {}, ({ response }) => {
         if (response.status === 401) {
           this.modalContent = '로그인이 만료되었습니다. 로그인해주세요.'
           this.path = '/user/login'

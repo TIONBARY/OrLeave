@@ -39,14 +39,14 @@
           <user-video :stream-manager="mainStreamManager" :level="level" />
         </div>
         <div id="video-container">
-          <user-video
-            class="col-5 col-sm-3"
-            v-for="sub in subscribers"
-            :key="sub.stream.connection.connectionId"
-            :stream-manager="sub"
-            :level="level"
-            @click="updateMainVideoStreamManager(sub)"
-          />
+          <div class="col-5 col-sm-3">
+            <user-video
+              v-for="sub in subscribers"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+              :level="level"
+            />
+          </div>
         </div>
       </div>
       <div style="font-size: 24px">
@@ -101,10 +101,11 @@
             width="130px"
             no-spinner
             class="absolute-bottom-left"
-            @click=";[levelUp(), question_pick(level)]"
-          >
-            <q-btn flat color="red" :ripple="false" />
-          </q-img>
+            @click="levelUp()"
+            v-if="this.level < 3"
+          />
+          <!-- <q-btn  flat :ripple="false" /> -->
+
           <q-img
             src="../../assets/meeting/leave.png"
             width="130px"
@@ -120,10 +121,10 @@
                 <q-space />
                 <q-btn color="red" dense icon="close" v-close-popup />
               </q-bar>
-              <q-card-section class="popup-text">
+              <q-card-section class="popup-text text-center">
                 정말 떠나시겠습니까?
               </q-card-section>
-              <q-card-section class="q-gutter-sm text-right">
+              <q-card-section class="q-gutter-sm text-center">
                 <q-btn class="primary" label="확인" @click="leaveSession" />
                 <q-btn
                   class="negative"
@@ -196,15 +197,25 @@
         </div>
       </div>
     </div>
+    <MeetingChat />
   </div>
 </template>
 
 <script>
 import { OpenVidu } from 'openvidu-browser'
 import UserVideo from './video/UserVideo.vue'
-import { ref } from 'vue'
-import { mapActions } from 'vuex'
-import { reportUser } from '@/api/meeting'
+import { onMounted } from 'vue'
+import { mapState } from 'vuex'
+import { reportUser, enterMeeting, leaveMeeting } from '@/api/meeting'
+import jwtDecode from 'jwt-decode'
+import { WEBSOCKET_URL } from '@/config/index'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+import MeetingChat from './MeetingChat.vue'
+
+const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
+const stompClient = Stomp.over(socket)
+// stompClient.debug = null // disable stomp loggings
 
 const meetingStore = 'meetingStore'
 
@@ -212,26 +223,59 @@ export default {
   name: 'App',
 
   components: {
-    UserVideo
+    UserVideo,
+    MeetingChat
   },
-  setup() {
-    const question = ref(null)
-    const mute = ref(true)
-    const camera = ref(false)
-    const level = ref(1)
-    const popupMatching = ref(false)
-    const popupReport = ref(false)
-    const category = ref(null)
-    const content = ref('')
-    const reportedNo = 0
-    const skipDisable = ref(true)
+  computed: {
+    ...mapState(meetingStore, ['sessionId', 'myPublisher', 'opponentInfo'])
+  },
+  data() {
+    onMounted(() => {
+      const token = jwtDecode(sessionStorage.getItem('Authorization'))
+      console.log(token.NickName)
+      this.myNickname = token.NickName
 
+      this.skip1 = setTimeout(() => {
+        this.skipDisable = false
+      }, 6000)
+      stompClient.connect({}, () => {
+        stompClient.subscribe('/sub/chat/' + this.sessionId + 's', (msg) => {
+          // 메세지를 받았을 때 실행하는 부분
+          const response = JSON.parse(msg.body)
+          const msgNickname = response.nickname
+          if (msgNickname === this.myNickname) {
+            this.mySkip = true
+          } else {
+            this.yourSkip = true
+          }
+          console.log('my:' + this.mySkip)
+          console.log('your:' + this.yourSkip)
+
+          if (this.mySkip && this.yourSkip) {
+            this.level++
+            this.mySkip = false
+            this.yourSkip = false
+            this.question_pick(this.level)
+            if (this.level === 2) {
+              this.skipDisable = true
+              this.skip2 = setTimeout(() => {
+                this.skipDisable = false
+              }, 6000)
+            } else {
+              this.skipDisable = true
+            }
+          }
+        })
+      })
+    })
     return {
-      question,
-      mute,
-      camera,
-      level,
-      skipDisable,
+      question: null,
+      camera: false,
+      level: 1,
+      skipDisable: true,
+      myNickname: null,
+      skip1: null,
+      skip2: null,
       // 질문을 단계별, 상대의 취미 별로 나눠야함
       questions: [
         [
@@ -263,21 +307,14 @@ export default {
         { label: '혐오발언', value: 4 },
         { label: '기타', value: 5 }
       ],
-      reportedNo,
-      category,
-      content,
-      popupMatching,
-      popupReport,
+      reportedNo: null,
+      category: null,
+      content: '',
+      popupMatching: false,
+      popupReport: false,
+      mySkip: false,
+      yourSkip: false,
 
-      question_pick() {
-        this.question = this.questions[this.level - 1].at(
-          Math.floor(Math.random() * this.questions.length)
-        )
-      }
-    }
-  },
-  data() {
-    return {
       OV: undefined,
       session: undefined,
       mainStreamManager: undefined,
@@ -298,8 +335,11 @@ export default {
   },
 
   methods: {
-    ...mapActions(meetingStore, ['enterSession', 'leftMeeting']),
-
+    question_pick() {
+      this.question = this.questions[this.level - 1].at(
+        Math.floor(Math.random() * this.questions.length)
+      )
+    },
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
       this.publisher.publishAudio(this.isOn.audio)
@@ -382,7 +422,10 @@ export default {
             )
           })
       })
-      window.addEventListener('beforeunload', this.leaveSession)
+      window.addEventListener('beforeunload', (e) => {
+        e.preventDefault()
+        this.leaveSession()
+      })
     },
 
     leaveSession() {
@@ -395,7 +438,7 @@ export default {
       this.subscribers = []
       this.OV = undefined
 
-      this.leftMeeting({ sessionId: this.mySessionId, token: this.token })
+      leaveMeeting(this.mySessionId, this.token)
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -424,7 +467,7 @@ export default {
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
-      return this.enterSession(sessionId)
+      return enterMeeting(sessionId)
     },
     time() {
       return String(Date.now())
@@ -438,21 +481,27 @@ export default {
           console.log('필터~', filter)
         })
     },
-    testStop() {
-      this.publisher.stream
-        .removeFilter()
-        .then(() => {
-          console.log('Filter removed')
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
     levelUp() {
-      this.level += 1
-      // this.skipDisable = false
+      console.log(this.skipDisable)
+      if (this.skipDisable) {
+        return
+      }
+      const msg = { nickname: this.myNickname, content: true }
+      console.log(msg)
+      stompClient.send(
+        '/pub/chat/' + this.sessionId + 's',
+        {},
+        JSON.stringify(msg)
+      )
       if (this.level === 2) {
-        this.testStop()
+        this.publisher.stream
+          .removeFilter()
+          .then(() => {
+            console.log('Filter removed')
+          })
+          .catch((error) => {
+            console.error(error)
+          })
       }
     },
     reportUser() {

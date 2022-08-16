@@ -75,11 +75,11 @@ async function stopMatching(success, fail) {
 }
 
 function enterMeeting(sessionId) {
-  const authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   const sessionObject = { sessionName: sessionId }
   return api.post('/session/enter', JSON.stringify(sessionObject), {
     headers: {
-      authorization: authorization
+      Authorization: Authorization
     }
   })
 }
@@ -160,7 +160,7 @@ async function deleteBanUser(bannedNo, success, fail) {
 async function reportUser(report, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .post('/meeting/recent-call', JSON.stringify(report), {
+    .post('/meeting', JSON.stringify(report), {
       headers: {
         Authorization: Authorization
       }

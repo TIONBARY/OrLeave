@@ -164,13 +164,14 @@ import {
 } from '@/api/meeting.js'
 import jwtDecode from 'jwt-decode'
 import { mapState, mapActions } from 'vuex'
+import { WEBSOCKET_URL } from '@/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import MatchModal from './MatchModal.vue'
 
 const meetingStore = 'meetingStore'
 
-const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
+const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
 const stompClient = Stomp.over(socket)
 stompClient.debug = null // disable stomp loggings
 
