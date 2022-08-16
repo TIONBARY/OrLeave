@@ -1,5 +1,5 @@
 <template>
-  <vue-scroll-snap>
+  <vue-scroll-snap :fullscreen="true">
     <div class="item row items-center justify-center">
       <div>
         <q-img
@@ -80,23 +80,49 @@
                     <tr>
                       <td>흡연</td>
                       <td>
-                        <q-radio v-model="this.meetingSetting.smoke" :val="0" label="상관없음" />
-                        <q-radio v-model="this.meetingSetting.smoke" :val="1" label="비흡연" />
-                        <q-radio v-model="this.meetingSetting.smoke" :val="2" label="흡연" />
+                        <q-radio
+                          v-model="this.meetingSetting.smoke"
+                          :val="0"
+                          label="상관없음"
+                        />
+                        <q-radio
+                          v-model="this.meetingSetting.smoke"
+                          :val="1"
+                          label="비흡연"
+                        />
+                        <q-radio
+                          v-model="this.meetingSetting.smoke"
+                          :val="2"
+                          label="흡연"
+                        />
                       </td>
                     </tr>
                     <tr>
                       <td>종교</td>
                       <td>
-                        <q-radio v-model="this.meetingSetting.religion" :val="0" label="상관없음" />
-                        <q-radio v-model="this.meetingSetting.religion" :val="1" label="같은 종교" />
+                        <q-radio
+                          v-model="this.meetingSetting.religion"
+                          :val="0"
+                          label="상관없음"
+                        />
+                        <q-radio
+                          v-model="this.meetingSetting.religion"
+                          :val="1"
+                          label="같은 종교"
+                        />
                       </td>
                     </tr>
                   </table>
                 </q-card-section>
 
                 <q-card-actions align="center">
-                  <q-btn flat label="OK" color="primary" v-close-popup @click="setMeetingSetting" />
+                  <q-btn
+                    flat
+                    label="OK"
+                    color="primary"
+                    v-close-popup
+                    @click="setMeetingSetting"
+                  />
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -104,7 +130,7 @@
         </div>
       </div>
     </div>
-    <div class="item pageSection">
+    <div class="item pageSection row">
       <div class="intro-title text-left">
         <h1>듣다,</h1>
         <h2>상대방과 이야기를 나누며<br />어떤 사람인지 알아보세요.</h2>
@@ -114,7 +140,7 @@
         :src="require('../assets/main/dateimg1.png')"
       />
     </div>
-    <div class="item pageSection">
+    <div class="item pageSection row">
       <div class="intro-title text-left">
         <h1>보다,</h1>
         <h2>마음이 잘 통한다면,<br />서로의 눈을 보며 대화해보세요.</h2>
@@ -124,7 +150,7 @@
         :src="require('../assets/main/dateimg2.png')"
       />
     </div>
-    <div class="item pageSection">
+    <div class="item pageSection row">
       <div class="intro-title text-left">
         <h1>잡다,</h1>
         <h2>마음이에 드는 상대를<br />쟁취하세요.</h2>
@@ -134,12 +160,14 @@
         :src="require('../assets/main/dateimg3.png')"
       />
     </div>
+
     <div class="item">
       <div class="third">
         <h1>개발자 소개</h1>
         <div class="q-mt-md row justify-center">
           <div class="img-container">
             <q-img
+              class="last-img"
               src="../assets/main/developers.png"
               width="500px"
               height="400px"
@@ -163,38 +191,72 @@
               <q-avatar size="25px">
                 <q-img src="../assets/profile/25.png" />
               </q-avatar>
-              정승욱
+              정승욱:&nbsp;
+              <q-avatar class="q-mr-sm" size="20px">
+                <q-img src="../assets/main/github.png" />
+              </q-avatar>
+              <q-avatar size="20px">
+                <q-img src="../assets/main/instagram.png" />
+              </q-avatar>
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/2.png" />
               </q-avatar>
-              정지은
+              정지은:&nbsp;
+              <q-avatar class="q-mr-sm" size="20px">
+                <q-img src="../assets/main/github.png" />
+              </q-avatar>
+              <q-avatar size="20px">
+                <q-img src="../assets/main/instagram.png" />
+              </q-avatar>
             </div>
             <div class="text-h5">Backend</div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/3.png" />
               </q-avatar>
-              박상수
+              박상수:&nbsp;
+              <q-avatar class="q-mr-sm" size="20px">
+                <q-img src="../assets/main/github.png" />
+              </q-avatar>
+              <q-avatar size="20px">
+                <q-img src="../assets/main/instagram.png" />
+              </q-avatar>
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/5.png" />
               </q-avatar>
-              윤지환
+              윤지환:&nbsp;
+              <q-avatar class="q-mr-sm" size="20px">
+                <q-img src="../assets/main/github.png" />
+              </q-avatar>
+              <q-avatar size="20px">
+                <q-img src="../assets/main/instagram.png" />
+              </q-avatar>
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/4.png" />
               </q-avatar>
-              허상
+              허상:&nbsp;
+              <q-avatar class="q-mr-sm" size="20px">
+                <q-img src="../assets/main/github.png" />
+              </q-avatar>
+              <q-avatar size="20px">
+                <q-img src="../assets/main/instagram.png" />
+              </q-avatar>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
+    <ConfirmModal
+      v-model="this.showModal"
+      @close="movePage"
+      :modalContent="this.modalContent"
+    />
   </vue-scroll-snap>
 </template>
 <script>
@@ -258,56 +320,66 @@ export default {
   methods: {
     checkMeetingSetting() {
       this.alert = true
-      getMeetingSetting(({ data }) => {
-        if (data.statusCode === 200) {
-          this.meetingSetting = data.meetingsetting
-          this.age = {
-            min: this.meetingSetting.age_min,
-            max: this.meetingSetting.age_max
+      getMeetingSetting(
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.meetingSetting = data.meetingsetting
+            this.age = {
+              min: this.meetingSetting.age_min,
+              max: this.meetingSetting.age_max
+            }
+            this.drink = {
+              min: this.meetingSetting.drink_min,
+              max: this.meetingSetting.drink_max
+            }
           }
-          this.drink = {
-            min: this.meetingSetting.drink_min,
-            max: this.meetingSetting.drink_max
+        },
+        ({ response }) => {
+          if (response.status === 401) {
+            this.modalContent = '로그인이 필요합니다.'
+            this.path = '/user/login'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.path = '/'
           }
+          this.willPageMove = true
+          this.showModal = true
         }
-      }, ({ response }) => {
-        if (response.status === 401) {
-          this.modalContent = '로그인이 필요합니다.'
-          this.path = '/user/login'
-        } else {
-          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-          this.path = '/'
-        }
-        this.willPageMove = true
-        this.showModal = true
-      })
+      )
     },
     setMeetingSetting() {
       this.meetingSetting.age_min = this.age.min
       this.meetingSetting.age_max = this.age.max
       this.meetingSetting.drink_min = this.drink.min
       this.meetingSetting.drink_max = this.drink.max
-      setMeetingSetting(this.meetingSetting, () => {}, ({ response }) => {
-        if (response.status === 401) {
-          this.modalContent = '로그인이 만료되었습니다. 로그인해주세요.'
-          this.path = '/user/login'
-        } else {
-          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-          this.path = '/'
+      setMeetingSetting(
+        this.meetingSetting,
+        () => {},
+        ({ response }) => {
+          if (response.status === 401) {
+            this.modalContent = '로그인이 만료되었습니다. 로그인해주세요.'
+            this.path = '/user/login'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.path = '/'
+          }
+          this.willPageMove = true
+          this.showModal = true
         }
-        this.willPageMove = true
-        this.showModal = true
-      })
+      )
     },
     startMatching() {
-      getEmail(() => {
-        this.$router.push('/meeting/lobby')
-      }, () => {
-        this.showModal = true
-        this.modalContent = '로그인이 필요합니다.'
-        this.willPageMove = true
-        this.path = '/user/login'
-      })
+      getEmail(
+        () => {
+          this.$router.push('/meeting/lobby')
+        },
+        () => {
+          this.showModal = true
+          this.modalContent = '로그인이 필요합니다.'
+          this.willPageMove = true
+          this.path = '/user/login'
+        }
+      )
     },
     movePage() {
       if (this.willPageMove) {
@@ -327,11 +399,7 @@ export default {
   height: auto;
 }
 .img-container {
-  background-color: whitesmoke;
-  border-radius: 20px;
-  padding: 0px;
-  height: auto;
-  width: auto;
+  background-color: transparent;
 }
 
 .pageSection {
@@ -345,20 +413,13 @@ export default {
 }
 .intro-img {
   position: absolute;
-  right: 20%;
-  bottom: 15%;
-  min-width: 30%;
-  min-height: 30%;
+  right: 10%;
+  bottom: 10%;
+  width: 400px;
+  height: auto;
+  min-width: 40%;
+  min-height: auto;
+  max-width: none;
+  background-color: transparent;
 }
-
-/* scroll-snap에 필요한 css */
-.item {
-  /* Set the minimum height of the items to be the same as the height of the scroll-snap-container.*/
-  min-height: 100vh;
-}
-.scroll-snap-container {
-  height: 100vh;
-  width: 100vw;
-}
-/* scroll-snap에 필요한 css */
 </style>
