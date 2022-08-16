@@ -36,8 +36,6 @@ import SockJS from 'sockjs-client'
 import jwtDecode from 'jwt-decode'
 import { mapState } from 'vuex'
 
-const myName = jwtDecode(sessionStorage.getItem('Authorization')).NickName
-
 export default {
   setup() {
     const message = ref('')
@@ -49,8 +47,9 @@ export default {
     const chatMsg = ref(null)
     const recvList = ref([])
     const chatLog = ref([])
+    const userName = ref('')
     return {
-      userName: myName,
+      userName,
       message,
       recvList,
       showChat,
@@ -72,6 +71,7 @@ export default {
     }
   },
   created() {
+    this.userName = jwtDecode(sessionStorage.getItem('Authorization')).NickName
     this.connect()
   },
   computed: {
