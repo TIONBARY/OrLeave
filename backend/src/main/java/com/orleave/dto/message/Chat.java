@@ -12,5 +12,5 @@ import lombok.Setter;
 public class Chat {
 	String nickname;
 	String content;
-	LocalDateTime time;
+	String time;
 }

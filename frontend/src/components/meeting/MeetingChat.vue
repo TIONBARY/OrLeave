@@ -15,15 +15,38 @@
         self="center right"
         persistent
       >
-        <q-scroll-area class="chat-log">
-          <q-chat-message
-            v-for="chat in chatLog"
-            :key="chat"
-            :text="[chat.text]"
-            :sent="chat.sent"
-          />
-        </q-scroll-area>
-        <input v-model="message" type="text" @keyup.enter="sendMessage" />
+        <div class="chat-area">
+          <q-scroll-area class="chat-log">
+            <q-chat-message
+              v-for="chat in chatLog"
+              :key="chat"
+              :name="chat.nickname"
+              :text="[chat.text]"
+              :sent="chat.sent"
+              :stamp="chat.time"
+            />
+          </q-scroll-area>
+          <div class="row justify-center items-center">
+            <q-input
+              class="chat-input"
+              v-model="message"
+              bg-color="white"
+              type="text"
+              @keyup.enter="sendMessage"
+            >
+              <template v-slot:append>
+                <q-btn
+                  color="primary"
+                  class="q-mr-sm"
+                  @click="sendMessage"
+                  label="전송"
+                  size="15px"
+                  dense
+                />
+              </template>
+            </q-input>
+          </div>
+        </div>
       </q-menu>
     </q-btn>
   </div>
@@ -34,6 +57,7 @@ import { ref } from 'vue'
 import Stomp from 'webstomp-client'
 import SockJS from 'sockjs-client'
 import jwtDecode from 'jwt-decode'
+import { WEBSOCKET_URL } from '@/config'
 import { mapState } from 'vuex'
 
 export default {
@@ -87,9 +111,17 @@ export default {
     send() {
       console.log('Send message:' + this.message)
       if (this.stompClient && this.stompClient.connected) {
+        const date = new Date()
+        const hour =
+          date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+        const minute =
+          date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+        const second =
+          date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
         const msg = {
           nickname: this.userName,
-          content: this.message
+          content: this.message,
+          time: hour + ':' + minute + ':' + second
         }
         this.stompClient.send(
           '/pub/chat/' + this.sessionId,
@@ -99,36 +131,38 @@ export default {
       }
     },
     connect() {
-      const serverURL = 'http://localhost:8080/api/v1/ws'
+      const serverURL = WEBSOCKET_URL
       const socket = new SockJS(serverURL)
       this.stompClient = Stomp.over(socket)
-      console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
       this.stompClient.connect(
         {},
         (frame) => {
           // 소켓 연결 성공
           this.connected = true
-          console.log('소켓 연결 성공', frame)
           // 서버의 메시지 전송 endpoint를 구독합니다.
           // 이런형태를 pub sub 구조라고 합니다.
           this.stompClient.subscribe('/sub/chat/' + this.sessionId, (res) => {
-            console.log('구독으로 받은 메시지 입니다.', res.body)
-
             // 받은 데이터를 json으로 파싱하고 리스트에 넣어줍니다.
             this.recvList.push(JSON.parse(res.body))
             const temp = this.recvList.pop()
-            console.log(temp)
-            console.log(temp.nickname + ' ' + this.userName)
             if (temp.nickname === this.userName) {
-              this.chatLog.push({ text: temp.content, sent: true })
+              this.chatLog.push({
+                nickname: temp.nickname,
+                text: temp.content,
+                time: temp.time,
+                sent: true
+              })
             } else {
-              this.chatLog.push({ text: temp.content, sent: false })
+              this.chatLog.push({
+                nickname: temp.nickname,
+                text: temp.content,
+                time: temp.time,
+                sent: false
+              })
             }
           })
         },
-        (error) => {
-          // 소켓 연결 실패
-          console.log('소켓 연결 실패', error)
+        () => {
           this.connected = false
         }
       )
@@ -149,7 +183,8 @@ export default {
   width: 10px;
   height: 50px;
   position: absolute;
-  left: -260px;
+  left: -210px;
+  z-index: 10;
 }
 .chat-bar {
   position: relative;
@@ -157,9 +192,16 @@ export default {
   padding: 15px;
   overflow: hidden;
 }
+.chat-area {
+  background-color: #e5edb8 !important;
+}
 .chat-log {
-  height: 300px;
-  margin: 10px;
+  height: 350px;
+  width: 200px;
+  padding: 10px;
+}
+.chat-input {
+  width: 180px;
 }
 .popup {
   background: #f3f1eb;

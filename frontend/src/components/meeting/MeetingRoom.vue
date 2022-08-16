@@ -36,7 +36,7 @@
 
       <div id="session-header" class="m-ma-lg row justify-around">
         <div id="main-video">
-          <user-video :stream-manager="mainStreamManager" :level="level" />
+          <user-video :stream-manager="mainStreamManager" :level="level" :nickname="myNickname" :imageNo="myImageNo+''"/>
         </div>
         <div id="video-container">
           <div class="col-5 col-sm-3">
@@ -45,6 +45,7 @@
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
               :level="level"
+              :nickname="opponentInfo.nickname" :imageNo="opponentInfo.imageNo+''"
             />
           </div>
         </div>
@@ -52,36 +53,38 @@
       <div style="font-size: 24px">
         {{ question }}
       </div>
-      <div>
+      <div class="q-mt-md">
         <q-btn
           @click="toggleAudio()"
           color="primary"
           v-if="isOn.audio"
-          icon="mic_off"
-          label="음소거 해제"
+          icon="mic"
+          label="음소거 시작"
+          class="q-mr-lg"
         />
         <q-btn
           @click="toggleAudio()"
           color="primary"
           v-else
-          icon="mic"
-          label="음소거 시작"
+          icon="mic_off"
+          label="음소거 해제"
+          class="q-mr-lg"
         />
 
         <q-btn
           @click="toggleVideo()"
           color="primary"
           v-if="isOn.video"
-          icon="videocam_off"
-          label="비디오 시작"
+          icon="videocam"
+          label="비디오 중지"
         />
 
         <q-btn
           @click="toggleVideo()"
           color="primary"
           v-else
-          icon="videocam"
-          label="비디오 중지"
+          icon="videocam_off"
+          label="비디오 시작"
         />
       </div>
       <div id="session-header">
@@ -250,6 +253,7 @@ export default {
       }
       console.log(token.NickName)
       this.myNickname = token.NickName
+      this.myImageNo = token.imageNo
 
       this.socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
       this.stompClient = Stomp.over(this.socket)
@@ -308,6 +312,7 @@ export default {
       level: 1,
       skipDisable: true,
       myNickname: null,
+      myImageNo: 0,
       skip1: null,
       skip2: null,
       // 질문을 단계별, 상대의 취미 별로 나눠야함

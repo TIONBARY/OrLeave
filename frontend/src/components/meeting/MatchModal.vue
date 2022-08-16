@@ -14,7 +14,7 @@
           class="q-ma-md"
           animation-speed="1"
         />
-        <br />{{ modalContent }}</q-card-section
+        <br /><q-img :src="require('../../assets/profile/' + imageNo + '.png')" width="30px" style="margin-right: 10px"/>{{ modalContent }}</q-card-section
       >
       <div class="full-width row justify-evenly q-mb-lg">
         <q-btn
@@ -38,7 +38,8 @@
 export default {
   props: {
     modalContent: String,
-    disable: Boolean
+    disable: Boolean,
+    imageNo: String
   },
   emits: ['confirm', 'close', 'changeDisable']
 }
