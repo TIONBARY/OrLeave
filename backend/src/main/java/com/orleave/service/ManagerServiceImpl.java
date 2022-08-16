@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
@@ -147,6 +148,20 @@ public class ManagerServiceImpl implements ManagerService{
 		noticeRepository.deleteById(no);
 		
 		
+	}
+
+	@Override
+	public Page<InquiryListDto> getInquiries(Pageable pageable) {
+		Page<InquiryListDto> inquiries = inquiryRepository.findAll(pageable).map(
+				inquiry -> InquiryListDto.builder()
+				.no(inquiry.getNo())
+				.title(inquiry.getTitle())
+				.isAnswered(inquiry.getAnswer().isEmpty())
+				.createdTime(inquiry.getCreatedTime())
+				.build()
+				);
+				
+		return inquiries;
 	}
 
 }

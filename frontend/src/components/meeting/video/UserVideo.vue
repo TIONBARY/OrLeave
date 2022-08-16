@@ -1,5 +1,17 @@
 <template>
-  <div v-if="streamManager">
+  <div v-if="streamManager && level === 1">
+    <ov-video :stream-manager="streamManager" style="filter: blur(10px)" />
+    <div>
+      <p>{{ clientData }}</p>
+    </div>
+  </div>
+  <div v-if="streamManager && level === 2">
+    <ov-video :stream-manager="streamManager" style="filter: blur(5px)" />
+    <div>
+      <p>{{ clientData }}</p>
+    </div>
+  </div>
+  <div v-if="streamManager && level === 3">
     <ov-video :stream-manager="streamManager" />
     <div>
       <p>{{ clientData }}</p>
@@ -18,7 +30,8 @@ export default {
   },
 
   props: {
-    streamManager: Object
+    streamManager: Object,
+    level: Number
   },
 
   computed: {

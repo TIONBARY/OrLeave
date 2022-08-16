@@ -49,11 +49,29 @@ async function ModifyNickname(no, nickname, success, fail) {
     .catch(fail)
 }
 
+async function getInquiries(page, size, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .get('/manager/inquiries', { headers: { Authorization }, params: { page, size } })
+    .then(success)
+    .catch(fail)
+}
+
+async function answerInquiry(inquiry, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  await api
+    .put('/manager/inquiry/answer', JSON.stringify(inquiry), { headers: { Authorization } })
+    .then(success)
+    .catch(fail)
+}
+
 export {
   managerLogin,
   getAllUsers,
   getUserReportList,
   getReportDetail,
   BanUser,
-  ModifyNickname
+  ModifyNickname,
+  getInquiries,
+  answerInquiry
 }
