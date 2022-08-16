@@ -4,7 +4,7 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 100%; max-width: 300px;"
+      style="width: 100%; max-width: 300px"
     />
     <hr />
     <div>
@@ -28,14 +28,17 @@
               </td>
             </tr>
             <tr>
-              <td class="q-pa-md" style="width: 80px; text-align: left">
+              <td
+                class="q-pa-md"
+                style="width: 80px; text-align: left; vertical-align: text-top"
+              >
                 내용
               </td>
               <td>
                 <q-editor
                   v-model="this.inquiry.content"
                   ref="editorRef"
-                  style="text-align: left;"
+                  style="text-align: left"
                   toolbar-text-color="white"
                   toolbar-toggle-color="yellow-8"
                   toolbar-bg="primary"
@@ -55,7 +58,12 @@
               </td>
             </tr>
           </table>
-          <q-btn class="q-mt-lg" label="문의 접수" type="submit" color="primary"/>
+          <q-btn
+            class="q-mt-lg"
+            label="문의 접수"
+            type="submit"
+            color="primary"
+          />
         </q-form>
         <br />
       </section>

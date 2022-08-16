@@ -4,41 +4,48 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 100%; max-width: 300px;"
+      style="width: 100%; max-width: 300px"
     />
     <hr />
     <div>
       <section class="basic-container">
         <table>
           <th colspan="3" class="q-pa-md" style="text-align: start">내 문의</th>
-          <tr :key="inquiry.no" v-for="inquiry in inquiryList">
-            <td class="q-pa-md" style="text-align: start">
-              <div class="cursor-pointer" @click="goDetail(inquiry.no)">
-                {{ inquiry.title }}
-              </div>
-            </td>
-            <td class="q-pa-md" style="text-align: end">
-              {{ changeToDate(inquiry.createdTime) }}
-            </td>
-            <td class="q-pa-md" style="text-align: end">
-              {{ changeToIcon(inquiry.answered) }}
-            </td>
-          </tr>
+          <template v-if="inquiryList.length === 0">
+            <tr>
+              <td style="height: 150px">작성한 문의가 없습니다.</td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr :key="inquiry.no" v-for="inquiry in inquiryList">
+              <td class="q-pa-md" style="text-align: start">
+                <div class="cursor-pointer" @click="goDetail(inquiry.no)">
+                  {{ inquiry.title }}
+                </div>
+              </td>
+              <td class="q-pa-md" style="text-align: end">
+                {{ changeToDate(inquiry.createdTime) }}
+              </td>
+              <td class="q-pa-md" style="text-align: end">
+                {{ changeToIcon(inquiry.answered) }}
+              </td>
+            </tr>
+          </template>
         </table>
       </section>
       <br />
       <div class="q-pa-lg flex flex-center">
-          <q-pagination
-            v-model="this.pageNum"
-            :max="this.totalPages"
-            :max-pages="this.maxPages"
-            direction-links
-            boundary-links
-            icon-first="skip_previous"
-            icon-last="skip_next"
-            icon-prev="fast_rewind"
-            icon-next="fast_forward"
-          />
+        <q-pagination
+          v-model="this.pageNum"
+          :max="this.totalPages"
+          :max-pages="this.maxPages"
+          direction-links
+          boundary-links
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+        />
       </div>
       <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
     </div>
