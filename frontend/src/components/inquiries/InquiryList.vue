@@ -5,6 +5,7 @@
       :src="require('../../assets/logo_l.png')"
       alt="image"
       style="width: 100%; max-width: 300px"
+      @click="this.$router.push('/')"
     />
     <hr />
     <div>
@@ -19,21 +20,21 @@
           <template v-else>
             <tr :key="inquiry.no" v-for="inquiry in inquiryList">
               <td class="q-pa-md" style="text-align: start">
-                <div class="cursor-pointer" @click="goDetail(inquiry.no)">
+                <router-link :to="`/inquiry/${inquiry.no}`">
                   {{ inquiry.title }}
-                </div>
+                </router-link>
               </td>
               <td class="q-pa-md" style="text-align: end">
                 {{ changeToDate(inquiry.createdTime) }}
               </td>
               <td class="q-pa-md" style="text-align: end">
-                {{ changeToIcon(inquiry.answered) }}
+                <q-icon v-if="inquiry.answered" name="check_box" />
+                <q-icon v-else name="check_box_outline_blank" />
               </td>
             </tr>
           </template>
         </table>
       </section>
-      <br />
       <div class="q-pa-lg flex flex-center">
         <q-pagination
           v-model="this.pageNum"
@@ -94,9 +95,16 @@ export default {
   created() {
     this.getInquiryList()
   },
+  watch: {
+    pageNum: function () {
+      this.movepage()
+    }
+  },
   methods: {
+    movepage() {
+      this.getInquiryList()
+    },
     getInquiryList() {
-      console.log('check')
       inquiryList(
         this.pageNum - 1,
         ({ data }) => {
@@ -129,19 +137,8 @@ export default {
       const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
       return `${year}-${month}-${day}`
     },
-    changeToIcon(isAnswered) {
-      console.log(isAnswered)
-      if (!isAnswered) {
-        return '□'
-      } else {
-        return '■'
-      }
-    },
     moveRegist() {
       this.$router.push('/inquiry/regist')
-    },
-    goDetail(no) {
-      this.$router.push('/inquiry/' + no)
     },
     movePage() {
       if (this.willPageMove) {
@@ -171,5 +168,9 @@ th {
 
 tr {
   border-bottom: 1px solid #979797;
+}
+
+a {
+  color: black;
 }
 </style>

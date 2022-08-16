@@ -5,6 +5,7 @@
       :src="require('../../assets/logo_l.png')"
       alt="image"
       style="width: 100%; max-width: 300px"
+      @click="this.$router.push('/')"
     />
     <hr />
     <div>

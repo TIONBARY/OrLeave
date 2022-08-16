@@ -26,7 +26,7 @@ const inquiryStore = {
           commit('setInquiries', response.data.inquiryList.content)
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -37,7 +37,7 @@ const inquiryStore = {
           commit('setInquiry', response.data.inquiry)
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -46,7 +46,7 @@ const inquiryStore = {
         inquiry,
         () => {},
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -55,18 +55,17 @@ const inquiryStore = {
         inquiryNo,
         () => {},
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
     inquiryModify: (context, inquiry) => {
-      console.log(inquiry)
       return inquiryModify(
         inquiry.no,
         inquiry,
         () => {},
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     }

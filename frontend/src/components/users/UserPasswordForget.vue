@@ -108,13 +108,22 @@
         <q-btn label="다음" type="submit" class="primary" />
       </q-form>
     </section>
-    <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
+    <ConfirmModal
+      v-model="this.showModal"
+      @close="movePage"
+      :modalContent="this.modalContent"
+    />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { confirmEmailCode, getEmail, setConfirmKey, modifyPasswordWithoutAuth } from '@/api/user'
+import {
+  confirmEmailCode,
+  getEmail,
+  setConfirmKey,
+  modifyPasswordWithoutAuth
+} from '@/api/user'
 import ConfirmModal from '../ConfirmModal.vue'
 
 export default {
@@ -182,54 +191,63 @@ export default {
   },
   methods: {
     sendEmail() {
-      console.log(this.email)
       if (this.email < 3 || !this.email.includes('@')) {
         this.showModal = true
         this.modalContent = '이메일 형식이 올바르지 않습니다.'
         this.willPageMove = false
         return
       }
-      setConfirmKey(this.email, ({ data }) => {
-        if (data.statusCode === 200) {
+      setConfirmKey(
+        this.email,
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.isReadonly = true
+            this.showModal = true
+            this.modalContent = '인증번호가 전송되었습니다.'
+            this.willPageMove = false
+            this.startTimer(60 * 3)
+          }
+        },
+        ({ response: { data } }) => {
           this.isReadonly = true
           this.showModal = true
-          this.modalContent = '인증번호가 전송되었습니다.'
+          this.modalContent =
+            '인증번호를 전송하지 못했습니다. 다시 시도해보세요.'
           this.willPageMove = false
-          this.startTimer(60 * 3)
+          clearInterval(this.intervalId)
         }
-      }, ({ response: { data } }) => {
-        this.isReadonly = true
-        this.showModal = true
-        this.modalContent = '인증번호를 전송하지 못했습니다. 다시 시도해보세요.'
-        this.willPageMove = false
-        clearInterval(this.intervalId)
-      })
+      )
     },
     async onSubmit() {
-      modifyPasswordWithoutAuth({
-        email: this.email,
-        password: this.password
-      }, ({ data }) => {
-        if (data.statusCode === 200) {
+      modifyPasswordWithoutAuth(
+        {
+          email: this.email,
+          password: this.password
+        },
+        ({ data }) => {
+          if (data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '비밀번호가 변경되었습니다.'
+            this.willPageMove = true
+            this.path = '/user/login'
+          }
+        },
+        ({ response }) => {
+          if (response.data.message === 'Wrong Password') {
+            this.modalContent =
+              '이전과 동일한 비밀번호입니다. 다른 비밀번호를 입력하세요.'
+            this.willPageMove = false
+          } else if (response.status === 403) {
+            this.modalContent = '가입하지 않은 계정입니다.'
+            this.willPageMove = true
+            this.path = '/user/signup/account'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.willPageMove = false
+          }
           this.showModal = true
-          this.modalContent = '비밀번호가 변경되었습니다.'
-          this.willPageMove = true
-          this.path = '/user/login'
         }
-      }, ({ response }) => {
-        if (response.data.message === 'Wrong Password') {
-          this.modalContent = '이전과 동일한 비밀번호입니다. 다른 비밀번호를 입력하세요.'
-          this.willPageMove = false
-        } else if (response.status === 403) {
-          this.modalContent = '가입하지 않은 계정입니다.'
-          this.willPageMove = true
-          this.path = '/user/signup/account'
-        } else {
-          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-          this.willPageMove = false
-        }
-        this.showModal = true
-      })
+      )
     },
     checkReadonly() {
       return this.emailCheck || '이메일을 인증해주세요'
@@ -255,32 +273,36 @@ export default {
       }, 1000)
     },
     confirm() {
-      confirmEmailCode({
-        email: this.email,
-        code: this.code
-      }, (response) => {
-        if (response.data.statusCode === 200) {
+      confirmEmailCode(
+        {
+          email: this.email,
+          code: this.code
+        },
+        (response) => {
+          if (response.data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '인증되었습니다.'
+            this.emailCheck = true
+            this.willPageMove = false
+          }
+          clearInterval(this.intervalId)
+        },
+        (error) => {
+          if (error.response.data.message === 'Wrong Code') {
+            this.modalContent = '코드를 잘못 입력하셨습니다.'
+          } else if (error.response.data.message === 'Email Confirm Time Out') {
+            this.modalContent = '인증코드 입력 시간이 초과되었습니다.'
+            clearInterval(this.intervalId)
+          } else if (error.response.data.message === 'Code Not Sent') {
+            this.modalContent = '인증코드를 전송해주세요.'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+          }
           this.showModal = true
-          this.modalContent = '인증되었습니다.'
-          this.emailCheck = true
+          this.emailCheck = false
           this.willPageMove = false
         }
-        clearInterval(this.intervalId)
-      }, (error) => {
-        if (error.response.data.message === 'Wrong Code') {
-          this.modalContent = '코드를 잘못 입력하셨습니다.'
-        } else if (error.response.data.message === 'Email Confirm Time Out') {
-          this.modalContent = '인증코드 입력 시간이 초과되었습니다.'
-          clearInterval(this.intervalId)
-        } else if (error.response.data.message === 'Code Not Sent') {
-          this.modalContent = '인증코드를 전송해주세요.'
-        } else {
-          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-        }
-        this.showModal = true
-        this.emailCheck = false
-        this.willPageMove = false
-      })
+      )
     },
     movePage() {
       if (this.willPageMove) {

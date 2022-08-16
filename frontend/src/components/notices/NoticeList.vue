@@ -4,35 +4,37 @@
       class="q-ma-lg"
       :src="require('../../assets/logo_l.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 100%; max-width: 300px"
+      @click="this.$router.push('/')"
     />
     <hr />
-    <div class="q-pa-xl">
+    <div>
       <section class="basic-container">
         <table>
           <th colspan="2" class="q-pa-md" style="text-align: start">
             공지사항
           </th>
-           <template v-if="notices.content.length === 0">
+          <template v-if="notices.content.length === 0">
             <tr>
               <td style="height: 150px">작성한 공지가 없습니다.</td>
             </tr>
           </template>
           <template v-else>
-          <tr :key="noticeList" v-for="noticeList in notices.content">
-            <td class="q-pa-md" style="text-align: start" >
-              <router-link :to="`/notice/${noticeList.no}`" @click="goDetail(noticeList.no)"   >{{
-                noticeList.title
-              }}</router-link>
-            </td>
-            <td class="q-pa-md" style="text-align: end">
-              {{ noticeList.createdTime }}
-            </td>
-          </tr>
-        </template>
+            <tr :key="noticeList" v-for="noticeList in notices.content">
+              <td class="q-pa-md" style="text-align: start">
+                <router-link
+                  :to="`/notice/${noticeList.no}`"
+                  @click="goDetail(noticeList.no)"
+                  >{{ noticeList.title }}</router-link
+                >
+              </td>
+              <td class="q-pa-md" style="text-align: end">
+                {{ noticeList.createdTime }}
+              </td>
+            </tr>
+          </template>
         </table>
       </section>
-      <br />
       <div class="q-pa-lg flex flex-center">
         <q-pagination
           v-model="this.pageNum"
@@ -79,13 +81,13 @@ export default {
     },
     time() {
       for (let i = 0; i < this.notices.content.length; i++) {
-        this.notices.content[i].createdTime = this.notices.content[i].createdTime.split(' ')[0]
-        console.log(this.notices.content[i].createdTime)
+        this.notices.content[i].createdTime =
+          this.notices.content[i].createdTime.split(' ')[0]
       }
     }
   },
   watch: {
-    pageNum: function(num) {
+    pageNum: function (num) {
       this.movepage(num)
     }
   },
@@ -115,5 +117,9 @@ th {
 
 tr {
   border-bottom: 1px solid #979797;
+}
+
+a {
+  color: black;
 }
 </style>
