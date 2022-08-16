@@ -19,6 +19,7 @@ import lombok.Setter;
 @Builder
 @ApiModel("UserListDto")
 public class UserListDto {
+	
 	@ApiModelProperty(name="번호")
 	int no;
 	@ApiModelProperty(name="이메일")

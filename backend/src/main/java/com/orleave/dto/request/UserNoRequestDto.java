@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 @ApiModel("UserNoRequest")
 public class UserNoRequestDto {
-	@ApiModelProperty(name="userno")
+	@ApiModelProperty(name="userNo")
 	int no;
 }

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.NoticeDetailDto;
+import com.orleave.dto.ProfileDto;
 import com.orleave.dto.request.EmailCheckCodeRequestDto;
 import com.orleave.dto.request.EmailConfirmRequestDto;
 import com.orleave.dto.request.LoginRequestDto;
@@ -113,8 +115,8 @@ public class UserController {
 	
 	@GetMapping("/login-google")
     public ResponseEntity<LoginResponseDto> googleCallback(@RequestParam String code) throws IOException {
-       String access_Token = oauthService.getGoogleAccessToken(code);
-       String email = oauthService.createGoogleUser(access_Token);
+       String accessToken = oauthService.getGoogleAccessToken(code);
+       String email = oauthService.createGoogleUser(accessToken);
        try {
     	   User user = userService.getUserByEmail(email);
     	   return ResponseEntity.status(200).body(LoginResponseDto.of(200, "Success", JwtTokenUtil.getToken(user)));
@@ -151,7 +153,10 @@ public class UserController {
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
-		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", user));
+		int userNo = userDetails.getUserNo();
+		ProfileDto dto = userService.getProfileByNo(userNo);
+		
+		return ResponseEntity.status(200).body(ProfileResponseDto.of(200, "Success", dto));
 	}
 	
 	@GetMapping("/userInfo")
@@ -215,7 +220,7 @@ public class UserController {
             @RequestParam @ApiParam(value="이메일", required = true) String email) throws Exception {
 		try {
 			userService.getUserByEmail(email);
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Email"));
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicated Email"));
 		} catch (UsernameNotFoundException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}
@@ -233,7 +238,7 @@ public class UserController {
             @RequestParam @ApiParam(value="닉네임", required = true) String nickname) throws Exception {
 		try {
 			userService.getUserByNickname(nickname);
-			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicate Nickname"));
+			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Duplicated Nickname"));
 		} catch (UserNotFoundException e) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 		}

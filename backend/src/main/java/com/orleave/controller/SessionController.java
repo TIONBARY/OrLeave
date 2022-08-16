@@ -150,8 +150,8 @@ public class SessionController {
         @ApiResponse(code = 404, message = "참여 중인 세션 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-	public ResponseEntity<BaseResponseDto> removeUser(@RequestBody SessionLeaveRequestDto sessionLeaveRequestDto, HttpSession httpSession, @ApiIgnore Authentication authentication)
-			throws Exception {
+	public ResponseEntity<BaseResponseDto> removeUser(@RequestBody SessionLeaveRequestDto sessionLeaveRequestDto, 
+			HttpSession httpSession, @ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) throw new TokenExpiredException("Token Expired");
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String nickname = userDetails.getUser().getNickname();

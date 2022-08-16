@@ -23,6 +23,7 @@ import com.orleave.repository.UserRepository;
 
 @Service
 public class InquiryServiceImpl implements InquiryService{
+	
 	@Autowired
 	InquiryRepository inquiryRepository;
 	

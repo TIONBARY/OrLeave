@@ -46,8 +46,8 @@ public class MatchingController {
 			@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		matchingService.startMatching(no, locationRequestDto.getLat(), locationRequestDto.getLng());
+		int userNo = userDetails.getUserNo();
+		matchingService.startMatching(userNo, locationRequestDto.getLat(), locationRequestDto.getLng());
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 	
@@ -64,8 +64,8 @@ public class MatchingController {
 	public ResponseEntity<? extends BaseResponseDto> findMatching(@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		WaitingUserDto matchedUser = matchingService.findMatching(no);
+		int userNo = userDetails.getUserNo();
+		WaitingUserDto matchedUser = matchingService.findMatching(userNo);
 		if (matchedUser == null) return ResponseEntity.status(400).body(BaseResponseDto.of(400, "User Not Exist"));
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", matchedUser));
 	}
@@ -83,8 +83,8 @@ public class MatchingController {
 	public ResponseEntity<? extends BaseResponseDto> stopMatching(@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		matchingService.stopMatching(no);
+		int userNo = userDetails.getUserNo();
+		matchingService.stopMatching(userNo);
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success"));
 	}
 	
@@ -102,8 +102,8 @@ public class MatchingController {
 			@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		WaitingUserDto femaleDto = matchingService.matchingSuccess(no, femaleNo);
+		int userNo = userDetails.getUserNo();
+		WaitingUserDto femaleDto = matchingService.matchingSuccess(userNo, femaleNo);
 		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", femaleDto));
 	}
 }

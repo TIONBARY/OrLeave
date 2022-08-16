@@ -72,7 +72,7 @@ public class ManagerServiceImpl implements ManagerService{
 		Page<UserReportListDto> reports= reportRepository.findByReported(no, pageable).map(
 				report -> UserReportListDto.builder()
 				.no(report.getNo())
-				.user_email(report.getUser().getEmail())
+				.userEmail(report.getUser().getEmail())
 				.category(report.getCategory())
 				.reportTime(report.getReportTime())
 				.build()

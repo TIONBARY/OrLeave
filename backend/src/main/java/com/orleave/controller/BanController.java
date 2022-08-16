@@ -48,7 +48,7 @@ public class BanController {
 			@ApiIgnore Authentication authentication) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		List<BanListDto> banList = banService.findByUserNo(userNo);
 		return ResponseEntity.status(200).body(BanListResponseDto.of(200, "Success", banList));
 	}

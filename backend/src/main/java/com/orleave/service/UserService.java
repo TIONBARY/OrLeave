@@ -2,6 +2,7 @@ package com.orleave.service;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.orleave.dto.ProfileDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.entity.User;
@@ -21,4 +22,5 @@ public interface UserService {
 	void loginSuccess(int no) throws Exception;
 	void loginfailed(int no) throws Exception;
 	void logincheck(int no) throws Exception;
+	ProfileDto getProfileByNo(int userNo) throws Exception;
 }
