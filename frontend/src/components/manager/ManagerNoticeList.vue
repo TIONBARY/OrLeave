@@ -1,11 +1,17 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg"
-      :src="require('../../assets/logo_l.png')"
+      class="q-ma-lg absolute-top-left"
+      :src="require('../../assets/logo_manager.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 80%; max-width: 200px"
+      @click="this.$router.push('/manager/main')"
     />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <hr />
     <div class="q-pa-xl">
       <section class="basic-container">
@@ -14,8 +20,12 @@
             공지사항
           </th>
           <tr :key="noticeList" v-for="noticeList in notices.content">
-            <td class="q-pa-md" style="text-align: start" @click="goDetail(noticeList.no)" >
-              <router-link :to="`${noticeList.no}`"   >{{
+            <td
+              class="q-pa-md"
+              style="text-align: start"
+              @click="goDetail(noticeList.no)"
+            >
+              <router-link :to="`${noticeList.no}`">{{
                 noticeList.title
               }}</router-link>
             </td>
@@ -25,7 +35,7 @@
           </tr>
         </table>
       </section>
-       <div class="q-pa-lg" >
+      <div class="q-pa-lg">
         <q-btn @click="move('managerNoticeRegist')">글쓰기</q-btn>
       </div>
       <div class="q-pa-lg flex flex-center" @click="movePage">
@@ -33,7 +43,12 @@
           v-model="current"
           :max="this.notices.totalPages"
           :max-pages="3"
-          boundary-numbers="false"
+          direction-links
+          boundary-links
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
         />
       </div>
     </div>
@@ -72,13 +87,14 @@ export default {
     },
     time() {
       for (let i = 0; i < this.notices.content.length; i++) {
-        this.notices.content[i].createdTime = this.notices.content[i].createdTime.split(' ')[0]
+        this.notices.content[i].createdTime =
+          this.notices.content[i].createdTime.split(' ')[0]
         console.log(this.notices.content[i].createdTime)
       }
     }
   },
   watch: {
-    current: function(num) {
+    current: function (num) {
       this.movepage(num)
     }
   },

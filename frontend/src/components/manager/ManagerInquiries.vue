@@ -1,23 +1,31 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg"
-      :src="require('../../assets/logo_l.png')"
+      class="q-ma-lg absolute-top-left"
+      :src="require('../../assets/logo_manager.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 80%; max-width: 200px"
+      @click="this.$router.push('/manager/main')"
     />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <hr />
     <div class="q-pa-xl">
       <section class="basic-container">
         <table>
-          <th colspan="2" class="q-pa-md" style="text-align: start">문의 목록</th>
+          <th colspan="2" class="q-pa-md" style="text-align: start">
+            문의 목록
+          </th>
           <tr :key="inquiry" v-for="inquiry in inquiryList">
             <td class="q-pa-md" style="text-align: start">
               {{ inquiry.no }}
             </td>
             <td class="q-pa-md" style="text-align: start">
               <div class="cursor-pointer" @click="goManagerDetail(inquiry.no)">
-              {{ inquiry.title }}
+                {{ inquiry.title }}
               </div>
             </td>
             <td class="q-pa-md" style="text-align: end">
@@ -28,7 +36,17 @@
       </section>
       <br />
       <div class="q-pa-lg flex flex-center" @click="movePage">
-        <q-pagination v-model="currentPage" :max="5" input />
+        <q-pagination
+          v-model="currentPage"
+          :max="this.totalPages"
+          :max-pages="this.maxPages"
+          direction-links
+          boundary-links
+          icon-first="skip_previous"
+          icon-last="skip_next"
+          icon-prev="fast_rewind"
+          icon-next="fast_forward"
+        />
       </div>
     </div>
   </div>
@@ -81,7 +99,11 @@ export default {
     // console.log(this.getinquiries)
   },
   methods: {
-    ...mapActions(inquiryStore, ['getinquiries', 'inquiryDetail', 'inquiryList']),
+    ...mapActions(inquiryStore, [
+      'getinquiries',
+      'inquiryDetail',
+      'inquiryList'
+    ]),
     goManagerDetail(no) {
       this.inquiryDetail(no)
       this.$router.push('/manager/inquiry/' + no)
@@ -97,9 +119,7 @@ export default {
           this.inquiryList = data.inquiryList.content
           this.totalPages = data.inquiryList.totalPages
         },
-        ({ response }) => {
-
-        }
+        ({ response }) => {}
       )
     }
   }
