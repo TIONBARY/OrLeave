@@ -39,14 +39,14 @@
           <user-video :stream-manager="mainStreamManager" :level="level" />
         </div>
         <div id="video-container">
-          <user-video
-            class="col-5 col-sm-3"
-            v-for="sub in subscribers"
-            :key="sub.stream.connection.connectionId"
-            :stream-manager="sub"
-            :level="level"
-            @click="updateMainVideoStreamManager(sub)"
-          />
+          <div class="col-5 col-sm-3">
+            <user-video
+              v-for="sub in subscribers"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+              :level="level"
+            />
+          </div>
         </div>
       </div>
       <div style="font-size: 24px">
@@ -102,9 +102,9 @@
             no-spinner
             class="absolute-bottom-left"
             @click="levelUp()"
-          >
-            <q-btn flat color="red" :ripple="false" />
-          </q-img>
+          />
+          <!-- <q-btn  flat :ripple="false" /> -->
+
           <q-img
             src="../../assets/meeting/leave.png"
             width="130px"
@@ -211,7 +211,7 @@ import Stomp from 'stompjs'
 
 const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
 const stompClient = Stomp.over(socket)
-stompClient.debug = null // disable stomp loggings
+// stompClient.debug = null // disable stomp loggings
 
 const meetingStore = 'meetingStore'
 
@@ -232,16 +232,20 @@ export default {
 
       this.skip1 = setTimeout(() => {
         this.skipDisable = false
-      }, 60000)
+      }, 6000)
       stompClient.connect({}, () => {
-        stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
+        stompClient.subscribe('/sub/chat/' + 'abc', (msg) => {
           // 메세지를 받았을 때 실행하는 부분
-          const msgNickname = msg.body.nickname
+          const response = JSON.parse(msg.body)
+          const msgNickname = response.nickname
           if (msgNickname === this.myNickname) {
             this.mySkip = true
           } else {
             this.yourSkip = true
           }
+          console.log('my:' + this.mySkip)
+          console.log('your:' + this.yourSkip)
+
           if (this.mySkip && this.yourSkip) {
             this.level++
             this.mySkip = false
@@ -425,7 +429,7 @@ export default {
       this.subscribers = []
       this.OV = undefined
 
-      leaveMeeting({ sessionId: this.mySessionId, token: this.token })
+      leaveMeeting(this.mySessionId, this.token)
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -469,9 +473,13 @@ export default {
         })
     },
     levelUp() {
+      console.log(this.skipDisable)
+      if (this.skipDisable) {
+        return
+      }
       const msg = { nickname: this.myNickname, content: true }
-      stompClient.send('/pub/chat' + this.sessionId, {}, JSON.stringify(msg))
-      // this.skipDisable = false
+      console.log(msg)
+      stompClient.send('/pub/chat/' + 'abc', {}, JSON.stringify(msg))
       if (this.level === 2) {
         this.publisher.stream
           .removeFilter()
