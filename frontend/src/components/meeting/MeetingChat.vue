@@ -34,6 +34,7 @@ import { ref } from 'vue'
 import Stomp from 'webstomp-client'
 import SockJS from 'sockjs-client'
 import jwtDecode from 'jwt-decode'
+import { WEBSOCKET_URL } from '@/config'
 import { mapState } from 'vuex'
 
 export default {
@@ -99,7 +100,7 @@ export default {
       }
     },
     connect() {
-      const serverURL = 'http://localhost:8080/api/v1/ws'
+      const serverURL = WEBSOCKET_URL
       const socket = new SockJS(serverURL)
       this.stompClient = Stomp.over(socket)
       console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
