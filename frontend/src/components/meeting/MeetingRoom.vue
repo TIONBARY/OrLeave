@@ -101,7 +101,7 @@
             width="130px"
             no-spinner
             class="absolute-bottom-left"
-            @click=";[levelUp(), question_pick(level)]"
+            @click="levelUp()"
           >
             <q-btn flat color="red" :ripple="false" />
           </q-img>
@@ -202,9 +202,16 @@
 <script>
 import { OpenVidu } from 'openvidu-browser'
 import UserVideo from './video/UserVideo.vue'
-import { ref } from 'vue'
-import { mapActions } from 'vuex'
-import { reportUser } from '@/api/meeting'
+import { onMounted } from 'vue'
+import { mapState } from 'vuex'
+import { reportUser, enterMeeting, leaveMeeting } from '@/api/meeting'
+import jwtDecode from 'jwt-decode'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+
+const socket = new SockJS('http://localhost:8080/api/v1/ws') // config로 옮겨야됨!!!!!!!!
+const stompClient = Stomp.over(socket)
+stompClient.debug = null // disable stomp loggings
 
 const meetingStore = 'meetingStore'
 
@@ -214,24 +221,51 @@ export default {
   components: {
     UserVideo
   },
-  setup() {
-    const question = ref(null)
-    const mute = ref(true)
-    const camera = ref(false)
-    const level = ref(1)
-    const popupMatching = ref(false)
-    const popupReport = ref(false)
-    const category = ref(null)
-    const content = ref('')
-    const reportedNo = 0
-    const skipDisable = ref(true)
+  computed: {
+    ...mapState(meetingStore, ['sessionId', 'myPublisher', 'opponentInfo'])
+  },
+  data() {
+    onMounted(() => {
+      const token = jwtDecode(sessionStorage.getItem('Authorization'))
+      console.log(token.NickName)
+      this.myNickname = token.NickName
 
+      this.skip1 = setTimeout(() => {
+        this.skipDisable = false
+      }, 60000)
+      stompClient.connect({}, () => {
+        stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
+          // 메세지를 받았을 때 실행하는 부분
+          const msgNickname = msg.body.nickname
+          if (msgNickname === this.myNickname) {
+            this.mySkip = true
+          } else {
+            this.yourSkip = true
+          }
+          if (this.mySkip && this.yourSkip) {
+            this.level++
+            this.mySkip = false
+            this.yourSkip = false
+            this.question_pick(this.level)
+
+            if (this.level === 1) {
+              this.skipDisable = true
+              this.skip2 = setTimeout(() => {
+                this.skipDisable = false
+              }, 60000)
+            }
+          }
+        })
+      })
+    })
     return {
-      question,
-      mute,
-      camera,
-      level,
-      skipDisable,
+      question: null,
+      camera: false,
+      level: 1,
+      skipDisable: true,
+      myNickname: null,
+      skip1: null,
+      skip2: null,
       // 질문을 단계별, 상대의 취미 별로 나눠야함
       questions: [
         [
@@ -263,21 +297,14 @@ export default {
         { label: '혐오발언', value: 4 },
         { label: '기타', value: 5 }
       ],
-      reportedNo,
-      category,
-      content,
-      popupMatching,
-      popupReport,
+      reportedNo: null,
+      category: null,
+      content: '',
+      popupMatching: false,
+      popupReport: false,
+      mySkip: false,
+      yourSkip: false,
 
-      question_pick() {
-        this.question = this.questions[this.level - 1].at(
-          Math.floor(Math.random() * this.questions.length)
-        )
-      }
-    }
-  },
-  data() {
-    return {
       OV: undefined,
       session: undefined,
       mainStreamManager: undefined,
@@ -298,8 +325,11 @@ export default {
   },
 
   methods: {
-    ...mapActions(meetingStore, ['enterSession', 'leftMeeting']),
-
+    question_pick() {
+      this.question = this.questions[this.level - 1].at(
+        Math.floor(Math.random() * this.questions.length)
+      )
+    },
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
       this.publisher.publishAudio(this.isOn.audio)
@@ -395,7 +425,7 @@ export default {
       this.subscribers = []
       this.OV = undefined
 
-      this.leftMeeting({ sessionId: this.mySessionId, token: this.token })
+      leaveMeeting({ sessionId: this.mySessionId, token: this.token })
 
       window.removeEventListener('beforeunload', this.leaveSession)
       this.$router.push('/')
@@ -424,7 +454,7 @@ export default {
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
-      return this.enterSession(sessionId)
+      return enterMeeting(sessionId)
     },
     time() {
       return String(Date.now())
@@ -438,21 +468,19 @@ export default {
           console.log('필터~', filter)
         })
     },
-    testStop() {
-      this.publisher.stream
-        .removeFilter()
-        .then(() => {
-          console.log('Filter removed')
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
     levelUp() {
-      this.level += 1
+      const msg = { nickname: this.myNickname, content: true }
+      stompClient.send('/pub/chat' + this.sessionId, {}, JSON.stringify(msg))
       // this.skipDisable = false
       if (this.level === 2) {
-        this.testStop()
+        this.publisher.stream
+          .removeFilter()
+          .then(() => {
+            console.log('Filter removed')
+          })
+          .catch((error) => {
+            console.error(error)
+          })
       }
     },
     reportUser() {

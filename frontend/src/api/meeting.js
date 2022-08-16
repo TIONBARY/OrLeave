@@ -160,7 +160,7 @@ async function deleteBanUser(bannedNo, success, fail) {
 async function reportUser(report, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .post('/meeting/recent-call', JSON.stringify(report), {
+    .post('/meeting', JSON.stringify(report), {
       headers: {
         Authorization: Authorization
       }
