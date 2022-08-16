@@ -38,7 +38,11 @@
           </section>
         </q-form>
       </section>
-      <ConfirmModal v-model="this.showModal" @close="movePage" :modalContent="this.modalContent" />
+      <ConfirmModal
+        v-model="this.showModal"
+        @close="movePage"
+        :modalContent="this.modalContent"
+      />
     </div>
   </div>
 </template>
@@ -69,25 +73,38 @@ export default {
   },
   methods: {
     async onSubmit() {
-      managerLogin(this.loginInfo, ({ data }) => {
-        const token = data.authorization
-        sessionStorage.setItem('Authorization', token)
-        this.$router.push({ name: 'managerMain' })
-      }, ({ response }) => {
-        if (response.status === 401) {
-          this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
-        } else if (response.data && response.data.message && response.data.message === 'Login Prohibited') {
-          this.modalContent = '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
-        } else if (response.data && response.data.message && response.data.message === 'Not Manager') {
-          this.modalContent = '관리자 계정이 아닙니다.'
-        } else if (response.status === 403) {
-          this.modalContent = '회원가입하지 않은 계정입니다.'
-        } else {
-          this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
+      managerLogin(
+        this.loginInfo,
+        ({ data }) => {
+          const token = data.authorization
+          sessionStorage.setItem('Authorization', token)
+          this.$router.push({ name: 'managerMain' })
+        },
+        ({ response }) => {
+          if (response.status === 401) {
+            this.modalContent = 'EMAIL과 PW가 일치하지 않습니다.'
+          } else if (
+            response.data &&
+            response.data.message &&
+            response.data.message === 'Login Prohibited'
+          ) {
+            this.modalContent =
+              '로그인을 5회 이상 실패하여 5분간 로그인이 제한됩니다.'
+          } else if (
+            response.data &&
+            response.data.message &&
+            response.data.message === 'Not Manager'
+          ) {
+            this.modalContent = '관리자 계정이 아닙니다.'
+          } else if (response.status === 403) {
+            this.modalContent = '회원가입하지 않은 계정입니다.'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해보세요.'
+          }
+          this.showModal = true
+          this.willPageMove = false
         }
-        this.showModal = true
-        this.willPageMove = false
-      })
+      )
     },
     printLog(msg) {
       console.log(msg)

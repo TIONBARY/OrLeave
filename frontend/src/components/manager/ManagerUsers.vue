@@ -1,5 +1,13 @@
 <template>
   <div>
+    <q-img
+      class="q-ma-lg absolute-top-left"
+      :src="require('../../assets/logo_manager.png')"
+      alt="image"
+      style="width: 80%; max-width: 200px"
+      @click="this.$router.push('/manager/main')"
+    />
+    <br />
     <br />
     <br />
     <h1>회원관리</h1>
@@ -32,15 +40,27 @@
                     dense
                     autofocus
                     counter
-                    @keyup.enter="nicknameChange(user.no, scope.value, user.nickname)"
+                    @keyup.enter="
+                      nicknameChange(user.no, scope.value, user.nickname)
+                    "
                   />
                 </q-popup-edit>
               </td>
               <td class="text-center">{{ changeGender(user.gender) }}</td>
               <td class="text-center">{{ user.birthDay }}</td>
               <td class="text-left">{{ user.matchcount }}</td>
-              <td class="text-left">{{ user.reportcount }} <q-icon class="cursor-pointer report-icon" name="dangerous" size="2rem" @click="showReportList(user.no, user.email)"/> </td>
-              <td class="text-center isBanned">{{ checkingUserType(user.userType) }}</td>
+              <td class="text-left">
+                {{ user.reportcount }}
+                <q-icon
+                  class="cursor-pointer report-icon"
+                  name="dangerous"
+                  size="2rem"
+                  @click="showReportList(user.no, user.email)"
+                />
+              </td>
+              <td class="text-center isBanned">
+                {{ checkingUserType(user.userType) }}
+              </td>
             </tr>
           </tbody>
         </q-markup-table>
