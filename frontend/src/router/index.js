@@ -51,10 +51,19 @@ const onlyAuthManager = async (to, from, next) => {
   }
 }
 
+const onlyNotUser = async (to, from, next) => {
+  const token = sessionStorage.getItem('Authorization')
+  if (token) {
+    alert(' 비정상적인 접근입니다.')
+    next({ name: 'main' })
+  }
+}
+
 const onlyUser = async (to, from, next) => {
   const token = sessionStorage.getItem('Authorization')
   if (!token) {
-    alert(' 회원가입 유저만 사용할 수 있습니다.')
+    alert(' 회원가입을 한 유저만 사용할 수 있습니다.')
+    next({ name: 'main' })
   }
   const userType = jwtDecode(token).userType
   if (userType === 'BANNED') {
@@ -87,26 +96,31 @@ const routes = [
     children: [
       {
         path: 'login',
+        beforeEnter: onlyNotUser,
         component: UserLogin
       },
       {
         path: 'login-kakao',
         name: 'kakaoAuth',
+        beforeEnter: onlyNotUser,
         component: KakaoLogin
       },
       {
         path: 'login-naver',
         name: 'NaverAuth',
+        beforeEnter: onlyNotUser,
         component: NaverLogin
       },
       {
         path: 'login-google',
         name: 'GoogleAuth',
+        beforeEnter: onlyNotUser,
         component: GoogleLogin
       },
       {
         path: 'signup/account',
         name: 'UserAccountRegist',
+        beforeEnter: onlyNotUser,
         component: UserAccountRegist
       },
       {
