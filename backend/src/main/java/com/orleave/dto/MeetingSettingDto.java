@@ -2,6 +2,7 @@ package com.orleave.dto;
 
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,11 +12,19 @@ import lombok.Setter;
 @Builder
 @ApiModel("MeetingSettingDto")
 public class MeetingSettingDto {
+	
+	@ApiModelProperty(name="종교")
 	int religion;
+	@ApiModelProperty(name="흡연")
 	int smoke;
-	int drink_min;
-	int drink_max;
+	@ApiModelProperty(name="최소 음주량")
+	int drinkMin;
+	@ApiModelProperty(name="최대 음주량")
+	int drinkMax;
+	@ApiModelProperty(name="거리")
 	int distance;
-	int age_min;
-	int age_max;
+	@ApiModelProperty(name="최소 나이")
+	int ageMin;
+	@ApiModelProperty(name="최대 나이")
+	int ageMax;
 }

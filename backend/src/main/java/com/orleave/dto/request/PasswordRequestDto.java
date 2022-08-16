@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @ApiModel("PasswordRequest")
 public class PasswordRequestDto {
-
 	@ApiModelProperty(name="password", example="your_password")
 	String password;
 }

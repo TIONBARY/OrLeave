@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.orleave.auth.SsafyUserDetails;
 import com.orleave.dto.MeetingLogListDto;
-import com.orleave.dto.request.LocationRequestDto;
+import com.orleave.dto.MeetingSettingDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
 import com.orleave.dto.request.ReportRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
@@ -56,10 +55,8 @@ public class MeetingController {
 		if (authentication == null) return ResponseEntity.status(401).body(MeetingSettingResponseDto.of(401, "Unauthorized",null));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		MeetingSetting meetingsetting = meetingService.getSettingByNo(no);
-		
-		
+		int userNo = userDetails.getUserNo();
+		MeetingSettingDto meetingsetting = meetingService.getSettingByNo(userNo);
 		
 		return ResponseEntity.status(200).body(MeetingSettingResponseDto.of(200,"sucess",meetingsetting));
 	}
@@ -79,10 +76,10 @@ public class MeetingController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		
-		meetingService.modifyMeetingSetting(no, meetingSettingRequestDto);
-			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		meetingService.modifyMeetingSetting(userNo, meetingSettingRequestDto);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
 	}
 	
 	@GetMapping("/recent-call")
@@ -97,8 +94,8 @@ public class MeetingController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int no = userDetails.getUserno();
-		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(no);
+		int userNo = userDetails.getUserNo();
+		List<MeetingLogListDto> meetingLogs = meetingService.getRecentMeetingLogs(userNo);
 		return ResponseEntity.status(200).body(MeetingLogResponseDto.of(200, "Success", meetingLogs));
 	}
 	

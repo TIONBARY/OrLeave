@@ -17,6 +17,7 @@ import lombok.Setter;
 @Builder
 @ApiModel("WaitingUserDto")
 public class WaitingUserDto {
+	
 	@ApiModelProperty(name="사용자 번호")
 	int no;
 	@ApiModelProperty(name="사용자 나이")

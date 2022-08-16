@@ -17,10 +17,12 @@ public class BanListResponseDto extends BaseResponseDto {
 	List<BanListDto> banList;
 	
 	public static BanListResponseDto of(Integer statusCode, String message, List<BanListDto> banList) {
-		BanListResponseDto res = new BanListResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setBanList(banList);
+		BanListResponseDto res = new BanListResponseDto(statusCode, message, banList);
 		return res;
+	}
+
+	public BanListResponseDto(Integer statusCode, String message, List<BanListDto> banList) {
+		super(statusCode, message);
+		this.banList = banList;
 	}
 }

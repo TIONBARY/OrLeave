@@ -72,7 +72,8 @@ public class ManagerController {
         @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseDto.class),
         @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseDto.class)
     })
-	public ResponseEntity<LoginResponseDto> login(@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) throws Exception {
+	public ResponseEntity<LoginResponseDto> login(
+			@RequestBody @ApiParam(value="로그인 정보", required = true) LoginRequestDto loginInfo) throws Exception {
 		String email = loginInfo.getEmail();
 		String password = loginInfo.getPassword();
 		User user;
@@ -83,11 +84,9 @@ public class ManagerController {
 			return ResponseEntity.status(404).body(LoginResponseDto.of(404, "Invalid Email", null));
 		}
 		
-		String userNo = Integer.toString(user.getNo());
-		
 		userService.logincheck(user.getNo());
-			
 		
+		String userNo = Integer.toString(user.getNo());
 		String userType = user.getUserType();
 		int imageNo = user.getImageNo();
 		String nickname=user.getNickname();
@@ -104,7 +103,6 @@ public class ManagerController {
 		return ResponseEntity.status(401).body(LoginResponseDto.of(401, "Invalid Password", null));
 	}
 
-	
 	@GetMapping("/users")
 	@ApiOperation(value = "유저 목록 전체 조회", notes = "유저 목록을 페이지 정보에 따라 전체 조회한다.") 
     @ApiResponses({
@@ -123,7 +121,6 @@ public class ManagerController {
 		Page<UserListDto> userList = managerService.getUsers(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(UserListResponseDto.of(200, "Success", userList));
 	}
-	
 	
 	@GetMapping("/users/{no}")
 	@ApiOperation(value = "유저 신고 목록 조회", notes = "선택한 유저의 신고 목록을 조회한다.") 
@@ -144,7 +141,6 @@ public class ManagerController {
 		Page<UserReportListDto> userReportList = managerService.getUserReports(PageRequest.of(page, size, Sort.by("no").descending()),no);
 		return ResponseEntity.status(200).body(UserReportListResponseDto.of(200, "Success", userReportList));
 	}
-	
 	
 	@GetMapping("/reports/{report_no}")
 	@ApiOperation(value = "신고 목록  상세 조회", notes = "선택한 신고의 내용을 조회한다.") 
@@ -185,12 +181,9 @@ public class ManagerController {
 		String UserType = userDetails.getUser().getUserType();
 		if(!UserType.equals("MANAGER"))return ResponseEntity.status(403).body(BaseResponseDto.of(403, "Not Manager"));
 		
-		
 		managerService.BanUser(userNoRequestDto.getNo());
 		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
-		
 	}
-	
 	
 	@PutMapping("/nickname")
 	@ApiOperation(value = "닉네임 변경", notes = "선택한 유저의 닉네임을 변경한다.") 

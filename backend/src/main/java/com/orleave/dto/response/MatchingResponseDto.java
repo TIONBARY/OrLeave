@@ -11,14 +11,17 @@ import lombok.Setter;
 @Setter
 @ApiModel("MatchingResponse")
 public class MatchingResponseDto extends BaseResponseDto {
+	
 	@ApiModelProperty(name="매칭된 상대방")
 	WaitingUserDto user;
 	
 	public static MatchingResponseDto of(Integer statusCode, String message, WaitingUserDto maleDto) {
-		MatchingResponseDto res = new MatchingResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setUser(maleDto);
+		MatchingResponseDto res = new MatchingResponseDto(statusCode, message, maleDto);
 		return res;
+	}
+	
+	public MatchingResponseDto(Integer statusCode, String message, WaitingUserDto user) {
+		super(statusCode, message);
+		this.user = user;
 	}
 }

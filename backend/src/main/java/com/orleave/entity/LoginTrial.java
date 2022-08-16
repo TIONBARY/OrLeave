@@ -24,7 +24,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class LoginTrial {
-	
 	@Id
 	@Column(name = "user_no", nullable = false)
 	private int userNo;

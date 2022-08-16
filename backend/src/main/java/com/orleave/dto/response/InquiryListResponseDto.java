@@ -17,10 +17,12 @@ public class InquiryListResponseDto extends BaseResponseDto {
 	Page<InquiryListDto> inquiryList;
 	
 	public static InquiryListResponseDto of(Integer statusCode, String message, Page<InquiryListDto> inquiryList) {
-		InquiryListResponseDto res = new InquiryListResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setInquiryList(inquiryList);
+		InquiryListResponseDto res = new InquiryListResponseDto(statusCode, message, inquiryList);
 		return res;
+	}
+
+	public InquiryListResponseDto(Integer statusCode, String message, Page<InquiryListDto> inquiryList) {
+		super(statusCode, message);
+		this.inquiryList = inquiryList;
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.orleave.dto.MeetingLogListDto;
+import com.orleave.dto.MeetingSettingDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
 import com.orleave.dto.request.ReportRequestDto;
 import com.orleave.entity.MeetingLog;
@@ -22,11 +23,12 @@ import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
 
+import io.swagger.annotations.ApiModelProperty;
+
 
 @Service("MeetingService")
 public class MeetingServiceImpl implements MeetingService{
 
-	
 	@Autowired
 	MeetingSettingRepository meetingSettingRepository;
 	
@@ -40,27 +42,38 @@ public class MeetingServiceImpl implements MeetingService{
 	ReportRepository reportRepository;
 	
 	@Override
-	public MeetingSetting getSettingByNo(int no) throws Exception{
-		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
-		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
-		MeetingSetting meetingsetting=meetingsettingtemp.get();
-		return meetingsetting;
+	public MeetingSettingDto getSettingByNo(int no) throws Exception{
+		Optional<MeetingSetting> meetingSettingTemp = meetingSettingRepository.findById(no);
+		if(!meetingSettingTemp.isPresent()) throw new UserNotFoundException();
+		MeetingSetting meetingsetting=meetingSettingTemp.get();
+		
+		MeetingSettingDto dto = MeetingSettingDto.builder()
+				.religion(meetingsetting.getReligion())
+				.smoke(meetingsetting.getSmoke())
+				.drinkMin(meetingsetting.getDrinkMin())
+				.drinkMax(meetingsetting.getDrinkMax())
+				.distance(meetingsetting.getDistance())
+				.ageMin(meetingsetting.getAgeMin())
+				.ageMax(meetingsetting.getAgeMax())
+				.build();
+		return dto;
 	}
 
 	@Override
 	public void modifyMeetingSetting(int no, MeetingSettingRequestDto dto) throws Exception{
 		Optional<MeetingSetting> meetingsettingtemp = meetingSettingRepository.findById(no);
 		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
-		MeetingSetting meetingsetting=meetingsettingtemp.get();
 		
-		meetingsetting.setReligion(dto.getReligion());
-		meetingsetting.setSmoke(dto.getSmoke());
-		meetingsetting.setDrinkMax(dto.getDrink_max());
-		meetingsetting.setDrinkMin(dto.getDrink_min());
-		meetingsetting.setDistance(dto.getDistance());
-		meetingsetting.setAgeMax(dto.getAge_max());
-		meetingsetting.setAgeMin(dto.getAge_min());
-		meetingSettingRepository.save(meetingsetting);
+		MeetingSetting meetingSetting = MeetingSetting.builder()
+				.religion(dto.getReligion())
+				.smoke(dto.getSmoke())
+				.drinkMax(dto.getDrink_max())
+				.drinkMin(dto.getDrink_min())
+				.distance(dto.getDistance())
+				.ageMax(dto.getAge_max())
+				.ageMin(dto.getAge_min())
+				.build();
+		meetingSettingRepository.save(meetingSetting);
 	}
 	
 	@Override
@@ -69,6 +82,7 @@ public class MeetingServiceImpl implements MeetingService{
 		if(!user.isPresent()) throw new UserNotFoundException();
 		List<MeetingLog> list = meetingLogRepository.findByUser1NoAndCreatedTimeBetween(userNo, LocalDateTime.now().minusDays(7), LocalDateTime.now());
 		List<MeetingLogListDto> logs = new ArrayList<>();
+		
 		for (MeetingLog log : list) {
 			int user2No = log.getUser2();
 			MeetingLogListDto dto = MeetingLogListDto.builder()
@@ -84,13 +98,14 @@ public class MeetingServiceImpl implements MeetingService{
 	
 	@Override
 	@Transactional
-	public void reportUser(User user, ReportRequestDto reportRequestDto) throws Exception{
+	public void reportUser(User user, ReportRequestDto dto) throws Exception{
 		if(user==null) throw new UserNotFoundException();
+		
 		Report report = Report.builder()
 				.user(user)
-				.reported(reportRequestDto.getReportedNo())
-				.category(reportRequestDto.getCategory())
-				.content(reportRequestDto.getContent())
+				.reported(dto.getReportedNo())
+				.category(dto.getCategory())
+				.content(dto.getContent())
 				.reportTime(LocalDateTime.now())
 				.build();
 		reportRepository.save(report);

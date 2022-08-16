@@ -15,6 +15,7 @@ import lombok.Setter;
 @Builder
 @ApiModel("MeetingLogListDto")
 public class MeetingLogListDto {
+	
 	@ApiModelProperty(name="번호")
 	int no;
 	@ApiModelProperty(name="매칭 상대방 번호")

@@ -18,10 +18,11 @@ public class NoticeListResponseDto extends BaseResponseDto {
 	Page<NoticeListDto> noticeList;
 	
 	public static NoticeListResponseDto of(Integer statusCode, String message, Page<NoticeListDto> noticeList) {
-		NoticeListResponseDto res = new NoticeListResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setNoticeList(noticeList);
+		NoticeListResponseDto res = new NoticeListResponseDto(statusCode, message, noticeList);
 		return res;
+	}
+	public NoticeListResponseDto(Integer statusCode, String message, Page<NoticeListDto> noticeList) {
+		super(statusCode, message);
+		this.noticeList = noticeList;
 	}
 }

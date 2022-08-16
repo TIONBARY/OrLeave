@@ -24,6 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "BAN")
 public class Ban {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "no", columnDefinition = "INT UNSIGNED")

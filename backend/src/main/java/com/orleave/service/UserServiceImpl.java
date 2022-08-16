@@ -12,8 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.ProfileDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
+import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.entity.Ban;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.LoginTrial;
@@ -37,6 +39,7 @@ import com.orleave.repository.UserRepositorySupport;
  */
 @Service("userService")
 public class UserServiceImpl implements UserService {
+	
 	@Autowired
 	UserRepository userRepository;
 	
@@ -238,5 +241,32 @@ public class UserServiceImpl implements UserService {
 		if (Duration.between(logintrial.getTime(), LocalDateTime.now()).getSeconds() <= 60 * 5) {
 			throw new LoginProhibitedException();
 		}
+	}
+
+	@Override
+	public ProfileDto getProfileByNo(int userNo) throws Exception {
+		Optional<User> userTemp = userRepositorySupport.findUserByNo(userNo);
+		if (!userTemp.isPresent()) throw new UserNotFoundException();
+		User user = userTemp.get();
+		ProfileDto dto = ProfileDto.builder()
+				.email(user.getEmail())
+				.gender(user.getGender())
+				.birthDay(user.getBirthDay())
+				.nickname(user.getNickname())
+				.mbti(user.getMbti())
+				.religion(user.getReligion())
+				.smoke(user.getSmoke())
+				.drink(user.getDrink())
+				.imageNo(user.getImageNo())
+				.build();
+		dto.setInterests(new ArrayList<Integer>());
+		for (UserInterest interest : user.getInterests()) {
+			dto.getInterests().add(interest.getInterest());
+		}
+		dto.setPersonalities(new ArrayList<Integer>());
+		for (UserPersonality personality : user.getPersonalities()) {
+			dto.getPersonalities().add(personality.getPersonality());
+		}
+		return dto;
 	}
 }

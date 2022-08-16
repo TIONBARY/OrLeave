@@ -13,9 +13,9 @@ import lombok.Setter;
 @Builder
 @ApiModel("ReportDetailDto")
 public class ReportDetailDto {
+	
 	@ApiModelProperty(name="신고 번호")
 	int no;
 	@ApiModelProperty(name="신고 내용")
 	String content;
-
 }

@@ -40,5 +40,4 @@ public class MeetingLog {
 	
 	@Column(name = "created_time", nullable = false)
 	private LocalDateTime createdTime;
-
 }

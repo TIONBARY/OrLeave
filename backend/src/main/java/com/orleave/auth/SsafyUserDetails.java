@@ -62,7 +62,7 @@ public class SsafyUserDetails implements UserDetails {
 	public void setAuthorities(List<GrantedAuthority> roles) {
 		this.roles = roles;
 	}
-	public int getUserno() {
+	public int getUserNo() {
 		return this.user.getNo();
 	}
 }

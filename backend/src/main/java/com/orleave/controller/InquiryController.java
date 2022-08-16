@@ -1,7 +1,5 @@
 package com.orleave.controller;
 
-import javax.security.sasl.AuthenticationException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,10 +52,11 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @RequestParam("page") int page, @RequestParam("size") int size) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		Page<InquiryListDto> inquiryList = inquiryService.getInquiriesByUserNo(userNo, PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
 	}
+	
 	@PostMapping("")
 	@ApiOperation(value = "1:1문의 작성", notes = "1:1문의를 생성한다.") 
     @ApiResponses({
@@ -78,6 +77,7 @@ public class InquiryController {
 			return ResponseEntity.status(400).body(BaseResponseDto.of(400, "Failed"));
 		}
 	}
+	
 	@GetMapping("/{no}")
 	@ApiOperation(value = "1:1문의 상세 조회", notes = "1:1문의 상세 정보를 조회한다.") 
     @ApiResponses({
@@ -91,10 +91,11 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		InquiryDetailDto inquiry = inquiryService.getInquiryDetail(no, userNo);
 		return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
 	}
+	
 	@PutMapping("/{no}")
 	@ApiOperation(value = "1:1문의 수정", notes = "1:1문의를 수정한다.") 
     @ApiResponses({
@@ -108,7 +109,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no, @RequestBody InquiryRequestDto inquiryRequestDto) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		if(inquiryService.modifyInquiry(no, userNo, inquiryRequestDto)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
 		} else {
@@ -116,6 +117,7 @@ public class InquiryController {
 		}
 		
 	}
+	
 	@DeleteMapping("/{no}")
 	@ApiOperation(value = "1:1문의 삭제", notes = "1:1문의를 삭제한다.") 
     @ApiResponses({
@@ -129,7 +131,7 @@ public class InquiryController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserno();
+		int userNo = userDetails.getUserNo();
 		if(inquiryService.deleteInquiry(no, userNo)) {
 			return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Deleted"));
 		} else {

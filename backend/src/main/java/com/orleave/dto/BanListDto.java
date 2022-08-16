@@ -13,6 +13,7 @@ import lombok.Setter;
 @Builder
 @ApiModel("BanListDto")
 public class BanListDto {
+	
 	@ApiModelProperty(name="번호")
 	int no;
 	@ApiModelProperty(name="차단한 사용자 번호")

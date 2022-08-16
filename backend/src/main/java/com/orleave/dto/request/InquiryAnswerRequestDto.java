@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @ApiModel("InquiryAnswerRequestDto")
 public class InquiryAnswerRequestDto {
-	@ApiModelProperty(name="inquiryno")
+	@ApiModelProperty(name="inquiryNo")
 	int no;
 	@ApiModelProperty(name="answer")
 	String Answer;

@@ -2,7 +2,9 @@ package com.orleave.dto.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -11,17 +13,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel("BaseResponseDto")
+@NoArgsConstructor
 public class BaseResponseDto {
-	@ApiModelProperty(name="응답 메시지", example = "정상")
-	String message = null;
+	
 	@ApiModelProperty(name="응답 코드", example = "200")
 	Integer statusCode = null;
-	
-	public BaseResponseDto() {}
-	
-	public BaseResponseDto(Integer statusCode){
-		this.statusCode = statusCode;
-	}
+	@ApiModelProperty(name="응답 메시지", example = "정상")
+	String message = null;
 	
 	public BaseResponseDto(Integer statusCode, String message){
 		this.statusCode = statusCode;
@@ -29,9 +27,7 @@ public class BaseResponseDto {
 	}
 	
 	public static BaseResponseDto of(Integer statusCode, String message) {
-		BaseResponseDto body = new BaseResponseDto();
-		body.message = message;
-		body.statusCode = statusCode;
+		BaseResponseDto body = new BaseResponseDto(statusCode, message);
 		return body;
 	}
 }

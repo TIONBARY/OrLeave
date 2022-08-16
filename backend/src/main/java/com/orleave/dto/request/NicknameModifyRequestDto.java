@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @ApiModel("NickNameModifyRequest")
 public class NicknameModifyRequestDto {
-	@ApiModelProperty(name="userno")
+	@ApiModelProperty(name="userNo")
 	int no;
 	@ApiModelProperty(name="nickname")
 	String nickname;

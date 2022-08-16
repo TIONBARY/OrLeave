@@ -1,6 +1,5 @@
 package com.orleave.entity;
 
-
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -49,6 +48,4 @@ public class Report {
 	
 	@Column(name = "report_time", nullable = false)
 	private LocalDateTime reportTime;
-	
-
 }
