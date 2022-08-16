@@ -121,10 +121,10 @@
                 <q-space />
                 <q-btn color="red" dense icon="close" v-close-popup />
               </q-bar>
-              <q-card-section class="popup-text">
+              <q-card-section class="popup-text text-center">
                 정말 떠나시겠습니까?
               </q-card-section>
-              <q-card-section class="q-gutter-sm text-right">
+              <q-card-section class="q-gutter-sm text-center">
                 <q-btn class="primary" label="확인" @click="leaveSession" />
                 <q-btn
                   class="negative"
@@ -197,6 +197,7 @@
         </div>
       </div>
     </div>
+    <MeetingChat />
   </div>
 </template>
 
@@ -210,6 +211,7 @@ import jwtDecode from 'jwt-decode'
 import { WEBSOCKET_URL } from '@/config/index'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import MeetingChat from './MeetingChat.vue'
 
 const socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
 const stompClient = Stomp.over(socket)
@@ -221,7 +223,8 @@ export default {
   name: 'App',
 
   components: {
-    UserVideo
+    UserVideo,
+    MeetingChat
   },
   computed: {
     ...mapState(meetingStore, ['sessionId', 'myPublisher', 'opponentInfo'])
@@ -236,7 +239,7 @@ export default {
         this.skipDisable = false
       }, 6000)
       stompClient.connect({}, () => {
-        stompClient.subscribe('/sub/chat/' + 'abc', (msg) => {
+        stompClient.subscribe('/sub/chat/' + this.sessionId + 's', (msg) => {
           // 메세지를 받았을 때 실행하는 부분
           const response = JSON.parse(msg.body)
           const msgNickname = response.nickname
@@ -419,7 +422,10 @@ export default {
             )
           })
       })
-      window.addEventListener('beforeunload', this.leaveSession)
+      window.addEventListener('beforeunload', (e) => {
+        e.preventDefault()
+        this.leaveSession()
+      })
     },
 
     leaveSession() {
@@ -482,7 +488,11 @@ export default {
       }
       const msg = { nickname: this.myNickname, content: true }
       console.log(msg)
-      stompClient.send('/pub/chat/' + 'abc', {}, JSON.stringify(msg))
+      stompClient.send(
+        '/pub/chat/' + this.sessionId + 's',
+        {},
+        JSON.stringify(msg)
+      )
       if (this.level === 2) {
         this.publisher.stream
           .removeFilter()
