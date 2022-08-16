@@ -147,7 +147,7 @@ const routes = [
       },
       {
         path: 'forget/password',
-        beforeEnter: onlyUser,
+        beforeEnter: onlyNotUser,
         component: UserPasswordForget
       }
     ]
