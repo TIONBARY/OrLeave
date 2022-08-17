@@ -57,7 +57,7 @@ public class MatchingServiceImpl implements MatchingService {
 	}
 	
 	@Override
-	public void startMatching(int userNo, double lat, double lng) throws Exception {
+	public WaitingUserDto startMatching(int userNo, double lat, double lng) throws Exception {
 		Optional<User> usertemp = userRepository.findById(userNo);
 		if(!usertemp.isPresent()) throw new UserNotFoundException();
 		User user=usertemp.get();
@@ -83,6 +83,7 @@ public class MatchingServiceImpl implements MatchingService {
 		}
 		if (user.getGender().equals("M")) males.put(userNo, userDto);
 		else females.put(userNo, userDto);
+		return userDto;
 	}
 
 	@Override
@@ -120,11 +121,7 @@ public class MatchingServiceImpl implements MatchingService {
 	
 	@Override
 	@Transactional
-	public WaitingUserDto matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException {
-		WaitingUserDto femaleDto = females.get(femaleNo);
-		if (femaleDto == null) throw new MatchingUserNotFoundException();
-		males.remove(userNo);
-		females.remove(femaleNo);
+	public void matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException {
 		MeetingLog meetingLog1 = MeetingLog.builder()
 				.user1(userRepository.findById(userNo).get())
 				.user2(femaleNo)
@@ -137,7 +134,6 @@ public class MatchingServiceImpl implements MatchingService {
 				.build();
 		meetingLogRepository.save(meetingLog1);
 		meetingLogRepository.save(meetingLog2);
-		return femaleDto;
 	}
 	
 	@Override
