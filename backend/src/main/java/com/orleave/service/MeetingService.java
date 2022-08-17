@@ -6,7 +6,6 @@ import com.orleave.dto.MeetingLogListDto;
 import com.orleave.dto.MeetingSettingDto;
 import com.orleave.dto.request.MeetingSettingRequestDto;
 import com.orleave.dto.request.ReportRequestDto;
-import com.orleave.entity.MeetingSetting;
 import com.orleave.entity.User;
 
 public interface MeetingService {

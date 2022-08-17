@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.orleave.dto.ProfileDto;
 import com.orleave.dto.request.ProfileModifyRequestDto;
 import com.orleave.dto.request.SignupRequestDto;
-import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.entity.Ban;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.LoginTrial;
@@ -226,6 +225,7 @@ public class UserServiceImpl implements UserService {
 		meetingLogRepository.deleteByUser1No(user.getNo());
 		meetingLogRepository.deleteByUser2(user.getNo());
 		banRepository.deleteByUserNo(user.getNo());
+		banRepository.deleteByBannedNo(user.getNo());
 		reportRepository.deleteByUserNo(user.getNo());
 		inquiryRepository.deleteByUserNo(user.getNo());
 		userRepository.delete(user);
