@@ -138,9 +138,22 @@
       </div>
     </div>
     <br />
-    <div>
-      <q-btn label="매칭 취소" color="secondary" @click="stopMatch()"></q-btn>
-    </div>
+    <template v-if="!isMatching">
+      <div class="q-gutter-md">
+        <q-btn label="매칭 시작" color="primary" @click="startMatch()" />
+        <q-btn
+          label="메인으로"
+          color="secondary"
+          @click="this.$router.push('/')"
+        />
+      </div>
+    </template>
+    <template v-else>
+      <div class="q-gutter-md">
+        <q-btn label="매칭 취소" color="secondary" @click="cancelMatch()" />
+        <q-btn label="메인으로" color="secondary" @click="backToMain()" />
+      </div>
+    </template>
     <MatchModal
       v-model="this.showChoiceModal"
       @confirm="confirm"
@@ -203,15 +216,6 @@ export default {
       })
       // 로비 세션 입장
       this.joinSession()
-
-      // 공통 구독 (모든 회원이 구독함)
-      this.commonSubscribe('/sub/match')
-
-      // 여자는 5초에 한 번씩 매칭확인API 호출
-      // (상대를 찾으면 공통 구독에 message를 보냄)
-      if (this.myProfile().gender === 'F') {
-        this.interval = this.intervalMatching()
-      }
     })
     onUnmounted(() => {
       // 여기서 clearInterval을 해야됨.
@@ -269,7 +273,9 @@ export default {
       mySessionId: new Date().toISOString() + Math.floor(Math.random() * 10000), // 임시로 현재 시간 + 4자리 난수로 설정
       myUserName: 'Participant' + Math.floor(Math.random() * 100), // 사용자의 이름으로 바꿔야함
 
-      alert: false
+      alert: false,
+
+      isMatching: false
     }
   },
   computed: {
@@ -348,9 +354,25 @@ export default {
         () => console.log('매칭에 실패했습니다.')
       )
     },
+    startMatch() {
+      this.isMatching = true
+      // 공통 구독 (모든 회원이 구독함)
+      this.commonSubscribe('/sub/match')
 
-    stopMatch() {
+      // 여자는 5초에 한 번씩 매칭확인API 호출
+      // (상대를 찾으면 공통 구독에 message를 보냄)
+      if (this.myProfile().gender === 'F') {
+        this.interval = this.intervalMatching()
+      }
+    },
+    cancelMatch() {
       stopMatching()
+      this.isMatching = false
+      clearInterval(this.interval)
+      this.stompClient.disconnect()
+    },
+    backToMain() {
+      if (this.isMatching) stopMatching()
       this.stompClient.disconnect()
       this.$router.push('/')
     },
@@ -610,6 +632,7 @@ export default {
       window.addEventListener('beforeunload', (e) => {
         e.preventDefault()
         this.leaveSession()
+        this.stompClient.disconnect()
       })
     },
     leaveSession() {
