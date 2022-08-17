@@ -224,7 +224,7 @@ public class UserServiceImpl implements UserService {
 		userInterestRepository.deleteByUserNo(user.getNo());
 		userPersonalityRepository.deleteByUserNo(user.getNo());
 		meetingLogRepository.deleteByUser1No(user.getNo());
-		meetingLogRepository.deleteByUser2No(user.getNo());
+		meetingLogRepository.deleteByUser2(user.getNo());
 		banRepository.deleteByUserNo(user.getNo());
 		reportRepository.deleteByUserNo(user.getNo());
 		inquiryRepository.deleteByUserNo(user.getNo());

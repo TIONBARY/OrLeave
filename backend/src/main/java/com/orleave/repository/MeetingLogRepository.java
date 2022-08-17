@@ -13,5 +13,5 @@ public interface MeetingLogRepository extends JpaRepository<MeetingLog, Integer>
 	Long countByUser1No(int no);
 	List<MeetingLog> findByUser1NoAndCreatedTimeBetween(int userNo, LocalDateTime fromDateTime, LocalDateTime toDateTime);
 	long deleteByUser1No(int user1No);
-	long deleteByUser2No(int user2No);
+	long deleteByUser2(int user2);
 }
