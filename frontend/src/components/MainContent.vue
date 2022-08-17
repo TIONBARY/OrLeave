@@ -121,7 +121,7 @@
                     label="OK"
                     color="primary"
                     v-close-popup
-                    @click="setMeetingSetting"
+                    @click="modifyMeetingSetting"
                   />
                 </q-card-actions>
               </q-card>
@@ -292,11 +292,11 @@ export default {
     const meetingSetting = ref({
       religion: 0,
       smoke: 0,
-      drink_min: 0,
-      drink_max: 2,
+      drinkMin: 0,
+      drinkMax: 2,
       distance: 4,
-      age_min: 20,
-      age_max: 50
+      ageMin: 20,
+      ageMax: 50
     })
     return {
       index,
@@ -320,17 +320,19 @@ export default {
   methods: {
     checkMeetingSetting() {
       this.alert = true
+      console.log(this.meetingSetting)
       getMeetingSetting(
         ({ data }) => {
+          console.log(data)
           if (data.statusCode === 200) {
-            this.meetingSetting = data.meetingsetting
+            this.meetingSetting = data.meetingSetting
             this.age = {
-              min: this.meetingSetting.age_min,
-              max: this.meetingSetting.age_max
+              min: this.meetingSetting.ageMin,
+              max: this.meetingSetting.ageMax
             }
             this.drink = {
-              min: this.meetingSetting.drink_min,
-              max: this.meetingSetting.drink_max
+              min: this.meetingSetting.drinkMin,
+              max: this.meetingSetting.drinkMax
             }
           }
         },
@@ -347,7 +349,7 @@ export default {
         }
       )
     },
-    setMeetingSetting() {
+    modifyMeetingSetting() {
       this.meetingSetting.age_min = this.age.min
       this.meetingSetting.age_max = this.age.max
       this.meetingSetting.drink_min = this.drink.min

@@ -65,6 +65,7 @@ public class MeetingServiceImpl implements MeetingService{
 		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
 		
 		MeetingSetting meetingSetting = MeetingSetting.builder()
+				.userNo(no)
 				.religion(dto.getReligion())
 				.smoke(dto.getSmoke())
 				.drinkMax(dto.getDrink_max())
