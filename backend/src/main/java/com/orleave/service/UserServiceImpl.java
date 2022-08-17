@@ -26,8 +26,12 @@ import com.orleave.entity.UserPersonality;
 import com.orleave.exception.LoginProhibitedException;
 import com.orleave.exception.UserNotFoundException;
 import com.orleave.exception.WrongPasswordException;
+import com.orleave.repository.BanRepository;
+import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.LoginTrialRepository;
+import com.orleave.repository.MeetingLogRepository;
 import com.orleave.repository.MeetingSettingRepository;
+import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserInterestRepository;
 import com.orleave.repository.UserPersonalityRepository;
 import com.orleave.repository.UserRepository;
@@ -54,6 +58,18 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	UserPersonalityRepository userPersonalityRepository;
+	
+	@Autowired
+	BanRepository banRepository;
+	
+	@Autowired
+	ReportRepository reportRepository;
+	
+	@Autowired
+	InquiryRepository inquiryRepository;
+	
+	@Autowired
+	MeetingLogRepository meetingLogRepository;
 	
 	@Autowired
 	UserRepositorySupport userRepositorySupport;
@@ -207,6 +223,11 @@ public class UserServiceImpl implements UserService {
 		meetingSettingRepository.deleteById(user.getNo());
 		userInterestRepository.deleteByUserNo(user.getNo());
 		userPersonalityRepository.deleteByUserNo(user.getNo());
+		meetingLogRepository.deleteByUser1No(user.getNo());
+		meetingLogRepository.deleteByUser2(user.getNo());
+		banRepository.deleteByUserNo(user.getNo());
+		reportRepository.deleteByUserNo(user.getNo());
+		inquiryRepository.deleteByUserNo(user.getNo());
 		userRepository.delete(user);
 	}
 
