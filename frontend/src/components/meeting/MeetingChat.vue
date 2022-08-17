@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="chat">
     <q-btn icon="arrow_back_ios" class="chat-btn">
       <q-btn
         icon="arrow_forward_ios"
@@ -16,7 +16,7 @@
         persistent
       >
         <div class="chat-area">
-          <q-scroll-area class="chat-log">
+          <q-scroll-area class="chat-log" ref="chatScroll">
             <q-chat-message
               v-for="chat in chatLog"
               :key="chat"
@@ -26,21 +26,22 @@
               :stamp="chat.time"
             />
           </q-scroll-area>
-          <div class="row justify-center items-center">
+          <div class="row justify-center items-center chat-input-div">
             <q-input
               class="chat-input"
               v-model="message"
               bg-color="white"
+              borderless
+              dense
               type="text"
               @keyup.enter="sendMessage"
             >
               <template v-slot:append>
                 <q-btn
                   color="primary"
-                  class="q-mr-sm"
                   @click="sendMessage"
                   label="전송"
-                  size="15px"
+                  size="10px"
                   dense
                 />
               </template>
@@ -72,6 +73,8 @@ export default {
     const recvList = ref([])
     const chatLog = ref([])
     const userName = ref('')
+    const scrollArea = ref(null)
+    const scrollTarget = ref(null)
     return {
       userName,
       message,
@@ -91,6 +94,8 @@ export default {
       chatMsg,
       popupMatching,
       popupReport,
+      scrollArea,
+      scrollTarget,
       opponent: '감자튀김'
     }
   },
@@ -160,6 +165,10 @@ export default {
                 sent: false
               })
             }
+            this.scrollArea = this.$refs.chatScroll
+            this.scrollTarget = this.scrollArea.getScrollTarget()
+            const duration = 100 // ms - use 0 to instant scroll
+            this.scrollArea.setScrollPosition('vertical', this.scrollTarget.scrollHeight, duration)
           })
         },
         () => {
@@ -172,6 +181,9 @@ export default {
 </script>
 
 <style scoped>
+.chat {
+  overflow: hidden;
+}
 .chat-btn {
   position: fixed;
   right: -10px;
@@ -183,25 +195,32 @@ export default {
   width: 10px;
   height: 50px;
   position: absolute;
-  left: -210px;
+  left: -260px;
   z-index: 10;
 }
 .chat-bar {
   position: relative;
+  right: 10px;
   width: 200px;
-  padding: 15px;
-  overflow: hidden;
 }
 .chat-area {
   background-color: #e5edb8 !important;
 }
 .chat-log {
   height: 350px;
-  width: 200px;
-  padding: 10px;
+  width: 250px;
+  padding: 20px;
+  overflow-x: hidden;
+}
+.chat-input-div {
+  width: 250px;
+  background-color: white;
 }
 .chat-input {
-  width: 180px;
+  width: 230px;
+}
+.chat-input input {
+  padding: 6px 10px !important;
 }
 .popup {
   background: #f3f1eb;
