@@ -3,6 +3,7 @@ package com.orleave.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,15 +44,13 @@ public class MatchingServiceImpl implements MatchingService {
 	@Autowired
 	MeetingLogRepository meetingLogRepository;
 	
-	private Map<Integer, WaitingUserDto> males;
-	private Map<Integer, WaitingUserDto> females;
+	private static Map<Integer, WaitingUserDto> males = new ConcurrentHashMap<>();
+	private static Map<Integer, WaitingUserDto> females = new ConcurrentHashMap<>();
 	private Map<Integer, Integer> distanceMap;
 	
 	@Autowired
 	public MatchingServiceImpl() {
-		males = new ConcurrentHashMap<>();
-		females = new ConcurrentHashMap<>();
-		distanceMap = new ConcurrentHashMap<>();
+		distanceMap = new HashMap<>();
 		distanceMap.put(0, 10); distanceMap.put(1, 20);
 		distanceMap.put(2, 50); distanceMap.put(3, 100);
 		distanceMap.put(4, Integer.MAX_VALUE);

@@ -154,8 +154,9 @@
                     <td style="width: 40%">
                       <q-input
                         outlined
+                        readonly
                         bg-color="white"
-                        v-model="reportedNo"
+                        v-model="opponentInfo.nickname"
                         dense
                       />
                     </td>
@@ -166,7 +167,7 @@
                       <q-option-group
                         v-model="category"
                         :options="reportOptions"
-                        type="checkbox"
+                        type="radio"
                         color="primary"
                       />
                     </td>
@@ -190,7 +191,7 @@
                 <q-btn
                   class="negative"
                   label="신고하기"
-                  @click=";[reportUser(), leaveSession()]"
+                  @click=";[report(), leaveSession()]"
                   type="submit"
                 />
                 <q-btn class="secondary" label="취소" v-close-popup />
@@ -201,6 +202,10 @@
       </div>
     </div>
     <MeetingChat />
+    <ConfirmModal
+        v-model="this.showModal"
+        :modalContent="this.modalContent"
+      />
   </div>
 </template>
 
@@ -215,6 +220,7 @@ import { WEBSOCKET_URL } from '@/config/index'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import MeetingChat from './MeetingChat.vue'
+import ConfirmModal from '../ConfirmModal.vue'
 
 // stompClient.debug = null // disable stomp loggings
 
@@ -225,7 +231,8 @@ export default {
 
   components: {
     UserVideo,
-    MeetingChat
+    MeetingChat,
+    ConfirmModal
   },
   computed: {
     ...mapState(meetingStore, [
@@ -237,21 +244,18 @@ export default {
   },
   data() {
     onMounted(() => {
-      console.log('!!!' + this.sessionId)
       if (this.sessionId === '' || this.isMatched === false) {
         this.$router.push('/404')
         return
       }
-
       const token = jwtDecode(sessionStorage.getItem('Authorization'))
 
       const myGender = token.gender
       if (myGender === 'M') {
-        setTimeout(this.joinSession, 3000)
+        setTimeout(this.joinSession, 1000)
       } else {
         this.joinSession()
       }
-      console.log(token.NickName)
       this.myNickname = token.NickName
       this.myImageNo = token.imageNo
 
@@ -273,7 +277,8 @@ export default {
               msgNickname !== this.myNickname
             ) {
               // 팝업을 띄워도 되고... 나가기 전에 알려주는 어떤 그런거
-              console.log('5초 후 방에서 나갑니다.')
+              this.modalContent = '5초 후 방에서 나갑니다.'
+              this.showModal = true
               this.autoExit = setTimeout(this.leaveSession, 5000)
               return
             }
@@ -282,8 +287,6 @@ export default {
             } else {
               this.yourSkip = true
             }
-            console.log('my:' + this.mySkip)
-            console.log('your:' + this.yourSkip)
 
             if (this.mySkip && this.yourSkip) {
               this.level++
@@ -346,7 +349,7 @@ export default {
         { label: '혐오발언', value: 4 },
         { label: '기타', value: 5 }
       ],
-      reportedNo: null,
+      reportNo: 0,
       category: null,
       content: '',
       popupMatching: false,
@@ -364,7 +367,8 @@ export default {
         video: true
       },
       token: undefined,
-
+      showModal: false,
+      modalContent: '',
       myUserName: Math.floor(Math.random() * 100)
       // myUserName: 비디오 아래에 들어갈 유저 닉네임 (jwt 디코드)
       // 사진도 넣어야한다
@@ -399,7 +403,6 @@ export default {
       this.session.on('streamCreated', ({ stream }) => {
         const subscriber = this.session.subscribe(stream)
         this.subscribers.push(subscriber)
-        console.log(stream)
       })
 
       // On every Stream destroyed...
@@ -411,8 +414,7 @@ export default {
       })
 
       // On every asynchronous exception...
-      this.session.on('exception', ({ exception }) => {
-        console.warn(exception)
+      this.session.on('exception', () => {
       })
 
       // --- Connect to the session with a valid user token ---
@@ -420,10 +422,7 @@ export default {
       // 'getToken' method is simulating what your server-side should do.
       // 'token' parameter should be retrieved and returned by your own backend
       this.getToken(this.sessionId).then((response) => {
-        console.log(this.sessionId)
         this.token = response.data.token
-        console.log('토큰')
-        console.log(this.token)
         this.session
           .connect(this.token, { clientData: this.myUserName })
           .then(() => {
@@ -448,7 +447,6 @@ export default {
 
             this.mainStreamManager = publisher
             this.publisher = publisher
-            console.log(this.publisher)
             // --- Publish your stream ---
             this.session.publish(this.publisher)
           })
@@ -470,7 +468,6 @@ export default {
 
     leaveSession() {
       const msg = { nickname: this.myNickname, content: false }
-      console.log(msg)
       this.stompClient.send(
         '/pub/chat/' + this.sessionId + 's',
         {},
@@ -506,12 +503,10 @@ export default {
       return enterMeeting(sessionId)
     },
     levelUp() {
-      console.log(this.skipDisable)
       if (this.skipDisable) {
         return
       }
       const msg = { nickname: this.myNickname, content: true }
-      console.log(msg)
       this.stompClient.send(
         '/pub/chat/' + this.sessionId + 's',
         {},
@@ -521,18 +516,17 @@ export default {
         this.publisher.stream
           .removeFilter()
           .then(() => {
-            console.log('Filter removed')
           })
           .catch((error) => {
             console.error(error)
           })
       }
     },
-    reportUser() {
-      const reportNo = this.reportNo
+    report() {
+      const reportedNo = this.opponentInfo.no
       const category = this.category
       const content = this.content
-      reportUser({ reportNo, category, content })
+      reportUser({ reportedNo, category, content })
     }
   },
   beforeMount() {
