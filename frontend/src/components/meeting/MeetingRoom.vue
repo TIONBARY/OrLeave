@@ -154,8 +154,9 @@
                     <td style="width: 40%">
                       <q-input
                         outlined
+                        readonly
                         bg-color="white"
-                        v-model="reportedNo"
+                        v-model="opponentInfo.nickname"
                         dense
                       />
                     </td>
@@ -166,7 +167,7 @@
                       <q-option-group
                         v-model="category"
                         :options="reportOptions"
-                        type="checkbox"
+                        type="radio"
                         color="primary"
                       />
                     </td>
@@ -190,7 +191,7 @@
                 <q-btn
                   class="negative"
                   label="신고하기"
-                  @click=";[reportUser(), leaveSession()]"
+                  @click=";[report(), leaveSession()]"
                   type="submit"
                 />
                 <q-btn class="secondary" label="취소" v-close-popup />
@@ -242,7 +243,6 @@ export default {
         this.$router.push('/404')
         return
       }
-
       const token = jwtDecode(sessionStorage.getItem('Authorization'))
 
       const myGender = token.gender
@@ -346,7 +346,7 @@ export default {
         { label: '혐오발언', value: 4 },
         { label: '기타', value: 5 }
       ],
-      reportedNo: null,
+      reportNo: 0,
       category: null,
       content: '',
       popupMatching: false,
@@ -528,11 +528,11 @@ export default {
           })
       }
     },
-    reportUser() {
-      const reportNo = this.reportNo
+    report() {
+      const reportedNo = this.opponentInfo.no
       const category = this.category
       const content = this.content
-      reportUser({ reportNo, category, content })
+      reportUser({ reportedNo, category, content })
     }
   },
   beforeMount() {
