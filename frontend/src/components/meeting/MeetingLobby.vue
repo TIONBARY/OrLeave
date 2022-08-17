@@ -351,7 +351,7 @@ export default {
             )
           }
         },
-        () => console.log('매칭에 실패했습니다.')
+        () => console.warn('매칭에 실패했습니다.')
       )
     },
     startMatch() {
@@ -396,7 +396,6 @@ export default {
             response.maleNo === parseInt(this.myInfo.no)
           ) {
             this.opponentInfo = response.female
-            console.log(this.opponentInfo)
             this.modalContent =
               response.female.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
@@ -433,7 +432,7 @@ export default {
                 this.opponentInfo = res.data.user
               },
               (error) => {
-                console.log(error)
+                console.warn(error)
               }
             ) // 매칭 성사 API 남자만 호출
           }
@@ -447,7 +446,7 @@ export default {
         if (this.mAccepted === false && this.fAccepted === false) {
           clearTimeout(timeout)
           this.showChoiceModal = false
-          console.log('매칭에 실패했습니다.')
+          console.warn('매칭에 실패했습니다.')
           if (this.myGender === 'F') this.interval = this.intervalMatching()
           this.mAccepted = null
           this.fAccepted = null
@@ -459,7 +458,7 @@ export default {
       const timeout = setTimeout(() => {
         this.showChoiceModal = false
         // 매칭 실패 조건 2
-        console.log('매칭에 실패했습니다.')
+        console.warn('매칭에 실패했습니다.')
         startMatching(this.location)
         if (this.myGender === 'F') this.interval = this.intervalMatching()
         this.mAccepted = null
@@ -532,9 +531,7 @@ export default {
           })
           this.session.unpublish(this.publisher).then(() => {
             this.publisher = newPublisher
-            this.session.publish(this.publisher).then(() => {
-              console.log('오디오 장치 전환')
-            })
+            this.session.publish(this.publisher)
           })
           this.audioId = audioDevices[index].deviceId
         }
@@ -556,9 +553,7 @@ export default {
           })
           this.session.unpublish(this.publisher).then(() => {
             this.publisher = newPublisher
-            this.session.publish(this.publisher).then(() => {
-              console.log('비디오 장치 전환')
-            })
+            this.session.publish(this.publisher)
           })
           this.videoId = videoDevices[index].deviceId
         }
@@ -622,7 +617,7 @@ export default {
             this.session.publish(this.publisher)
           })
           .catch((error) => {
-            console.log(
+            console.warn(
               'There was an error connecting to the session:',
               error.code,
               error.message
