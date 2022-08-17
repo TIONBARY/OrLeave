@@ -6,7 +6,10 @@
     <div class="row q-gutter-md justify-center items-center">
       <div id="user-video" class="video-container"></div>
       <div>
-        <q-img :src="require('../../assets/profile/' + imageNo + '.png')" width="30%" />
+        <q-img
+          :src="require('../../assets/profile/' + imageNo + '.png')"
+          width="30%"
+        />
         <q-btn
           color="primary"
           @click="alert = true"
@@ -25,7 +28,7 @@
                   <tr>
                     <td width="10%">나이</td>
                     <td width="70%" class="q-px-ml">
-                      {{ setting.age_min }} - {{ setting.age_max }}
+                      {{ setting.ageMin }} - {{ setting.ageMax }}
                     </td>
                   </tr>
                   <q-separator inset />
@@ -143,7 +146,7 @@
       @confirm="confirm"
       @close="close"
       @changeDisable="this.disable = true"
-      :imageNo="opponentInfo.imageNo+''"
+      :imageNo="opponentInfo.imageNo + ''"
       :modalContent="this.modalContent"
       :disable="this.disable"
       @hide="this.disable = false"
@@ -173,8 +176,6 @@ const meetingStore = 'meetingStore'
 
 // stompClient.debug = null // disable stomp loggings
 
-let interval = null
-
 export default {
   name: 'App',
 
@@ -184,8 +185,11 @@ export default {
     onMounted(() => {
       this.imageNo = this.myProfile().imageNo
       // 미팅 설정 가져오기
-      getMeetingSetting().then(
-        (res) => (this.setting = res.data.meetingsetting)
+      getMeetingSetting(
+        (res) => {
+          this.setting = res.data.meetingSetting
+        },
+        (error) => console.warn(error)
       )
       // 현재 위치 설정
       navigator.geolocation.getCurrentPosition((loc) => {
@@ -201,16 +205,18 @@ export default {
       // 여자는 5초에 한 번씩 매칭확인API 호출
       // (상대를 찾으면 공통 구독에 message를 보냄)
       if (this.myProfile().gender === 'F') {
-        interval = this.intervalMatching()
+        this.interval = this.intervalMatching()
       }
     })
     onUnmounted(() => {
       // 여기서 clearInterval을 해야됨.
-      clearInterval(interval)
+      clearInterval(this.interval)
       this.leaveSession()
     })
 
     return {
+      interval: null,
+
       socket: null,
       stompClient: null,
 
@@ -218,8 +224,8 @@ export default {
 
       disable: false,
       imageNo: 1,
-      myInfo: null,
-      opponentInfo: { imageNo: 1 },
+      myInfo: {},
+      opponentInfo: {},
 
       myGender: null,
       myNo: null,
@@ -270,13 +276,13 @@ export default {
     filtered_drink() {
       let a = ''
       let b = ''
-      if (this.setting.drink_min === 0) a = '안함'
-      else if (this.setting.drink_min === 1) a = '가끔'
-      else if (this.setting.drink_min === 2) a = '자주'
+      if (this.setting.drinkMin === 0) a = '안함'
+      else if (this.setting.drinkMin === 1) a = '가끔'
+      else if (this.setting.drinkMin === 2) a = '자주'
       else a = 'unknown'
-      if (this.setting.drink_max === 0) b = '안함'
-      else if (this.setting.drink_max === 1) b = '가끔'
-      else if (this.setting.drink_max === 2) b = '자주'
+      if (this.setting.drinkMax === 0) b = '안함'
+      else if (this.setting.drinkMax === 1) b = '가끔'
+      else if (this.setting.drinkMax === 2) b = '자주'
       else b = 'unknown'
       return a + ' ~ ' + b
     },
@@ -310,7 +316,7 @@ export default {
             this.modalContent = res.data.user.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
             this.opponentInfo = { ...res.data.user } // 여자가 남자의 정보 저장
-            clearInterval(interval)
+            clearInterval(this.interval)
 
             this.newSessionId =
               this.myProfile().NickName + new Date().toISOString()
@@ -344,7 +350,15 @@ export default {
       this.socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
       this.stompClient = Stomp.over(this.socket)
       this.stompClient.connect({}, (frame) => {
-        startMatching(this.location)
+        startMatching(
+          this.location,
+          (res) => {
+            console.log('이게 myinfo가 맞는지 확인좀')
+            console.log(res)
+            this.myInfo = res
+          },
+          (err) => console.warn(err)
+        )
         this.stompClient.subscribe(url, (msg) => {
           const response = JSON.parse(msg.body)
           const myInfo = this.myProfile()
@@ -353,12 +367,12 @@ export default {
             response.maleNo === parseInt(myInfo.sub)
           ) {
             this.opponentInfo = response.female
+            console.log('상대 여자의 정보가 제대로  들어왔는지 확인해주세요')
             console.log(this.opponentInfo)
             this.modalContent =
               response.female.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
             this.setSessionId(response.roomId)
-            console.log('3' + response.roomId)
             this.subscribeSession()
             // 11초
           }
@@ -371,10 +385,6 @@ export default {
     subscribeSession() {
       this.stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
         const res = JSON.parse(msg.body)
-        console.log('res')
-        console.log(res)
-        console.log(parseInt(res.nickname) + '@' + this.myNo)
-        console.log(typeof parseInt(res.nickname) + '@' + typeof this.myNo)
         if (parseInt(res.nickname) === this.myNo) {
           if (this.myGender === 'M') this.mAccepted = res.content === 'true'
           else this.fAccepted = res.content === 'true'
@@ -383,14 +393,10 @@ export default {
           else this.mAccepted = res.content === 'true'
           this.opponentNo = parseInt(res.nickname)
         }
-
-        console.log('m' + this.mAccepted + 'f' + this.fAccepted)
         if (this.mAccepted && this.fAccepted) {
           // 유일한 매칭 성공 조건
           clearTimeout(timeout)
-          console.log('매칭에 성공했습니다!')
           this.setIsMatched(true)
-          // 이하에서 location 정보가 비어있지만, 매칭이 성사된 후에는 의미 없으니 따로 추가해주지 않았음.
           if (this.myGender === 'M') {
             successMatching(
               this.opponentNo,
@@ -413,7 +419,7 @@ export default {
           clearTimeout(timeout)
           this.showChoiceModal = false
           console.log('매칭에 실패했습니다.')
-          if (this.myGender === 'F') interval = this.intervalMatching()
+          if (this.myGender === 'F') this.interval = this.intervalMatching()
           this.mAccepted = null
           this.fAccepted = null
           startMatching(this.location)
@@ -424,7 +430,7 @@ export default {
         // 매칭 실패 조건 2
         console.log('매칭에 실패했습니다.')
         startMatching(this.location)
-        if (this.myGender === 'F') interval = this.intervalMatching()
+        if (this.myGender === 'F') this.interval = this.intervalMatching()
         this.mAccepted = null
         this.fAccepted = null
       }, 11000)

@@ -4,6 +4,7 @@ const api = apiInstance()
 
 function getMeetingSetting(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  console.log('getting')
   return api
     .get('/meeting/setting', {
       headers: {
@@ -28,7 +29,7 @@ async function setMeetingSetting(setting, success, fail) {
 
 function startMatching(location, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
-  api
+  return api
     .post('/matching', JSON.stringify(location), {
       headers: {
         Authorization: Authorization
