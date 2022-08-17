@@ -4,6 +4,7 @@ const api = apiInstance()
 
 function getMeetingSetting(success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  console.log('getting')
   return api
     .get('/meeting/setting', {
       headers: {
