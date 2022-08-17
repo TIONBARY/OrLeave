@@ -114,7 +114,6 @@ export default {
       }
     },
     send() {
-      console.log('Send message:' + this.message)
       if (this.stompClient && this.stompClient.connected) {
         const date = new Date()
         const hour =
