@@ -13,3 +13,4 @@ createApp(App)
   .mount('#app')
 
 window.Kakao.init(KAKAO_CLIENT_ID)
+window.console.log = function () {}

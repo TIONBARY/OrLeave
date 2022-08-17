@@ -259,7 +259,7 @@ export default {
 
       this.skip1 = setTimeout(() => {
         this.skipDisable = false
-      }, 6000)
+      }, 30000)
       this.stompClient.connect({}, () => {
         this.stompClient.subscribe(
           '/sub/chat/' + this.sessionId + 's',
@@ -292,7 +292,13 @@ export default {
                 this.skipDisable = true
                 this.skip2 = setTimeout(() => {
                   this.skipDisable = false
-                }, 6000)
+                }, 30000)
+                this.publisher.stream
+                  .removeFilter()
+                  .then(() => {})
+                  .catch((error) => {
+                    console.error(error)
+                  })
               } else {
                 this.skipDisable = true
               }
@@ -436,7 +442,7 @@ export default {
               filter: {
                 type: 'GStreamerFilter',
                 options: {
-                  command: 'pitch pitch=1.8'
+                  command: 'pitch pitch=1.5'
                 }
               }
             })
@@ -447,7 +453,7 @@ export default {
             this.session.publish(this.publisher)
           })
           .catch((error) => {
-            console.log(
+            console.warn(
               'There was an error connecting to the session:',
               error.code,
               error.message
@@ -508,14 +514,14 @@ export default {
         {},
         JSON.stringify(msg)
       )
-      if (this.level === 2) {
-        this.publisher.stream
-          .removeFilter()
-          .then(() => {})
-          .catch((error) => {
-            console.error(error)
-          })
-      }
+      // if (this.level === 2) {
+      //   this.publisher.stream
+      //     .removeFilter()
+      //     .then(() => {})
+      //     .catch((error) => {
+      //       console.error(error)
+      //     })
+      // }
     },
     report() {
       const reportedNo = this.opponentInfo.no

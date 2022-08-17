@@ -153,7 +153,7 @@
     <div class="item pageSection row">
       <div class="intro-title text-left">
         <h1>잡다,</h1>
-        <h2>마음이에 드는 상대를<br />쟁취하세요.</h2>
+        <h2>마음에 드는 상대를<br />쟁취하세요.</h2>
       </div>
       <q-img
         class="img-container intro-img"
@@ -179,74 +179,38 @@
               <q-avatar size="25px">
                 <q-img src="../assets/profile/10.png" />
               </q-avatar>
-              김시언:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              김시언
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/25.png" />
               </q-avatar>
-              정승욱:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              정승욱
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/2.png" />
               </q-avatar>
-              정지은:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              정지은
             </div>
             <div class="text-h5">Backend</div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/3.png" />
               </q-avatar>
-              박상수:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              박상수
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/5.png" />
               </q-avatar>
-              윤지환:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              윤지환
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/4.png" />
               </q-avatar>
-              허상:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              허상
             </div>
           </div>
         </div>
@@ -320,10 +284,8 @@ export default {
   methods: {
     checkMeetingSetting() {
       this.alert = true
-      console.log(this.meetingSetting)
       getMeetingSetting(
         ({ data }) => {
-          console.log(data)
           if (data.statusCode === 200) {
             this.meetingSetting = data.meetingSetting
             this.age = {
