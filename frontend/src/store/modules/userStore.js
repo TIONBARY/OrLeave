@@ -131,7 +131,12 @@ const userStore = {
     async modifyProfile({ commit }) {
       await requestModifyProfile(
         this.profile,
-        (response) => {},
+        (response) => {
+          if (response.data.statusCode === 200) {
+            const token = response.data.authorization
+            sessionStorage.setItem('Authorization', token)
+          }
+        },
         (error) => {
           console.log(error)
         }
