@@ -47,8 +47,8 @@ public class MatchingController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserNo();
-		matchingService.startMatching(userNo, locationRequestDto.getLat(), locationRequestDto.getLng());
-		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
+		WaitingUserDto userDto = matchingService.startMatching(userNo, locationRequestDto.getLat(), locationRequestDto.getLng());
+		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", userDto));
 	}
 	
 	@GetMapping("")
@@ -103,7 +103,7 @@ public class MatchingController {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		int userNo = userDetails.getUserNo();
-		WaitingUserDto femaleDto = matchingService.matchingSuccess(userNo, femaleNo);
-		return ResponseEntity.status(200).body(MatchingResponseDto.of(200, "Success", femaleDto));
+		matchingService.matchingSuccess(userNo, femaleNo);
+		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Success"));
 	}
 }

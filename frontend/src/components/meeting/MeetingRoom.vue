@@ -1,52 +1,47 @@
 <template>
   <div id="main-container" class="container">
-    <!-- <div id="join" v-if="!session">
-      <div id="join-dialog" class="jumbotron vertical-center">
-        <h1>Join a video session</h1>
-        <div class="form-group">
-          <p>
-            <label>Participant</label>
-            <input
-              v-model="myUserName"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p>
-            <label>Session</label>
-            <input
-              v-model="mySessionId"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p class="text-center">
-            <button class="btn btn-lg btn-success" @click=";[joinSession()]">
-              Join!
-            </button>
-          </p>
-        </div>
-      </div>
-    </div> -->
     <!-- 사이트 디버깅 막기 -->
     <div id="session">
       <h1>{{ level }}단계</h1>
 
       <div id="session-header" class="m-ma-lg row justify-around">
-        <div id="main-video">
-          <user-video :stream-manager="mainStreamManager" :level="level" :nickname="myNickname" :imageNo="myImageNo+''"/>
+        <div class="column">
+          <div class="video-box">
+            <div id="user-video">
+              <user-video :stream-manager="mainStreamManager" :level="level" />
+            </div>
+          </div>
+          <div class="q-my-lg">
+            <q-img
+              :src="require('../../assets/profile/' + myImageNo + '.png')"
+              width="30px"
+              style="margin-right: 10px"
+            />
+            {{ myNickname }}
+          </div>
         </div>
         <div id="video-container">
-          <div class="col-5 col-sm-3">
-            <user-video
-              v-for="sub in subscribers"
-              :key="sub.stream.connection.connectionId"
-              :stream-manager="sub"
-              :level="level"
-              :nickname="opponentInfo.nickname" :imageNo="opponentInfo.imageNo+''"
-            />
+          <div class="col-5 col-sm-3 column">
+            <div class="video-box">
+              <user-video
+                v-for="sub in subscribers"
+                :key="sub.stream.connection.connectionId"
+                :stream-manager="sub"
+                :level="level"
+              />
+            </div>
+            <div class="q-my-lg">
+              <q-img
+                :src="
+                  require('../../assets/profile/' +
+                    opponentInfo.imageNo +
+                    '.png')
+                "
+                width="30px"
+                style="margin-right: 10px"
+              />
+              {{ opponentInfo.nickname }}
+            </div>
           </div>
         </div>
       </div>
@@ -202,10 +197,7 @@
       </div>
     </div>
     <MeetingChat />
-    <ConfirmModal
-        v-model="this.showModal"
-        :modalContent="this.modalContent"
-      />
+    <ConfirmModal v-model="this.showModal" :modalContent="this.modalContent" />
   </div>
 </template>
 
@@ -248,6 +240,9 @@ export default {
         this.$router.push('/404')
         return
       }
+      if (!this.myPublisher.publishAudio) this.isOn.audio = false
+      if (!this.myPublisher.publishVideo) this.isOn.video = false
+
       const token = jwtDecode(sessionStorage.getItem('Authorization'))
 
       const myGender = token.gender
@@ -382,6 +377,7 @@ export default {
         Math.floor(Math.random() * this.questions.length)
       )
     },
+    // 오디오 비디오 토글
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
       this.publisher.publishAudio(this.isOn.audio)
@@ -414,8 +410,7 @@ export default {
       })
 
       // On every asynchronous exception...
-      this.session.on('exception', () => {
-      })
+      this.session.on('exception', () => {})
 
       // --- Connect to the session with a valid user token ---
 
@@ -429,14 +424,15 @@ export default {
             // --- Get your own camera stream with the desired properties ---
 
             const publisher = this.OV.initPublisher(undefined, {
-              audioSource: undefined, // The source of audio. If undefined default microphone
-              videoSource: undefined, // The source of video. If undefined default webcam
-              publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
-              publishVideo: true, // Whether you want to start publishing with your video enabled or not
-              resolution: '640x480', // The resolution of your video
-              frameRate: 30, // The frame rate of your video
-              insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
-              mirror: false, // Whether to mirror your local video or not
+              ...this.myPublisher,
+              // audioSource: undefined, // The source of audio. If undefined default microphone
+              // videoSource: undefined, // The source of video. If undefined default webcam
+              // publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+              // publishVideo: true, // Whether you want to start publishing with your video enabled or not
+              // resolution: '640x480', // The resolution of your video
+              // frameRate: 30, // The frame rate of your video
+              // insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
+              // mirror: false, // Whether to mirror your local video or not
               filter: {
                 type: 'GStreamerFilter',
                 options: {
@@ -515,8 +511,7 @@ export default {
       if (this.level === 2) {
         this.publisher.stream
           .removeFilter()
-          .then(() => {
-          })
+          .then(() => {})
           .catch((error) => {
             console.error(error)
           })
@@ -553,5 +548,10 @@ export default {
   width: 30%;
   min-width: 450px;
   max-width: 550px;
+}
+.video-box {
+  width: 500px;
+  height: 375px;
+  overflow: hidden;
 }
 </style>

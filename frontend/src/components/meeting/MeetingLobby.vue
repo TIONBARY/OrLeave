@@ -138,9 +138,22 @@
       </div>
     </div>
     <br />
-    <div>
-      <q-btn label="매칭 취소" color="secondary" @click="stopMatch()"></q-btn>
-    </div>
+    <template v-if="!isMatching">
+      <div class="q-gutter-md">
+        <q-btn label="매칭 시작" color="primary" @click="startMatch()" />
+        <q-btn
+          label="메인으로"
+          color="secondary"
+          @click="this.$router.push('/')"
+        />
+      </div>
+    </template>
+    <template v-else>
+      <div class="q-gutter-md">
+        <q-btn label="매칭 취소" color="secondary" @click="cancelMatch()" />
+        <q-btn label="메인으로" color="secondary" @click="backToMain()" />
+      </div>
+    </template>
     <MatchModal
       v-model="this.showChoiceModal"
       @confirm="confirm"
@@ -150,6 +163,10 @@
       :modalContent="this.modalContent"
       :disable="this.disable"
       @hide="this.disable = false"
+    />
+    <ConfirmModal
+      v-model="this.showModal"
+      :modalContent="this.confirlModalContent"
     />
   </div>
 </template>
@@ -171,6 +188,7 @@ import { WEBSOCKET_URL } from '@/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import MatchModal from './MatchModal.vue'
+import ConfirmModal from '../ConfirmModal.vue'
 
 const meetingStore = 'meetingStore'
 
@@ -179,7 +197,7 @@ const meetingStore = 'meetingStore'
 export default {
   name: 'App',
 
-  components: { MatchModal },
+  components: { MatchModal, ConfirmModal },
 
   data() {
     onMounted(() => {
@@ -198,15 +216,6 @@ export default {
       })
       // 로비 세션 입장
       this.joinSession()
-
-      // 공통 구독 (모든 회원이 구독함)
-      this.commonSubscribe('/sub/match')
-
-      // 여자는 5초에 한 번씩 매칭확인API 호출
-      // (상대를 찾으면 공통 구독에 message를 보냄)
-      if (this.myProfile().gender === 'F') {
-        this.interval = this.intervalMatching()
-      }
     })
     onUnmounted(() => {
       // 여기서 clearInterval을 해야됨.
@@ -238,6 +247,11 @@ export default {
       fAccepted: 0,
       // ~ modal
 
+      // confirm modal ~
+      showModal: false,
+      confirlModalContent: '매칭이 거절되었습니다.',
+      // ~ confirm modal
+
       OV: undefined,
       session: undefined,
       mainStreamManager: undefined,
@@ -259,7 +273,9 @@ export default {
       mySessionId: new Date().toISOString() + Math.floor(Math.random() * 10000), // 임시로 현재 시간 + 4자리 난수로 설정
       myUserName: 'Participant' + Math.floor(Math.random() * 100), // 사용자의 이름으로 바꿔야함
 
-      alert: false
+      alert: false,
+
+      isMatching: false
     }
   },
   computed: {
@@ -330,7 +346,7 @@ export default {
               JSON.stringify({
                 roomId: this.newSessionId,
                 maleNo: res.data.user.no,
-                femaleNo: this.myProfile().sub
+                female: this.myInfo
               })
             )
           }
@@ -338,9 +354,25 @@ export default {
         () => console.log('매칭에 실패했습니다.')
       )
     },
+    startMatch() {
+      this.isMatching = true
+      // 공통 구독 (모든 회원이 구독함)
+      this.commonSubscribe('/sub/match')
 
-    stopMatch() {
+      // 여자는 5초에 한 번씩 매칭확인API 호출
+      // (상대를 찾으면 공통 구독에 message를 보냄)
+      if (this.myProfile().gender === 'F') {
+        this.interval = this.intervalMatching()
+      }
+    },
+    cancelMatch() {
       stopMatching()
+      this.isMatching = false
+      clearInterval(this.interval)
+      this.stompClient.disconnect()
+    },
+    backToMain() {
+      if (this.isMatching) stopMatching()
       this.stompClient.disconnect()
       this.$router.push('/')
     },
@@ -353,21 +385,17 @@ export default {
         startMatching(
           this.location,
           (res) => {
-            console.log('이게 myinfo가 맞는지 확인좀')
-            console.log(res)
-            this.myInfo = res
+            this.myInfo = res.data.user
           },
           (err) => console.warn(err)
         )
         this.stompClient.subscribe(url, (msg) => {
           const response = JSON.parse(msg.body)
-          const myInfo = this.myProfile()
           if (
-            myInfo.gender === 'M' &&
-            response.maleNo === parseInt(myInfo.sub)
+            this.myGender === 'M' &&
+            response.maleNo === parseInt(this.myInfo.no)
           ) {
             this.opponentInfo = response.female
-            console.log('상대 여자의 정보가 제대로  들어왔는지 확인해주세요')
             console.log(this.opponentInfo)
             this.modalContent =
               response.female.nickname + '님과 매칭되었습니다.'
@@ -383,6 +411,7 @@ export default {
     // modal ~
     // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
     subscribeSession() {
+      stopMatching()
       this.stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
         const res = JSON.parse(msg.body)
         if (parseInt(res.nickname) === this.myNo) {
@@ -423,6 +452,8 @@ export default {
           this.mAccepted = null
           this.fAccepted = null
           startMatching(this.location)
+          this.showModal = true
+          setTimeout(() => (this.showModal = false), 3000)
         }
       })
       const timeout = setTimeout(() => {
@@ -433,6 +464,8 @@ export default {
         if (this.myGender === 'F') this.interval = this.intervalMatching()
         this.mAccepted = null
         this.fAccepted = null
+        this.showModal = true
+        setTimeout(() => (this.showModal = false), 3000)
       }, 11000)
     },
 
@@ -599,6 +632,7 @@ export default {
       window.addEventListener('beforeunload', (e) => {
         e.preventDefault()
         this.leaveSession()
+        this.stompClient.disconnect()
       })
     },
     leaveSession() {

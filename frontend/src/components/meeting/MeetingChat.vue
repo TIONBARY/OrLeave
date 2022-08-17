@@ -167,7 +167,11 @@ export default {
             this.scrollArea = this.$refs.chatScroll
             this.scrollTarget = this.scrollArea.getScrollTarget()
             const duration = 100 // ms - use 0 to instant scroll
-            this.scrollArea.setScrollPosition('vertical', this.scrollTarget.scrollHeight, duration)
+            this.scrollArea.setScrollPosition(
+              'vertical',
+              this.scrollTarget.scrollHeight,
+              duration
+            )
           })
         },
         () => {
@@ -189,13 +193,15 @@ export default {
   top: 45%;
   width: 10px;
   height: 50px;
+  background: #f3f1eb;
 }
 .chat-hide-btn {
   width: 10px;
   height: 50px;
   position: absolute;
-  left: -260px;
+  left: -255px;
   z-index: 10;
+  background: #f3f1eb;
 }
 .chat-bar {
   position: relative;

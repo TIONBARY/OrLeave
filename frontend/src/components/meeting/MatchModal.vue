@@ -30,10 +30,10 @@
         <q-btn
           class="secondary"
           :disable="this.disable"
-          v-close-popup
-          @click="$emit('close')"
-          >거절</q-btn
+          @click="$emit('close'), $emit('changeDisable')"
         >
+          거절
+        </q-btn>
       </div>
     </q-card>
   </q-dialog>
