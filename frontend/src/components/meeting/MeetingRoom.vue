@@ -99,9 +99,14 @@
             width="130px"
             no-spinner
             class="absolute-bottom-left"
+            :class="{ disabled: skipDisable, abled: !skipDisable }"
             @click="levelUp()"
             v-if="this.level < 3"
-          />
+          >
+            <q-tooltip v-if="skipDisable">
+              <div>조금 더 대화를 나눠보세요.</div>
+            </q-tooltip>
+          </q-img>
           <!-- <q-btn  flat :ripple="false" /> -->
 
           <q-img
@@ -109,7 +114,7 @@
             width="130px"
             no-spinner
             @click="popupMatching = true"
-            class="absolute-bottom-right"
+            class="absolute-bottom-right abled"
           >
             <q-btn flat :ripple="false" />
           </q-img>
@@ -236,6 +241,9 @@ export default {
   },
   data() {
     onMounted(() => {
+      this.opponentInfo.interests.forEach((index) => {
+        Array.prototype.push.apply(this.customQuestions, this.questions[index])
+      })
       if (this.sessionId === '' || this.isMatched === false) {
         this.$router.push('/404')
         return
@@ -321,27 +329,31 @@ export default {
       skip2: null,
       // 질문을 단계별, 상대의 취미 별로 나눠야함
       questions: [
+        // [0]~[10]: 관심사
+        ['게임1', '게임2', '게임3'],
+        ['운동1', '운동2', '운동3'],
+        ['영화1', '영화2', '영화3'],
+        ['독서1', '독서2', '독서3'],
+        ['음악1', '음악2', '음악3'],
+        ['맛집탐방1', '맛집탐방2', '맛집탐방3'],
+        ['패션1', '패션2', '패션3'],
+        ['채식1', '채식2', '채식3'],
+        ['반려동물1', '반려동물2', '반려동물3'],
+        ['재테크1', '재테크2', '재테크3'],
+        ['자동차1', '자동차2', '자동차3'],
+        // [11]: 공통 질문
         [
           '시작은 언제나 자기소개입니다.',
           '간단하게 본인을 설명하세요',
-          '카메라를 보고 대답해주세요',
-          '지금 상대방은 억양, 어조, 높낮이 정도만 들을 수 있어요',
           '프로필 사진을 고른 이유를 물어보세요',
-          '시간대에 따라 식사를 하셨는지 물어보세요'
-        ],
-        [
-          '상대방은 OOO 을/를 좋아합니다',
+          '시간대에 따라 식사를 하셨는지 물어보세요',
           '좋아하는 영화나 음식을 물어 공감대를 형성해 보세요',
-          '오늘 또는 최근의 날씨 얘기를 하는 것도 좋습니다.',
-          '외모에 대한 칭찬은 싸피에서 하지 말랬습니다. 목소리는 괜찮을지도?',
-          '말이 겹쳤을 때는 먼저 말하세요, 상대방도 똑같이 양보할 생각만 합니다.'
-        ],
-        [
-          '좋아하는 스포츠를 물어보세요. 직관을 좋아하면 같이 보러갈수도 있습니다.',
+          '오늘 날씨 얘기를 하는 것도 좋습니다.',
           '인생 영화에 대해 물어보세요',
           '여행 중 기억에 남는 에피소드를 물어보세요'
         ]
       ],
+      customQuestions: [],
       reportOptions: [
         { label: '폭언 및 욕설', value: 0 },
         { label: '부적절한 닉네임', value: 1 },
@@ -378,10 +390,17 @@ export default {
 
   methods: {
     ...mapActions(meetingStore, ['setSessionId', 'setIsMatched']),
-    question_pick() {
-      this.question = this.questions[this.level - 1].at(
-        Math.floor(Math.random() * this.questions.length)
-      )
+    question_pick(level) {
+      // this.opponentInfo 에서 관심사를 찾아서 거기서 랜덤을 돌려야 함
+      if (level === 1) {
+        this.question = this.questions[11].at(
+          Math.floor(Math.random() * this.questions.length)
+        )
+      } else {
+        this.question = this.customQuestions.at(
+          Math.floor(Math.random() * this.customQuestions.length)
+        )
+      }
     },
     // 오디오 비디오 토글
     toggleAudio() {
@@ -531,7 +550,7 @@ export default {
     }
   },
   beforeMount() {
-    this.question_pick()
+    this.question_pick(1)
   }
 }
 </script>
@@ -559,5 +578,12 @@ export default {
   width: 500px;
   height: 375px;
   overflow: hidden;
+}
+.disabled {
+  filter: grayscale(80%);
+  cursor: wait;
+}
+.abled {
+  cursor: pointer;
 }
 </style>
