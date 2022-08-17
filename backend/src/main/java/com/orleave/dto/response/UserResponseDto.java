@@ -1,9 +1,5 @@
 package com.orleave.dto.response;
 
-
-
-import com.orleave.entity.User;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -15,13 +11,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel("UserResponse")
-public class UserResponseDto{
+public class UserResponseDto extends BaseResponseDto {
+	
 	@ApiModelProperty(name="User Email")
 	String email;
 	
-	public static UserResponseDto of(User user) {
-		UserResponseDto res = new UserResponseDto();
-		res.setEmail(user.getEmail());
+	public static UserResponseDto of(int statusCode, String message, String email) {
+		UserResponseDto res = new UserResponseDto(statusCode, email, email);
 		return res;
+	}
+
+	public UserResponseDto(Integer statusCode, String message, String email) {
+		super(statusCode, message);
+		this.email = email;
 	}
 }

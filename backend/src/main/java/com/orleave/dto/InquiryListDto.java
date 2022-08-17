@@ -17,10 +17,13 @@ import lombok.Setter;
 @Builder
 @ApiModel("InquiryListDto")
 public class InquiryListDto {
+	
 	@ApiModelProperty(name="번호")
 	int no;
 	@ApiModelProperty(name="문의 제목")
 	String title;
+	@ApiModelProperty(name="문의 답변 여부")
+	boolean isAnswered;
 	@ApiModelProperty(name="문의 작성 시간")
 	LocalDateTime createdTime;
 	
@@ -28,6 +31,7 @@ public class InquiryListDto {
 		InquiryListDto res = InquiryListDto.builder()
 				.no(inquiry.getNo())
 				.title(inquiry.getTitle())
+				.isAnswered(inquiry.getAnswer().length() > 0)
 				.createdTime(inquiry.getCreatedTime())
 				.build();
 		return res;

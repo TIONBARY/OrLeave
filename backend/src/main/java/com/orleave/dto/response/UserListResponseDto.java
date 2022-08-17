@@ -18,10 +18,12 @@ public class UserListResponseDto extends BaseResponseDto {
 	Page<UserListDto> userList;
 	
 	public static UserListResponseDto of(Integer statusCode, String message, Page<UserListDto> userList) {
-		UserListResponseDto res = new UserListResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setUserList(userList);
+		UserListResponseDto res = new UserListResponseDto(statusCode, message, userList);
 		return res;
+	}
+
+	public UserListResponseDto(Integer statusCode, String message, Page<UserListDto> userList) {
+		super(statusCode, message);
+		this.userList = userList;
 	}
 }

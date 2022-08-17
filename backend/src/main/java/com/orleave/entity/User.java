@@ -107,7 +107,7 @@ public class User {
 	
 	public void addReport(Report report) {
 		reports.add(report);
-
+	}
 	@OneToMany(mappedBy = "user")
 	private List<Ban> bans;
 	

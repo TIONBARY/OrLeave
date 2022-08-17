@@ -16,10 +16,14 @@ public class NoticeDetailResponseDto extends BaseResponseDto {
 	NoticeDetailDto notice;
 	
 	public static NoticeDetailResponseDto of(Integer statusCode, String message, NoticeDetailDto notice) {
-		NoticeDetailResponseDto res = new NoticeDetailResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setNotice(notice);
+		NoticeDetailResponseDto res = new NoticeDetailResponseDto(statusCode, message, notice);
 		return res;
 	}
+
+	public NoticeDetailResponseDto(Integer statusCode, String message, NoticeDetailDto notice) {
+		super(statusCode, message);
+		this.notice = notice;
+	}
+
+	
 }

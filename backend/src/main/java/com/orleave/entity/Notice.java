@@ -25,8 +25,10 @@ import lombok.Setter;
 @Setter
 @Builder
 public class Notice {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "no", nullable = false, columnDefinition = "INT UNSIGNED")
 	private int no;
 	
 	@Column(name = "title", nullable = false, length = 100)

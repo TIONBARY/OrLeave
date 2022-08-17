@@ -3,8 +3,6 @@ package com.orleave.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import javax.security.sasl.AuthenticationException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +15,15 @@ import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.request.InquiryRequestDto;
 import com.orleave.entity.Inquiry;
 import com.orleave.entity.User;
+import com.orleave.exception.InquiryNotFoundException;
+import com.orleave.exception.UserNotFoundException;
 import com.orleave.repository.InquiryRepository;
 import com.orleave.repository.UserRepository;
 
 
 @Service
 public class InquiryServiceImpl implements InquiryService{
+	
 	@Autowired
 	InquiryRepository inquiryRepository;
 	
@@ -31,19 +32,15 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable) {
+	public Page<InquiryListDto> getInquiriesByUserNo(int userNo, Pageable pageable) throws Exception {
 		Page<InquiryListDto> inquiryList = inquiryRepository.findByUserNo(userNo, pageable)
-				.map(inquiry -> InquiryListDto.builder()
-						.no(inquiry.getNo())
-						.title(inquiry.getTitle())
-						.createdTime(inquiry.getCreatedTime())
-						.build());	
+				.map(inquiry -> InquiryListDto.of(inquiry));	
 		return inquiryList;
 	}
 
 	@Override
 	@Transactional
-	public boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto) {
+	public boolean createInquiry(User user, InquiryRequestDto inquiryRequestDto) throws Exception {
 		Inquiry inquiry = Inquiry.builder()
 				.title(inquiryRequestDto.getTitle())
 				.content(inquiryRequestDto.getContent())
@@ -57,11 +54,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public InquiryDetailDto getInquiryDetail(int no, int userNo) throws AuthenticationException {
+	public InquiryDetailDto getInquiryDetail(int no, int userNo) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return null;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		InquiryDetailDto dto = InquiryDetailDto.builder()
 				.no(inquiry.getNo())
 				.title(inquiry.getTitle())
@@ -74,11 +71,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws AuthenticationException{
+	public boolean modifyInquiry(int no, int userNo, InquiryRequestDto inquiryRequestDto) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return false;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiry.setTitle(inquiryRequestDto.getTitle());
 		inquiry.setContent(inquiryRequestDto.getContent());
 		inquiryRepository.save(inquiry);
@@ -87,11 +84,11 @@ public class InquiryServiceImpl implements InquiryService{
 
 	@Override
 	@Transactional
-	public boolean deleteInquiry(int no, int userNo) throws AuthenticationException {
+	public boolean deleteInquiry(int no, int userNo) throws Exception {
 		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
-		if (!inquiryTemp.isPresent()) return false;
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
 		Inquiry inquiry = inquiryTemp.get();
-		if(inquiry.getUser().getNo()!=userNo) throw new AuthenticationException();
+		if(inquiry.getUser().getNo()!=userNo) throw new UserNotFoundException();
 		inquiryRepository.deleteById(no);
 		return true;
 	}

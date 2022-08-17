@@ -52,5 +52,4 @@ public class MeetingSetting {
 	
 	@Column(name = "age_max", nullable = false, columnDefinition = "INT UNSIGNED")
 	private int ageMax;
-	
 }

@@ -48,13 +48,17 @@ h2 {
   background: white !important;
   color: #6b7a16 !important;
 }
+.negative {
+  background: #eed7ce !important;
+  color: #6b7a16 !important;
+}
 
 a {
   text-decoration: none;
   font-size: 80%;
 }
 
-table {
+* {
   font-family: 'GowunDodum-Regular';
 }
 </style>

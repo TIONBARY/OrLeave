@@ -16,10 +16,12 @@ public class InquiryDetailResponseDto extends BaseResponseDto {
 	InquiryDetailDto inquiry;
 	
 	public static InquiryDetailResponseDto of(Integer statusCode, String message, InquiryDetailDto inquiry) {
-		InquiryDetailResponseDto res = new InquiryDetailResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setInquiry(inquiry);
+		InquiryDetailResponseDto res = new InquiryDetailResponseDto(statusCode, message, inquiry);
 		return res;
+	}
+
+	public InquiryDetailResponseDto(Integer statusCode, String message, InquiryDetailDto inquiry) {
+		super(statusCode, message);
+		this.inquiry = inquiry;
 	}
 }

@@ -7,6 +7,6 @@ import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.NoticeListDto;
 
 public interface NoticeService {
-	Page<NoticeListDto> getNotices(Pageable pageable);
-	NoticeDetailDto getNoticeDetail(int no);
+	Page<NoticeListDto> getNotices(Pageable pageable) throws Exception;
+	NoticeDetailDto getNoticeDetail(int no) throws Exception;
 }

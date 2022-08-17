@@ -17,6 +17,7 @@ import lombok.Setter;
 @Builder
 @ApiModel("NoticeListDto")
 public class NoticeListDto {
+	
 	@ApiModelProperty(name="공지사항 번호")
 	int no;
 	@ApiModelProperty(name="공지사항 제목")

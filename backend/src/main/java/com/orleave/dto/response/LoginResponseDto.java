@@ -13,14 +13,17 @@ import lombok.Setter;
 @Setter
 @ApiModel("UserLoginPostResponse")
 public class LoginResponseDto extends BaseResponseDto{
-	@ApiModelProperty(name="JWT 인증 토큰", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN...")
-	String accessToken;
 	
-	public static LoginResponseDto of(Integer statusCode, String message, String accessToken) {
-		LoginResponseDto res = new LoginResponseDto();
-		res.setStatusCode(statusCode);
-		res.setMessage(message);
-		res.setAccessToken(accessToken);
+	@ApiModelProperty(name="JWT 인증 토큰", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN...")
+	String authorization;
+	
+	public static LoginResponseDto of(Integer statusCode, String message, String authorization) {
+		LoginResponseDto res = new LoginResponseDto(statusCode, message, authorization);
 		return res;
+	}
+
+	public LoginResponseDto(Integer statusCode, String message, String authorization) {
+		super(statusCode, message);
+		this.authorization = authorization;
 	}
 }

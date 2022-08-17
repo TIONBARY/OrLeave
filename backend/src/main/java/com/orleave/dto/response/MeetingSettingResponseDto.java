@@ -1,12 +1,14 @@
 package com.orleave.dto.response;
 
+import com.orleave.dto.MeetingSettingDto;
 import com.orleave.entity.MeetingSetting;
 
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -14,28 +16,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
 @ApiModel("MeetingSettingResponse")
-public class MeetingSettingResponseDto{
-	int religion;
-	int smoke;
-	int drink_min;
-	int drink_max;
-	int distance;
-	int age_min;
-	int age_max;
+public class MeetingSettingResponseDto extends BaseResponseDto{
 	
+	MeetingSettingDto meetingSetting;
 	
-	public static MeetingSettingResponseDto of(MeetingSetting meetingsetting) {
-		MeetingSettingResponseDto res = MeetingSettingResponseDto.builder()
-				.religion(meetingsetting.getReligion())
-				.smoke(meetingsetting.getSmoke())
-				.drink_max(meetingsetting.getDrinkMax())
-				.drink_min(meetingsetting.getDrinkMin())
-				.distance(meetingsetting.getDistance())
-				.age_max(meetingsetting.getAgeMax())
-				.age_min(meetingsetting.getAgeMin())
-				.build();
+	public static MeetingSettingResponseDto of(Integer statusCode, String message, MeetingSettingDto meetingSetting) {
+		MeetingSettingResponseDto res=new MeetingSettingResponseDto(statusCode, message, meetingSetting);
 		return res;
+	}
+
+	public MeetingSettingResponseDto(Integer statusCode, String message, MeetingSettingDto meetingSetting) {
+		super(statusCode, message);
+		this.meetingSetting = meetingSetting;
 	}
 }

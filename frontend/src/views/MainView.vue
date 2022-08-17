@@ -1,16 +1,18 @@
 <template>
-  <main-content />
-  <!-- <main-index /> -->
+  <div>
+    <menu-bar />
+    <main-content />
+  </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import MainContent from '@/components/MainContent.vue'
-// import MainIndex from '@/components/MainIndex.vue'
+import MenuBar from '@/components/MenuBar.vue'
 export default {
   components: {
-    MainContent
-    // MainIndex
+    MainContent,
+    MenuBar
   }
 }
 </script>

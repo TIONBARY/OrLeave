@@ -22,7 +22,9 @@ bin/
 application-db.properties
 application-jwt.properties
 application-openvidu.properties
+application-oauth.properties
 email.properties
+selfsigned.jks
 
 ### IntelliJ IDEA ###
 .idea
@@ -45,3 +47,5 @@ out/
 
 
 node_modules/
+.metadata
+/.recommenders/

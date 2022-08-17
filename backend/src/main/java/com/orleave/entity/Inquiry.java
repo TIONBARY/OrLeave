@@ -46,5 +46,4 @@ public class Inquiry {
 	
 	@Column(name = "created_time", nullable = false)
 	private LocalDateTime createdTime;
-
 }
