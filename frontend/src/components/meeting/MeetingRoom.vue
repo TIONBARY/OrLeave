@@ -1,58 +1,47 @@
 <template>
   <div id="main-container" class="container">
-    <!-- <div id="join" v-if="!session">
-      <div id="join-dialog" class="jumbotron vertical-center">
-        <h1>Join a video session</h1>
-        <div class="form-group">
-          <p>
-            <label>Participant</label>
-            <input
-              v-model="myUserName"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p>
-            <label>Session</label>
-            <input
-              v-model="mySessionId"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p class="text-center">
-            <button class="btn btn-lg btn-success" @click=";[joinSession()]">
-              Join!
-            </button>
-          </p>
-        </div>
-      </div>
-    </div> -->
     <!-- 사이트 디버깅 막기 -->
     <div id="session">
       <h1>{{ level }}단계</h1>
 
       <div id="session-header" class="m-ma-lg row justify-around">
-        <div id="main-video">
-          <user-video
-            :stream-manager="mainStreamManager"
-            :level="level"
-            :nickname="myNickname"
-            :imageNo="myImageNo + ''"
-          />
+        <div class="column">
+          <div class="video-box">
+            <div id="user-video">
+              <user-video :stream-manager="mainStreamManager" :level="level" />
+            </div>
+          </div>
+          <div class="q-my-lg">
+            <q-img
+              :src="require('../../assets/profile/' + myImageNo + '.png')"
+              width="30px"
+              style="margin-right: 10px"
+            />
+            {{ myNickname }}
+          </div>
         </div>
         <div id="video-container">
-          <div class="col-5 col-sm-3">
-            <user-video
-              v-for="sub in subscribers"
-              :key="sub.stream.connection.connectionId"
-              :stream-manager="sub"
-              :level="level"
-              :nickname="opponentInfo.nickname"
-              :imageNo="opponentInfo.imageNo + ''"
-            />
+          <div class="col-5 col-sm-3 column">
+            <div class="video-box">
+              <user-video
+                v-for="sub in subscribers"
+                :key="sub.stream.connection.connectionId"
+                :stream-manager="sub"
+                :level="level"
+              />
+            </div>
+            <div class="q-my-lg">
+              <q-img
+                :src="
+                  require('../../assets/profile/' +
+                    opponentInfo.imageNo +
+                    '.png')
+                "
+                width="30px"
+                style="margin-right: 10px"
+              />
+              {{ opponentInfo.nickname }}
+            </div>
           </div>
         </div>
       </div>
@@ -388,6 +377,7 @@ export default {
         Math.floor(Math.random() * this.questions.length)
       )
     },
+    // 오디오 비디오 토글
     toggleAudio() {
       this.isOn.audio = !this.isOn.audio
       this.publisher.publishAudio(this.isOn.audio)
@@ -558,5 +548,10 @@ export default {
   width: 30%;
   min-width: 450px;
   max-width: 550px;
+}
+.video-box {
+  width: 500px;
+  height: 375px;
+  overflow: hidden;
 }
 </style>
