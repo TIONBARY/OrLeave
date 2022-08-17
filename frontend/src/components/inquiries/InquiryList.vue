@@ -34,21 +34,27 @@
             </tr>
           </template>
         </table>
+        <br />
+        <div class="parent">
+          <div class="child"></div>
+          <div cclass="child center row justify-center">
+            <q-pagination
+              v-model="this.pageNum"
+              :max="this.totalPages"
+              :max-pages="this.maxPages"
+              direction-links
+              boundary-links
+              icon-first="skip_previous"
+              icon-last="skip_next"
+              icon-prev="fast_rewind"
+              icon-next="fast_forward"
+            />
+          </div>
+          <div class="child right row justify-end">
+            <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
+          </div>
+        </div>
       </section>
-      <div class="q-pa-lg flex flex-center">
-        <q-pagination
-          v-model="this.pageNum"
-          :max="this.totalPages"
-          :max-pages="this.maxPages"
-          direction-links
-          boundary-links
-          icon-first="skip_previous"
-          icon-last="skip_next"
-          icon-prev="fast_rewind"
-          icon-next="fast_forward"
-        />
-      </div>
-      <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
     </div>
     <ConfirmModal
       v-model="this.showConfirmModal"
@@ -172,5 +178,12 @@ tr {
 
 a {
   color: black;
+}
+.parent {
+  display: flex;
+}
+
+.parent .child {
+  flex: 1;
 }
 </style>
