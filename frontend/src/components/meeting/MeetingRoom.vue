@@ -36,7 +36,12 @@
 
       <div id="session-header" class="m-ma-lg row justify-around">
         <div id="main-video">
-          <user-video :stream-manager="mainStreamManager" :level="level" :nickname="myNickname" :imageNo="myImageNo+''"/>
+          <user-video
+            :stream-manager="mainStreamManager"
+            :level="level"
+            :nickname="myNickname"
+            :imageNo="myImageNo + ''"
+          />
         </div>
         <div id="video-container">
           <div class="col-5 col-sm-3">
@@ -45,7 +50,8 @@
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
               :level="level"
-              :nickname="opponentInfo.nickname" :imageNo="opponentInfo.imageNo+''"
+              :nickname="opponentInfo.nickname"
+              :imageNo="opponentInfo.imageNo + ''"
             />
           </div>
         </div>
@@ -202,10 +208,7 @@
       </div>
     </div>
     <MeetingChat />
-    <ConfirmModal
-        v-model="this.showModal"
-        :modalContent="this.modalContent"
-      />
+    <ConfirmModal v-model="this.showModal" :modalContent="this.modalContent" />
   </div>
 </template>
 
@@ -248,6 +251,9 @@ export default {
         this.$router.push('/404')
         return
       }
+      if (!this.myPublisher.publishAudio) this.isOn.audio = false
+      if (!this.myPublisher.publishVideo) this.isOn.video = false
+
       const token = jwtDecode(sessionStorage.getItem('Authorization'))
 
       const myGender = token.gender
@@ -414,8 +420,7 @@ export default {
       })
 
       // On every asynchronous exception...
-      this.session.on('exception', () => {
-      })
+      this.session.on('exception', () => {})
 
       // --- Connect to the session with a valid user token ---
 
@@ -429,14 +434,15 @@ export default {
             // --- Get your own camera stream with the desired properties ---
 
             const publisher = this.OV.initPublisher(undefined, {
-              audioSource: undefined, // The source of audio. If undefined default microphone
-              videoSource: undefined, // The source of video. If undefined default webcam
-              publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
-              publishVideo: true, // Whether you want to start publishing with your video enabled or not
-              resolution: '640x480', // The resolution of your video
-              frameRate: 30, // The frame rate of your video
-              insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
-              mirror: false, // Whether to mirror your local video or not
+              ...this.myPublisher,
+              // audioSource: undefined, // The source of audio. If undefined default microphone
+              // videoSource: undefined, // The source of video. If undefined default webcam
+              // publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+              // publishVideo: true, // Whether you want to start publishing with your video enabled or not
+              // resolution: '640x480', // The resolution of your video
+              // frameRate: 30, // The frame rate of your video
+              // insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
+              // mirror: false, // Whether to mirror your local video or not
               filter: {
                 type: 'GStreamerFilter',
                 options: {
@@ -515,8 +521,7 @@ export default {
       if (this.level === 2) {
         this.publisher.stream
           .removeFilter()
-          .then(() => {
-          })
+          .then(() => {})
           .catch((error) => {
             console.error(error)
           })
