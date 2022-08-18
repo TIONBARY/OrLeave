@@ -125,7 +125,7 @@
         </q-bar>
         <q-card-section class="popup-text">
           차단리스트
-          <div style="background-color: white">
+          <div style="background-color: white" class="bannedList">
             <div
               :key="block.bannedUserNickname"
               v-for="(block, index) in banuserlist"
@@ -230,5 +230,9 @@ a {
   width: 30%;
   min-width: 450px;
   max-width: 550px;
+}
+.bannedList {
+  height:150px;
+  overflow:auto;
 }
 </style>
