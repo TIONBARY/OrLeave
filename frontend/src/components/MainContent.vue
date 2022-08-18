@@ -5,7 +5,7 @@
         <q-img
           :src="require('../assets/logo_l.png')"
           spinner-color="white"
-          width="400px"
+          width="380px"
         />
 
         <div class="q-mt-sm">
@@ -173,7 +173,7 @@
               height="400px"
             />
           </div>
-          <div class="column q-ma-xl q-gutter-sm text-left">
+          <div class="q-gutter-sm text-left">
             <div class="text-h5">Frontend</div>
             <div>
               <q-avatar size="25px">
@@ -379,7 +379,7 @@ export default {
   position: absolute;
   right: 10%;
   bottom: 10%;
-  width: 400px;
+  width: 40vw;
   height: auto;
   min-width: 40%;
   min-height: auto;
