@@ -93,11 +93,11 @@ public class MatchingServiceImpl implements MatchingService {
 		if (femaleDto == null) throw new MatchingUserNotFoundException();
 		MeetingSetting femaleMeetingSetting = meetingSettingRepository.findById(userNo).get();
 		outer: for (int maleNo : males.keySet()) {
-			List<Ban> femaleBan = banRepository.findByUserNo(userNo);
+			List<Ban> femaleBan = banRepository.findByUserNoOrderByNoDesc(userNo);
 			for (Ban ban : femaleBan) {
 				if (ban.getBannedNo() == maleNo) continue outer;
 			}
-			List<Ban> maleBan = banRepository.findByUserNo(maleNo);
+			List<Ban> maleBan = banRepository.findByUserNoOrderByNoDesc(maleNo);
 			for (Ban ban : maleBan) {
 				if (ban.getBannedNo() == userNo) continue outer;
 			}
