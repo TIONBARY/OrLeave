@@ -50,7 +50,8 @@ export default {
           if (userType === 'Banned') {
             this.showModal = true
             this.modalContent = '해당 계정은 정지되어 사용할 수 없습니다.'
-            this.willPageMove = false
+            this.willPageMove = true
+            this.path = '/user/login'
             return
           }
           if (data.statusCode === 200) {
