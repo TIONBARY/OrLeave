@@ -111,9 +111,6 @@ export default {
         }
       )
     },
-    printLog(msg) {
-      console.log(msg)
-    },
     movePage() {
       if (this.willPageMove) {
         this.$router.push(this.path)

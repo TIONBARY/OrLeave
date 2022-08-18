@@ -92,7 +92,6 @@ export default {
       for (let i = 0; i < this.notices.content.length; i++) {
         this.notices.content[i].createdTime =
           this.notices.content[i].createdTime.split(' ')[0]
-        console.log(this.notices.content[i].createdTime)
       }
     }
   },

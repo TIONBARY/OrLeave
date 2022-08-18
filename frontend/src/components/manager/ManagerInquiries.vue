@@ -107,7 +107,6 @@ export default {
   methods: {
     ...mapActions(inquiryStore, ['inquiryDetail', 'inquiryList']),
     goManagerDetail(no) {
-      this.inquiryDetail(no)
       this.$router.push('/manager/inquiry/' + no)
     },
     async movepage() {
