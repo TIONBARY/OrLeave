@@ -82,8 +82,10 @@
 ![ERD](/uploads/01b894e01d525c9e802bd3f56d58b071/ERD.png)
 
 ## 요구사항 정의서
+[요구사항정의서](https://docs.google.com/spreadsheets/d/1iBTKCzx7lzYH7YWYYFgMEQgo3bqs2lh0LCCXyjAavOA/edit#gid=0)
 
 ## api 명세서
+[API명세서](https://docs.google.com/spreadsheets/d/1ihB1o0xKKdK35dzXh3goaO711LWoWAnFTGnUXBgJTcc/edit#gid=0)
 
 ## 기획배경
 
