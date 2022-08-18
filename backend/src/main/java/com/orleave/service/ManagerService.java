@@ -3,6 +3,7 @@ package com.orleave.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
@@ -23,4 +24,5 @@ public interface ManagerService {
 	void ModifyNotices(NoticeModifyRequestDto noticeModifyRequestDto)throws Exception;
 	void DeleteNotices(int no)throws Exception;
 	Page<InquiryListDto> getInquiries(Pageable pageable);
+	InquiryDetailDto getInquiryDetail(int no) throws Exception;
 }

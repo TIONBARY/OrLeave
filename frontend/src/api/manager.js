@@ -12,7 +12,10 @@ async function managerLogin(loginInfo, success, fail) {
 async function getAllUsers(page, size, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .get('/manager/users', { headers: { Authorization }, params: { page, size } })
+    .get('/manager/users', {
+      headers: { Authorization },
+      params: { page, size }
+    })
     .then(success)
     .catch(fail)
 }
@@ -20,7 +23,10 @@ async function getAllUsers(page, size, success, fail) {
 async function getUserReportList(page, size, userNo, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .get(`/manager/users/${userNo}`, { headers: { Authorization }, params: { page, size } })
+    .get(`/manager/users/${userNo}`, {
+      headers: { Authorization },
+      params: { page, size }
+    })
     .then(success)
     .catch(fail)
 }
@@ -44,7 +50,9 @@ async function BanUser(no, success, fail) {
 async function ModifyNickname(no, nickname, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .put('/manager/nickname', JSON.stringify({ no, nickname }), { headers: { Authorization } })
+    .put('/manager/nickname', JSON.stringify({ no, nickname }), {
+      headers: { Authorization }
+    })
     .then(success)
     .catch(fail)
 }
@@ -52,7 +60,10 @@ async function ModifyNickname(no, nickname, success, fail) {
 async function getInquiries(page, size, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .get('/manager/inquiries', { headers: { Authorization }, params: { page, size } })
+    .get('/manager/inquiries', {
+      headers: { Authorization },
+      params: { page, size }
+    })
     .then(success)
     .catch(fail)
 }
@@ -60,7 +71,21 @@ async function getInquiries(page, size, success, fail) {
 async function answerInquiry(inquiry, success, fail) {
   const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
   await api
-    .put('/manager/inquiry/answer', JSON.stringify(inquiry), { headers: { Authorization } })
+    .put('/manager/inquiry/answer', JSON.stringify(inquiry), {
+      headers: { Authorization }
+    })
+    .then(success)
+    .catch(fail)
+}
+
+function inquiryDetail(inquiryNo, success, fail) {
+  const Authorization = 'Bearer ' + sessionStorage.getItem('Authorization')
+  return api
+    .get(`/manager/inquiries/${inquiryNo}`, {
+      headers: {
+        Authorization: Authorization
+      }
+    })
     .then(success)
     .catch(fail)
 }
@@ -73,5 +98,6 @@ export {
   BanUser,
   ModifyNickname,
   getInquiries,
-  answerInquiry
+  answerInquiry,
+  inquiryDetail
 }

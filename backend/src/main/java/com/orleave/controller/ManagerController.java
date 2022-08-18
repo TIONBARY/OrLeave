@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orleave.auth.SsafyUserDetails;
+import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
@@ -31,6 +32,7 @@ import com.orleave.dto.request.NoticeModifyRequestDto;
 import com.orleave.dto.request.NoticeRequestDto;
 import com.orleave.dto.request.UserNoRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
+import com.orleave.dto.response.InquiryDetailResponseDto;
 import com.orleave.dto.response.InquiryListResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
 import com.orleave.dto.response.ReportDetailResponseDto;
@@ -253,6 +255,24 @@ public class ManagerController {
 		
 		Page<InquiryListDto> inquiryList = managerService.getInquiries(PageRequest.of(page, size, Sort.by("no").descending()));
 		return ResponseEntity.status(200).body(InquiryListResponseDto.of(200, "Success", inquiryList));
+	}
+	
+	@GetMapping("/inquiries/{no}")
+	@ApiOperation(value = "1:1문의 상세 조회", notes = "1:1문의 상세 정보를 조회한다.") 
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "성공"),
+        @ApiResponse(code = 401, message = "인증되지 않은 토큰"),
+        @ApiResponse(code = 403, message = "접근 권한 없음"),
+        @ApiResponse(code = 404, message = "1:1문의 조회 실패"),
+        @ApiResponse(code = 500, message = "서버 오류")
+    })
+	public ResponseEntity<? extends BaseResponseDto> getInquiryDetail(
+			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
+		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
+		int userNo = userDetails.getUserNo();
+		InquiryDetailDto inquiry = managerService.getInquiryDetail(no);
+		return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
 	}
 	
 	@PostMapping("/notices")

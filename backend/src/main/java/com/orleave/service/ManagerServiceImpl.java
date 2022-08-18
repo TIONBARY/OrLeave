@@ -3,11 +3,14 @@ package com.orleave.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
@@ -161,6 +164,22 @@ public class ManagerServiceImpl implements ManagerService{
 				);
 				
 		return inquiries;
+	}
+	
+	@Override
+	@Transactional
+	public InquiryDetailDto getInquiryDetail(int no) throws Exception {
+		Optional<Inquiry> inquiryTemp = inquiryRepository.findById(no);
+		if (!inquiryTemp.isPresent()) throw new InquiryNotFoundException();
+		Inquiry inquiry = inquiryTemp.get();
+		InquiryDetailDto dto = InquiryDetailDto.builder()
+				.no(inquiry.getNo())
+				.title(inquiry.getTitle())
+				.content(inquiry.getContent())
+				.answer(inquiry.getAnswer())
+				.createdTime(inquiry.getCreatedTime())
+				.build();
+		return dto;
 	}
 
 }
