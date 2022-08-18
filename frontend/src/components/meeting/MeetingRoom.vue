@@ -202,7 +202,11 @@
       </div>
     </div>
     <MeetingChat />
-    <ConfirmModal v-model="this.showModal" :modalContent="this.modalContent" />
+    <ConfirmModal
+      v-model="this.showModal"
+      @close="this.leaveSession"
+      :modalContent="this.modalContent"
+    />
   </div>
 </template>
 
@@ -241,9 +245,6 @@ export default {
   },
   data() {
     onMounted(() => {
-      this.opponentInfo.interests.forEach((index) => {
-        Array.prototype.push.apply(this.customQuestions, this.questions[index])
-      })
       if (this.sessionId === '' || this.isMatched === false) {
         this.$router.push('/404')
         return
@@ -280,7 +281,14 @@ export default {
               msgNickname !== this.myNickname
             ) {
               // 팝업을 띄워도 되고... 나가기 전에 알려주는 어떤 그런거
-              this.modalContent = '5초 후 방에서 나갑니다.'
+              let seconds = 5
+              const msg = '초 후 방에서 나갑니다.'
+              this.modalContent = seconds + '초 후 방에서 나갑니다.'
+              const msgInterval = setInterval(() => {
+                --seconds
+                if (seconds === 0) clearInterval(msgInterval)
+                this.modalContent = seconds + msg
+              }, 1000)
               this.showModal = true
               this.autoExit = setTimeout(this.leaveSession, 5000)
               return
@@ -295,7 +303,7 @@ export default {
               this.level++
               this.mySkip = false
               this.yourSkip = false
-              this.question_pick(this.level)
+              this.question_pick()
               if (this.level === 2) {
                 this.skipDisable = true
                 this.skip2 = setTimeout(() => {
@@ -330,28 +338,85 @@ export default {
       // 질문을 단계별, 상대의 취미 별로 나눠야함
       questions: [
         // [0]~[10]: 관심사
-        ['게임1', '게임2', '게임3'],
-        ['운동1', '운동2', '운동3'],
-        ['영화1', '영화2', '영화3'],
-        ['독서1', '독서2', '독서3'],
-        ['음악1', '음악2', '음악3'],
-        ['맛집탐방1', '맛집탐방2', '맛집탐방3'],
-        ['패션1', '패션2', '패션3'],
-        ['채식1', '채식2', '채식3'],
-        ['반려동물1', '반려동물2', '반려동물3'],
-        ['재테크1', '재테크2', '재테크3'],
-        ['자동차1', '자동차2', '자동차3'],
-        // [11]: 공통 질문
         [
-          '시작은 언제나 자기소개입니다.',
-          '간단하게 본인을 설명하세요',
-          '프로필 사진을 고른 이유를 물어보세요',
-          '시간대에 따라 식사를 하셨는지 물어보세요',
-          '좋아하는 영화나 음식을 물어 공감대를 형성해 보세요',
-          '오늘 날씨 얘기를 하는 것도 좋습니다.',
-          '인생 영화에 대해 물어보세요',
-          '여행 중 기억에 남는 에피소드를 물어보세요'
+          '즐겨하는 게임이 무엇인지 물어보세요.',
+          '좋아하는 e스포츠 선수가 있는지 물어보세요.',
+          '좋아하는 게임 유튜브가 있는지 물어보세요.'
+        ],
+        [
+          '평소 꾸준히 하는 운동이 있는지 물어보세요.',
+          '즐겨 보는(하는) 스포츠에 대해 물어보세요.',
+          '좋아하는 운동 선수가 있는지 물어보세요.'
+        ],
+        [
+          '어떤 장르의 영화를 좋아하는지 물어보세요.',
+          '가장 최근 본 영화를 물어보세요.',
+          '인생 영화가 무엇인지 물어보세요.'
+        ],
+        [
+          '어떤 장르의 책을 좋아하는지 물어보세요.',
+          '가장 최근에 본 책을 물어보세요.',
+          '가장 감명깊게 읽은 책에 대해 물어보세요.'
+        ],
+        [
+          '어떤 장르의 음악을 좋아하는지 물어보세요.',
+          '좋아하는 가수가 누구인지 물어보세요.',
+          '가장 좋아하는 노래를 물어보세요.'
+        ],
+        [
+          '인생 최고의 맛집은 어디였는지 물어보세요.',
+          '대체로 어떤 맛집을 탐방하는지 물어보세요.',
+          '자신이 가봤던 맛집을 소개해보세요.'
+        ],
+        [
+          '패션에 얼마나 관심이 있는지 물어보세요.',
+          '어떤 패션을 선호하는지 물어보세요.',
+          '패션에 관심이 생긴 계기를 물어보세요.'
+        ],
+        [
+          '왜 보드게임을 좋아하는지 물어보세요.',
+          '보드게임 카페에 자주 가는지 물어보세요.',
+          '가장 좋아하는 보드게임을 물어보세요.'
+        ],
+        [
+          '반려동물 유튜브를 보는지 물어보세요.',
+          '반려동물과의 특별한 추억을 물어보세요.',
+          '동물로 환생한다면, 어떻게 하고싶은지 물어보세요.'
+        ],
+        [
+          '자신있는 요리를 물어보세요.',
+          '가장 최근에 한 요리를 물어보세요.',
+          '인생 처음으로 했던 요리를 물어보세요.'
+        ],
+        [
+          '정중하게 상대의 백준 티어를 물어보세요.',
+          '같이 모각코 할 생각이 있는지 물어보세요.',
+          '기억에 남는 알고리즘 문제에 대해 물어보세요.'
+        ],
+        // [11]~[21]: 성격
+        ['상대는 차분한 사람입니다. 귀를 기울여 보아요.'],
+        ['상대는 발랄한 사람입니다. 텐션에 놀라지 마세요.'],
+        ['상대는 센스있는 사람입니다. 유심히 지켜보세요.'],
+        ['상대의 배려심을 주목하세요.'],
+        ['상대는 자신감이 넘치고 당당한 사람입니다.'],
+        ['상대는 어떤 상황에서도 항상 열정적입니다.'],
+        ['상대는 부지런한 사람이네요!'],
+        ['상대는 매사에 긍정적인 편입니다.'],
+        ['상대는 세심한 성격의 소유자입니다.'],
+        ['상대방은 온화한 사람입니다. 존중하며 대화해요.'],
+        ['상대는 솔직한 사람입니다. 조금 직설적인가요?'],
+        // [22]: 공통 질문
+        [
+          '프로필 사진을 고른 이유를 물어보세요.',
+          '시간대에 따라 식사를 하셨는지 물어보세요.',
+          '좋아하는 것을 얘기하며 공감대를 형성해 보세요.',
+          '요즘 날씨에 대해 얘기해볼까요?',
+          '친구들 사이에서 어떤 이미지인지 물어보세요.',
+          '가족들 사이에서 어떤 이미지인지 물어보세요.'
         ]
+        // mbti질문 무조건 하나(모름이면 안넣기), 관심사 랜덤으로 하나?, 성격 랜덤으로 하나?
+        // 공통질문1 + MBTI질문0/1 + 관심사당질문1*1~3 + 성격당질문1*1~3
+        // 나온 질문은 pop
       ],
       customQuestions: [],
       reportOptions: [
@@ -390,17 +455,10 @@ export default {
 
   methods: {
     ...mapActions(meetingStore, ['setSessionId', 'setIsMatched']),
-    question_pick(level) {
-      // this.opponentInfo 에서 관심사를 찾아서 거기서 랜덤을 돌려야 함
-      if (level === 1) {
-        this.question = this.questions[11].at(
-          Math.floor(Math.random() * this.questions.length)
-        )
-      } else {
-        this.question = this.customQuestions.at(
-          Math.floor(Math.random() * this.customQuestions.length)
-        )
-      }
+    question_pick() {
+      const rand = Math.floor(Math.random() * this.customQuestions.length)
+      const picked = this.customQuestions.pop(rand)
+      this.question = picked
     },
     // 오디오 비디오 토글
     toggleAudio() {
@@ -533,14 +591,6 @@ export default {
         {},
         JSON.stringify(msg)
       )
-      // if (this.level === 2) {
-      //   this.publisher.stream
-      //     .removeFilter()
-      //     .then(() => {})
-      //     .catch((error) => {
-      //       console.error(error)
-      //     })
-      // }
     },
     report() {
       const reportedNo = this.opponentInfo.no
@@ -550,7 +600,25 @@ export default {
     }
   },
   beforeMount() {
-    this.question_pick(1)
+    // 공통질문 push
+    this.customQuestions.push(
+      this.questions[22].at(
+        Math.floor(Math.random() * this.questions[22].length)
+      )
+    )
+    // 관심사질문 push
+    this.opponentInfo.interests.forEach((index) => {
+      const picked = this.questions[index].at(Math.floor(Math.random() * 3))
+      this.customQuestions.push(picked)
+    })
+    // 성격질문 push
+    this.opponentInfo.personalities.forEach((index) => {
+      Array.prototype.push.apply(
+        this.customQuestions,
+        this.questions[index + 11]
+      )
+    })
+    this.question_pick()
   }
 }
 </script>
@@ -578,6 +646,7 @@ export default {
   width: 500px;
   height: 375px;
   overflow: hidden;
+  border-radius: 10px;
 }
 .disabled {
   filter: grayscale(80%);

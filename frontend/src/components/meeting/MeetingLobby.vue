@@ -1,9 +1,12 @@
 <template>
   <div>
-    <br />
-    <h2>매칭 중 ...</h2>
-    <br />
-    <div class="row q-gutter-md justify-center items-center">
+    <q-img
+      class="q-ma-lg"
+      :src="require('../../assets/logo_l.png')"
+      alt="image"
+      style="width: 100%; max-width: 300px"
+    />
+    <div class="q-mt-lg row q-gutter-md justify-center items-center">
       <div id="user-video" class="video-container"></div>
       <div>
         <q-img
@@ -654,5 +657,7 @@ export default {
 .video-container {
   width: 500px;
   height: 375px;
+  overflow: hidden;
+  border-radius: 10px;
 }
 </style>
