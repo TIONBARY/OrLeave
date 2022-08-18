@@ -70,7 +70,6 @@
                   type="textarea"
                   dense
                   autofocus
-                  counter
                   hint="저장하려면 esc를 누르세요"
                   @keyup.esc="modifyAnswer(this.inquiry.no, scope.value)"
                 />

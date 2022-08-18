@@ -40,6 +40,7 @@
                     dense
                     autofocus
                     counter
+                    hint="저장하려면 enter를 누르세요"
                     @keyup.enter="
                       nicknameChange(user.no, scope.value, user.nickname)
                     "

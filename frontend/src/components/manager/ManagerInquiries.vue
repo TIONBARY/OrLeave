@@ -32,7 +32,7 @@
               {{ inquiry.createdTime.split(' ')[0] }}
             </td>
             <td class="q-pa-md" style="text-align: center">
-              <q-icon v-if="inquiry.answered" name="check_box" />
+              <q-icon v-if="!inquiry.answered" name="check_box" />
               <q-icon v-else name="check_box_outline_blank" />
             </td>
           </tr>
