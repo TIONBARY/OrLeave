@@ -1,11 +1,17 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg"
-      :src="require('../../assets/logo_l.png')"
+      class="q-ma-lg absolute-top-left cursor-pointer"
+      :src="require('../../assets/logo_manager.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 80%; max-width: 200px"
+      @click="this.$router.push('/manager/main')"
     />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <hr />
     <div class="q-pa-xl">
       <section class="basic-container">
@@ -14,33 +20,54 @@
             공지사항
           </th>
           <tr>
-            <td class="q-pa-md" style="width: 10%">제목</td>
             <td
-              class="q-pa-md"
-              style="text-align: start; background-color: white"
+              class="q-pa-sm inquiryBox text-weight-bold"
+              style="text-align: start"
             >
               {{ this.notice.title }}
             </td>
           </tr>
           <tr>
+            <td class="q-pl-sm text-left" style="font-size: 15px">
+              {{ this.notice.createdTime.split(' ')[0] }}
+            </td>
+          </tr>
+          <q-separator size="2px" />
+          <tr>
             <td
               colspan="2"
-              class="q-pa-md"
-              style="text-align: start; background-color: white"
+              class="q-pa-sm inquiryBox vertical-top"
+              style="text-align: start; height: 200px"
             >
-              {{ this.notice.content }}
+              <div v-html="this.notice.content" />
+            </td>
+          </tr>
+          <tr style="margin: 10px 0">
+            <td colspan="2" class="text-right">
+              <q-btn
+                @click="modifynotice(this.notice.no)"
+                class="primary"
+                style="margin-right: 10px"
+                >수정</q-btn
+              >
+              <q-btn @click="asknotice()" class="negative">삭제</q-btn>
             </td>
           </tr>
         </table>
-          <q-btn @click="modifynotice(this.notice.no)">수정</q-btn>
-          <q-btn @click="asknotice()">삭제</q-btn>
       </section>
       <br />
-      <div>
-        <router-link to="../notice/list">목록으로</router-link>
-      </div>
-    <ConfirmModal v-model="this.show" @close="movePage" :modalContent="this.content" />
-    <ChoiceModal v-model="this.Cshow" @confirm="deletenotice(this.notice.no)" :modalContent="this.content" />
+
+      <q-btn class="secondary" label="목록으로" to="/manager/notice/list" />
+      <ConfirmModal
+        v-model="this.show"
+        @close="movePage"
+        :modalContent="this.content"
+      />
+      <ChoiceModal
+        v-model="this.Cshow"
+        @confirm="deletenotice(this.notice.no)"
+        :modalContent="this.content"
+      />
     </div>
   </div>
 </template>
@@ -97,7 +124,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg absolute-top-left"
+      class="q-ma-lg absolute-top-left cursor-pointer"
       :src="require('../../assets/logo_manager.png')"
       alt="image"
       style="width: 80%; max-width: 200px"
@@ -16,7 +16,7 @@
     <div class="q-pa-xl">
       <section class="basic-container">
         <table>
-          <th colspan="2" class="q-pa-md" style="text-align: start">
+          <th colspan="4" class="q-pa-md" style="text-align: start">
             문의 목록
           </th>
           <tr :key="inquiry" v-for="inquiry in inquiryList">
@@ -29,15 +29,18 @@
               </div>
             </td>
             <td class="q-pa-md" style="text-align: end">
-              {{ inquiry.created_time }}
+              {{ inquiry.createdTime.split(' ')[0] }}
+            </td>
+            <td class="q-pa-md" style="text-align: center">
+              <q-icon v-if="inquiry.answered" name="check_box" />
+              <q-icon v-else name="check_box_outline_blank" />
             </td>
           </tr>
         </table>
       </section>
-      <br />
       <div class="q-pa-lg flex flex-center" @click="movePage">
         <q-pagination
-          v-model="currentPage"
+          v-model="this.pageNum"
           :max="this.totalPages"
           :max-pages="this.maxPages"
           direction-links
@@ -59,7 +62,7 @@ import { getInquiries } from '@/api/manager'
 
 const userStore = 'userStore'
 const inquiryStore = 'inquiryStore'
-const perPage = ref(10)
+const perPage = ref(5)
 const currentPage = ref(1)
 
 export default {
@@ -95,31 +98,47 @@ export default {
   },
   created() {
     this.getInquiryList()
-    // this.inquiries = this.getinquiries
-    // console.log(this.getinquiries)
+  },
+  watch: {
+    pageNum: function () {
+      this.movepage()
+    }
   },
   methods: {
-    ...mapActions(inquiryStore, [
-      'getinquiries',
-      'inquiryDetail',
-      'inquiryList'
-    ]),
+    ...mapActions(inquiryStore, ['inquiryDetail', 'inquiryList']),
     goManagerDetail(no) {
       this.inquiryDetail(no)
       this.$router.push('/manager/inquiry/' + no)
     },
-    async movepage(num) {
-      await this.inquiryList(num - 1)
+    async movepage() {
+      await this.getInquiryList()
     },
     getInquiryList() {
       getInquiries(
         this.pageNum - 1,
-        this.pageSize,
+        this.perPage,
         ({ data }) => {
           this.inquiryList = data.inquiryList.content
           this.totalPages = data.inquiryList.totalPages
         },
-        ({ response }) => {}
+        ({ response }) => {
+          if (response.status === 401) {
+            this.modalContent = '로그인이 만료되었습니다. 로그인해주세요.'
+            this.path = '/manager/login'
+          } else if (
+            response.status === 403 &&
+            response.data &&
+            response.data.message === 'Not Manager'
+          ) {
+            this.modalContent = '관리자만 접근 가능합니다.'
+            this.path = '/'
+          } else {
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.path = '/manager/main'
+          }
+          this.showModal = true
+          this.willPageMove = true
+        }
       )
     }
   }
@@ -128,7 +147,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {

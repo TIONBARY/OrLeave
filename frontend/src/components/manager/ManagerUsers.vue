@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg absolute-top-left"
+      class="q-ma-lg absolute-top-left cursor-pointer"
       :src="require('../../assets/logo_manager.png')"
       alt="image"
       style="width: 80%; max-width: 200px"

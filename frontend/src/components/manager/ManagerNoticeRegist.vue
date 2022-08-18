@@ -1,11 +1,17 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg"
-      :src="require('../../assets/logo_l.png')"
+      class="q-ma-lg absolute-top-left cursor-pointer"
+      :src="require('../../assets/logo_manager.png')"
       alt="image"
-      style="width: 20%; height: 20%"
+      style="width: 80%; max-width: 200px"
+      @click="this.$router.push('/manager/main')"
     />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <hr />
     <div class="q-pa-xl">
       <section class="basic-container">
@@ -15,8 +21,8 @@
               공지사항
             </th>
             <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
-                공지 제목
+              <td class="q-pa-md" style="width: 20%; text-align: center">
+                제목
               </td>
               <td>
                 <q-input
@@ -28,8 +34,8 @@
               </td>
             </tr>
             <tr>
-              <td class="q-pa-md" style="width: 20%; text-align: start">
-                공지 내용
+              <td class="q-pa-md" style="width: 20%; text-align: center">
+                내용
               </td>
               <td>
                 <q-editor
@@ -54,12 +60,18 @@
               </td>
             </tr>
           </table>
-          <q-btn label="공지등록" type="submit" color="primary" />
+          <br />
+          <q-btn label="등록" type="submit" color="primary" />
+          <q-btn label="취소" to="/manager/notice/list" class="negative" />
         </q-form>
         <br />
       </section>
       <br />
-    <ConfirmModal v-model="this.show" @close="movePage" :modalContent="this.content" />
+      <ConfirmModal
+        v-model="this.show"
+        @close="movePage"
+        :modalContent="this.content"
+      />
     </div>
   </div>
 </template>
@@ -84,7 +96,6 @@ export default {
       content,
 
       editor: ref(null)
-
     }
   },
   components: {
@@ -112,7 +123,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {

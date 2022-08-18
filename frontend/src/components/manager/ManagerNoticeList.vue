@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-img
-      class="q-ma-lg absolute-top-left"
+      class="q-ma-lg absolute-top-left cursor-pointer"
       :src="require('../../assets/logo_manager.png')"
       alt="image"
       style="width: 80%; max-width: 200px"
@@ -34,15 +34,17 @@
             </td>
           </tr>
         </table>
+        <div class="right row justify-end q-pt-lg">
+          <q-btn class="primary" @click="move('managerNoticeRegist')"
+            >글쓰기</q-btn
+          >
+        </div>
       </section>
-      <div class="q-pa-lg">
-        <q-btn @click="move('managerNoticeRegist')">글쓰기</q-btn>
-      </div>
       <div class="q-pa-lg flex flex-center" @click="movePage">
         <q-pagination
-          v-model="current"
+          v-model="currentPage"
           :max="this.notices.totalPages"
-          :max-pages="3"
+          :max-pages="this.maxPages"
           direction-links
           boundary-links
           icon-first="skip_previous"
@@ -57,9 +59,9 @@
 
 <script>
 import { ref } from 'vue'
-
 import { mapState, mapActions } from 'vuex'
 const noticeStore = 'noticeStore'
+const maxPages = ref(10)
 
 export default {
   setup() {
@@ -67,7 +69,8 @@ export default {
     return {
       page,
       pageNum: 0,
-      current: ref(1)
+      currentPage: ref(1),
+      maxPages
     }
   },
   computed: {
@@ -94,7 +97,7 @@ export default {
     }
   },
   watch: {
-    current: function (num) {
+    currentPage: function (num) {
       this.movepage(num)
     }
   },
@@ -107,7 +110,9 @@ export default {
 
 <style scoped>
 .basic-container {
-  width: 50%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 table {

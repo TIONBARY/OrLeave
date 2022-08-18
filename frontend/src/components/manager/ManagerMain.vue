@@ -8,6 +8,7 @@
       alt="image"
       style="width: 100%; max-width: 300px"
       @click="this.$router.push('/manager/main')"
+      no-spinner
     />
     <!-- Content -->
     <!-- Login -->
