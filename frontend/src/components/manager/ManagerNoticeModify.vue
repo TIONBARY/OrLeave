@@ -97,7 +97,6 @@ export default {
     ConfirmModal
   },
   created() {
-    console.log(this.notice)
     this.noticemod.title = this.notice.title
     this.noticemod.content = this.notice.content
     this.noticemod.no = this.notice.no
@@ -109,7 +108,6 @@ export default {
     ...mapActions(noticeStore, ['noticeModify']),
     async onSubmit() {
       await this.noticeModify(this.noticemod)
-      console.log(this.modalContent)
       this.show = this.showModal
       this.content = this.modalContent
     },
