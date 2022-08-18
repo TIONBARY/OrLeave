@@ -34,8 +34,11 @@
             </tr>
           </template>
         </table>
+        <div class="right row justify-end q-pt-lg">
+          <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
+        </div>
       </section>
-      <div class="q-pa-lg flex flex-center">
+      <div class="q-pa-lg flex flex-center" @click="movePage">
         <q-pagination
           v-model="this.pageNum"
           :max="this.totalPages"
@@ -48,7 +51,6 @@
           icon-next="fast_forward"
         />
       </div>
-      <q-btn @click="moveRegist()" class="primary">문의하기</q-btn>
     </div>
     <ConfirmModal
       v-model="this.showConfirmModal"
@@ -168,9 +170,5 @@ th {
 
 tr {
   border-bottom: 1px solid #979797;
-}
-
-a {
-  color: black;
 }
 </style>

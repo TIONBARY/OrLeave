@@ -72,14 +72,8 @@ const userStore = {
     async checkEmail({ commit }, email) {
       await checkEmailExist(
         email,
-        (response) => {
-          if (response.data.statusCode === 200) {
-            console.log("email doesn't exist, SUCCESS!")
-          } else {
-            console.log('email exists, FAIL!')
-          }
-        },
-        (error) => console.log(error)
+        () => {},
+        (error) => console.warn(error)
       )
     },
 
@@ -87,13 +81,7 @@ const userStore = {
     async sendConfirmKey({ commit }, email) {
       await setConfirmKey(
         email,
-        (response) => {
-          if (response.data.statusCode === 200) {
-            console.log('succeeded to send confirm key')
-          } else {
-            console.log('failed to send confirm key')
-          }
-        },
+        () => {},
         (error) => console.warn(error)
       )
     },
@@ -105,13 +93,7 @@ const userStore = {
     async signup({ commit }, signupInfo) {
       await trySignup(
         signupInfo,
-        (response) => {
-          if (response.data.statusCode === 200) {
-            console.log('회원가입 성공!')
-          } else {
-            console.log('회원가입 실패!')
-          }
-        },
+        () => {},
         (error) => {
           console.warn(error)
         }
@@ -124,16 +106,21 @@ const userStore = {
         (response) => {
           commit('SET_PROFILE', response.data.profile)
         },
-        (error) => console.log(error)
+        (error) => console.warn(error)
       )
     },
 
     async modifyProfile({ commit }) {
       await requestModifyProfile(
         this.profile,
-        (response) => {},
+        (response) => {
+          if (response.data.statusCode === 200) {
+            const token = response.data.authorization
+            sessionStorage.setItem('Authorization', token)
+          }
+        },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -144,7 +131,7 @@ const userStore = {
           commit('SET_BANUSER_LIST', response.data.banList)
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -166,7 +153,7 @@ const userStore = {
         no,
         (response) => {},
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     },
@@ -177,7 +164,7 @@ const userStore = {
           commit('SET_MEETINGUSER_LIST', response.data.meetingLogList)
         },
         (error) => {
-          console.log(error)
+          console.warn(error)
         }
       )
     }

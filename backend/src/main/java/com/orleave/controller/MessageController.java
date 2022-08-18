@@ -27,12 +27,8 @@ public class MessageController {
 	
 	@MessageMapping("/match")
 	@SendTo("/sub/match")
-	public MatchingSendInfo matchingFounded(MatchingReceiveInfo message) throws Exception {
-		MatchingSendInfo sendInfo = new MatchingSendInfo();
-		sendInfo.setFemale(matchingService.getUserInfo(message.getFemaleNo()));
-		sendInfo.setMaleNo(message.getMaleNo());
-		sendInfo.setRoomId(message.getRoomId());		
-		return sendInfo;
+	public MatchingSendInfo matchingFounded(MatchingSendInfo message) throws Exception {		
+		return message;
 	}
 	
 	@MessageMapping("/chat/{roomId}")

@@ -11,5 +11,7 @@ import com.orleave.entity.MeetingLog;
 @Repository
 public interface MeetingLogRepository extends JpaRepository<MeetingLog, Integer> {
 	Long countByUser1No(int no);
-	List<MeetingLog> findByUser1NoAndCreatedTimeBetween(int userNo, LocalDateTime fromDateTime, LocalDateTime toDateTime);
+	List<MeetingLog> findTop5ByUser1NoAndCreatedTimeBetweenOrderByNoDesc(int userNo, LocalDateTime fromDateTime, LocalDateTime toDateTime);
+	long deleteByUser1No(int user1No);
+	long deleteByUser2(int user2);
 }

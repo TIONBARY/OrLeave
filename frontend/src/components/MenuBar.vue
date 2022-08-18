@@ -1,7 +1,11 @@
 <template>
   <div>
     <!-- 익명(로그인하지 않았을 때) -->
-    <q-avatar v-if="nickname===null" size="90px" class="q-ma-lg fixed-top-right">
+    <q-avatar
+      v-if="nickname === null"
+      size="90px"
+      class="q-ma-lg fixed-top-right"
+    >
       <q-btn round v-close-popup style="margin: 2px">
         <img
           :src="require('../assets/anonymous.png')"
@@ -23,7 +27,7 @@
             <q-item-section>
               <div>
                 <q-img :src="require('../assets/anonymous.png')" width="80px" />
-                <span class="q-ma-md" style="font-size: 24px"
+                <span class="q-ma-md" style="font-size: 20px"
                   ><router-link to="/user/login">로그인</router-link> |
 
                   <router-link to="/user/signup/account"
@@ -35,21 +39,20 @@
           </q-item>
           <q-separator color="black" />
           <router-link to="/notice/list">
-          <q-item clickable>
-            <q-item-section>공지사항</q-item-section>
-          </q-item>
-          </router-link>
-          <router-link to="/inqiury/list">
-          <q-item clickable>
-            <q-item-section>1:1문의</q-item-section>
-          </q-item>
+            <q-item clickable>
+              <q-item-section>공지사항</q-item-section>
+            </q-item>
           </router-link>
         </q-menu>
       </q-btn>
     </q-avatar>
     <!-- 로그인되어있는 상태 -->
 
-    <q-avatar v-if="nickname!=null" size="90px" class="q-ma-lg fixed-top-right">
+    <q-avatar
+      v-if="nickname != null"
+      size="90px"
+      class="q-ma-lg fixed-top-right"
+    >
       <q-btn round v-close-popup style="margin: 2px">
         <img
           :src="require('../assets/profile/' + imageno + '.png')"
@@ -74,37 +77,39 @@
                   :src="require('../assets/profile/' + imageno + '.png')"
                   width="80px"
                 />
-                <span class="q-ma-md" style="font-size: 24px">{{nickname}} 님</span>
+                <span class="q-ma-md" style="font-size: 24px"
+                  >{{ nickname }} 님</span
+                >
               </div>
             </q-item-section>
           </q-item>
           <q-separator color="black" />
           <router-link to="/user/modify/profile">
-          <q-item clickable>
-            <q-item-section>프로필 수정</q-item-section>
-          </q-item>
+            <q-item clickable>
+              <q-item-section>프로필 수정</q-item-section>
+            </q-item>
           </router-link>
-           <router-link to="/user/modify/account">
-          <q-item clickable>
-            <q-item-section>계정정보 수정</q-item-section>
-          </q-item>
-           </router-link>
+          <router-link to="/user/modify/account">
+            <q-item clickable>
+              <q-item-section>계정정보 수정</q-item-section>
+            </q-item>
+          </router-link>
           <q-separator />
           <router-link to="/notice/list">
-          <q-item clickable>
-            <q-item-section>공지사항</q-item-section>
-          </q-item>
+            <q-item clickable>
+              <q-item-section>공지사항</q-item-section>
+            </q-item>
           </router-link>
-           <router-link to="/inquiry/list">
-          <q-item clickable>
-            <q-item-section>1:1문의</q-item-section>
-          </q-item>
-           </router-link>
+          <router-link to="/inquiry/list">
+            <q-item clickable>
+              <q-item-section>1:1문의</q-item-section>
+            </q-item>
+          </router-link>
           <q-item clickable>
             <q-item-section @click="popupBlock = true">차단관리</q-item-section>
           </q-item>
           <q-separator />
-          <q-item clickable >
+          <q-item clickable>
             <q-item-section @click="Logout">로그아웃</q-item-section>
           </q-item>
         </q-menu>
@@ -120,7 +125,7 @@
         </q-bar>
         <q-card-section class="popup-text">
           차단리스트
-          <div style="background-color: white">
+          <div style="background-color: white" class="bannedList">
             <div
               :key="block.bannedUserNickname"
               v-for="(block, index) in banuserlist"
@@ -173,7 +178,13 @@ export default {
     ...mapState(userStore, ['SET_LOGOUT', 'banuserlist', 'meetinguserlist'])
   },
   methods: {
-    ...mapActions(userStore, ['logout', 'getBanuser', 'deleteBanuser', 'getmeetinglog', 'addBanuser']),
+    ...mapActions(userStore, [
+      'logout',
+      'getBanuser',
+      'deleteBanuser',
+      'getmeetinglog',
+      'addBanuser'
+    ]),
     Logout() {
       this.logout()
     },
@@ -200,7 +211,7 @@ export default {
 </script>
 <style scoped>
 a {
-  color: black;
+  font-size: 100%;
 }
 .popup {
   background: #f3f1eb;
@@ -219,5 +230,9 @@ a {
   width: 30%;
   min-width: 450px;
   max-width: 550px;
+}
+.bannedList {
+  height:150px;
+  overflow:auto;
 }
 </style>

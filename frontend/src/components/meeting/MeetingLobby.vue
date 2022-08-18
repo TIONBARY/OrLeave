@@ -1,12 +1,18 @@
 <template>
   <div>
-    <br />
-    <h2>매칭 중 ...</h2>
-    <br />
-    <div class="row q-gutter-md justify-center items-center">
+    <q-img
+      class="q-ma-lg"
+      :src="require('../../assets/logo_l.png')"
+      alt="image"
+      style="width: 100%; max-width: 300px"
+    />
+    <div class="q-mt-lg row q-gutter-md justify-center items-center">
       <div id="user-video" class="video-container"></div>
       <div>
-        <q-img :src="require('../../assets/profile/' + imageNo + '.png')" width="30%" />
+        <q-img
+          :src="require('../../assets/profile/' + imageNo + '.png')"
+          width="30%"
+        />
         <q-btn
           color="primary"
           @click="alert = true"
@@ -25,7 +31,7 @@
                   <tr>
                     <td width="10%">나이</td>
                     <td width="70%" class="q-px-ml">
-                      {{ setting.age_min }} - {{ setting.age_max }}
+                      {{ setting.ageMin }} - {{ setting.ageMax }}
                     </td>
                   </tr>
                   <q-separator inset />
@@ -135,18 +141,35 @@
       </div>
     </div>
     <br />
-    <div>
-      <q-btn label="매칭 취소" color="secondary" @click="stopMatch()"></q-btn>
-    </div>
+    <template v-if="!isMatching">
+      <div class="q-gutter-md">
+        <q-btn label="매칭 시작" color="primary" @click="startMatch()" />
+        <q-btn
+          label="메인으로"
+          color="secondary"
+          @click="this.$router.push('/')"
+        />
+      </div>
+    </template>
+    <template v-else>
+      <div class="q-gutter-md">
+        <q-btn label="매칭 취소" color="secondary" @click="cancelMatch()" />
+        <q-btn label="메인으로" color="secondary" @click="backToMain()" />
+      </div>
+    </template>
     <MatchModal
       v-model="this.showChoiceModal"
       @confirm="confirm"
       @close="close"
       @changeDisable="this.disable = true"
-      :imageNo="opponentInfo.imageNo+''"
+      :imageNo="opponentInfo.imageNo + ''"
       :modalContent="this.modalContent"
       :disable="this.disable"
       @hide="this.disable = false"
+    />
+    <ConfirmModal
+      v-model="this.showModal"
+      :modalContent="this.confirlModalContent"
     />
   </div>
 </template>
@@ -168,24 +191,26 @@ import { WEBSOCKET_URL } from '@/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import MatchModal from './MatchModal.vue'
+import ConfirmModal from '../ConfirmModal.vue'
 
 const meetingStore = 'meetingStore'
 
 // stompClient.debug = null // disable stomp loggings
 
-let interval = null
-
 export default {
   name: 'App',
 
-  components: { MatchModal },
+  components: { MatchModal, ConfirmModal },
 
   data() {
     onMounted(() => {
       this.imageNo = this.myProfile().imageNo
       // 미팅 설정 가져오기
-      getMeetingSetting().then(
-        (res) => (this.setting = res.data.meetingsetting)
+      getMeetingSetting(
+        (res) => {
+          this.setting = res.data.meetingSetting
+        },
+        (error) => console.warn(error)
       )
       // 현재 위치 설정
       navigator.geolocation.getCurrentPosition((loc) => {
@@ -194,23 +219,16 @@ export default {
       })
       // 로비 세션 입장
       this.joinSession()
-
-      // 공통 구독 (모든 회원이 구독함)
-      this.commonSubscribe('/sub/match')
-
-      // 여자는 5초에 한 번씩 매칭확인API 호출
-      // (상대를 찾으면 공통 구독에 message를 보냄)
-      if (this.myProfile().gender === 'F') {
-        interval = this.intervalMatching()
-      }
     })
     onUnmounted(() => {
       // 여기서 clearInterval을 해야됨.
-      clearInterval(interval)
+      clearInterval(this.interval)
       this.leaveSession()
     })
 
     return {
+      interval: null,
+
       socket: null,
       stompClient: null,
 
@@ -218,8 +236,8 @@ export default {
 
       disable: false,
       imageNo: 1,
-      myInfo: null,
-      opponentInfo: { imageNo: 1 },
+      myInfo: {},
+      opponentInfo: {},
 
       myGender: null,
       myNo: null,
@@ -231,6 +249,11 @@ export default {
       mAccepted: 0,
       fAccepted: 0,
       // ~ modal
+
+      // confirm modal ~
+      showModal: false,
+      confirlModalContent: '매칭이 거절되었습니다.',
+      // ~ confirm modal
 
       OV: undefined,
       session: undefined,
@@ -253,7 +276,9 @@ export default {
       mySessionId: new Date().toISOString() + Math.floor(Math.random() * 10000), // 임시로 현재 시간 + 4자리 난수로 설정
       myUserName: 'Participant' + Math.floor(Math.random() * 100), // 사용자의 이름으로 바꿔야함
 
-      alert: false
+      alert: false,
+
+      isMatching: false
     }
   },
   computed: {
@@ -270,13 +295,13 @@ export default {
     filtered_drink() {
       let a = ''
       let b = ''
-      if (this.setting.drink_min === 0) a = '안함'
-      else if (this.setting.drink_min === 1) a = '가끔'
-      else if (this.setting.drink_min === 2) a = '자주'
+      if (this.setting.drinkMin === 0) a = '안함'
+      else if (this.setting.drinkMin === 1) a = '가끔'
+      else if (this.setting.drinkMin === 2) a = '자주'
       else a = 'unknown'
-      if (this.setting.drink_max === 0) b = '안함'
-      else if (this.setting.drink_max === 1) b = '가끔'
-      else if (this.setting.drink_max === 2) b = '자주'
+      if (this.setting.drinkMax === 0) b = '안함'
+      else if (this.setting.drinkMax === 1) b = '가끔'
+      else if (this.setting.drinkMax === 2) b = '자주'
       else b = 'unknown'
       return a + ' ~ ' + b
     },
@@ -310,7 +335,7 @@ export default {
             this.modalContent = res.data.user.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
             this.opponentInfo = { ...res.data.user } // 여자가 남자의 정보 저장
-            clearInterval(interval)
+            clearInterval(this.interval)
 
             this.newSessionId =
               this.myProfile().NickName + new Date().toISOString()
@@ -324,17 +349,33 @@ export default {
               JSON.stringify({
                 roomId: this.newSessionId,
                 maleNo: res.data.user.no,
-                femaleNo: this.myProfile().sub
+                female: this.myInfo
               })
             )
           }
         },
-        () => console.log('매칭에 실패했습니다.')
+        () => console.warn('매칭에 실패했습니다.')
       )
     },
+    startMatch() {
+      this.isMatching = true
+      // 공통 구독 (모든 회원이 구독함)
+      this.commonSubscribe('/sub/match')
 
-    stopMatch() {
+      // 여자는 5초에 한 번씩 매칭확인API 호출
+      // (상대를 찾으면 공통 구독에 message를 보냄)
+      if (this.myProfile().gender === 'F') {
+        this.interval = this.intervalMatching()
+      }
+    },
+    cancelMatch() {
       stopMatching()
+      this.isMatching = false
+      clearInterval(this.interval)
+      this.stompClient.disconnect()
+    },
+    backToMain() {
+      if (this.isMatching) stopMatching()
       this.stompClient.disconnect()
       this.$router.push('/')
     },
@@ -344,21 +385,24 @@ export default {
       this.socket = new SockJS(WEBSOCKET_URL) // config로 옮겨야됨!!!!!!!!
       this.stompClient = Stomp.over(this.socket)
       this.stompClient.connect({}, (frame) => {
-        startMatching(this.location)
+        startMatching(
+          this.location,
+          (res) => {
+            this.myInfo = res.data.user
+          },
+          (err) => console.warn(err)
+        )
         this.stompClient.subscribe(url, (msg) => {
           const response = JSON.parse(msg.body)
-          const myInfo = this.myProfile()
           if (
-            myInfo.gender === 'M' &&
-            response.maleNo === parseInt(myInfo.sub)
+            this.myGender === 'M' &&
+            response.maleNo === parseInt(this.myInfo.no)
           ) {
             this.opponentInfo = response.female
-            console.log(this.opponentInfo)
             this.modalContent =
               response.female.nickname + '님과 매칭되었습니다.'
             this.showChoiceModal = true
             this.setSessionId(response.roomId)
-            console.log('3' + response.roomId)
             this.subscribeSession()
             // 11초
           }
@@ -369,12 +413,9 @@ export default {
     // modal ~
     // 둘다 구독 시작 (setTimeout 11초 후 거절했다는 팝업창)
     subscribeSession() {
+      stopMatching()
       this.stompClient.subscribe('/sub/chat/' + this.sessionId, (msg) => {
         const res = JSON.parse(msg.body)
-        console.log('res')
-        console.log(res)
-        console.log(parseInt(res.nickname) + '@' + this.myNo)
-        console.log(typeof parseInt(res.nickname) + '@' + typeof this.myNo)
         if (parseInt(res.nickname) === this.myNo) {
           if (this.myGender === 'M') this.mAccepted = res.content === 'true'
           else this.fAccepted = res.content === 'true'
@@ -383,14 +424,10 @@ export default {
           else this.mAccepted = res.content === 'true'
           this.opponentNo = parseInt(res.nickname)
         }
-
-        console.log('m' + this.mAccepted + 'f' + this.fAccepted)
         if (this.mAccepted && this.fAccepted) {
           // 유일한 매칭 성공 조건
           clearTimeout(timeout)
-          console.log('매칭에 성공했습니다!')
           this.setIsMatched(true)
-          // 이하에서 location 정보가 비어있지만, 매칭이 성사된 후에는 의미 없으니 따로 추가해주지 않았음.
           if (this.myGender === 'M') {
             successMatching(
               this.opponentNo,
@@ -398,7 +435,7 @@ export default {
                 this.opponentInfo = res.data.user
               },
               (error) => {
-                console.log(error)
+                console.warn(error)
               }
             ) // 매칭 성사 API 남자만 호출
           }
@@ -412,21 +449,25 @@ export default {
         if (this.mAccepted === false && this.fAccepted === false) {
           clearTimeout(timeout)
           this.showChoiceModal = false
-          console.log('매칭에 실패했습니다.')
-          if (this.myGender === 'F') interval = this.intervalMatching()
+          console.warn('매칭에 실패했습니다.')
+          if (this.myGender === 'F') this.interval = this.intervalMatching()
           this.mAccepted = null
           this.fAccepted = null
           startMatching(this.location)
+          this.showModal = true
+          setTimeout(() => (this.showModal = false), 3000)
         }
       })
       const timeout = setTimeout(() => {
         this.showChoiceModal = false
         // 매칭 실패 조건 2
-        console.log('매칭에 실패했습니다.')
+        console.warn('매칭에 실패했습니다.')
         startMatching(this.location)
-        if (this.myGender === 'F') interval = this.intervalMatching()
+        if (this.myGender === 'F') this.interval = this.intervalMatching()
         this.mAccepted = null
         this.fAccepted = null
+        this.showModal = true
+        setTimeout(() => (this.showModal = false), 3000)
       }, 11000)
     },
 
@@ -493,9 +534,7 @@ export default {
           })
           this.session.unpublish(this.publisher).then(() => {
             this.publisher = newPublisher
-            this.session.publish(this.publisher).then(() => {
-              console.log('오디오 장치 전환')
-            })
+            this.session.publish(this.publisher)
           })
           this.audioId = audioDevices[index].deviceId
         }
@@ -517,9 +556,7 @@ export default {
           })
           this.session.unpublish(this.publisher).then(() => {
             this.publisher = newPublisher
-            this.session.publish(this.publisher).then(() => {
-              console.log('비디오 장치 전환')
-            })
+            this.session.publish(this.publisher)
           })
           this.videoId = videoDevices[index].deviceId
         }
@@ -583,7 +620,7 @@ export default {
             this.session.publish(this.publisher)
           })
           .catch((error) => {
-            console.log(
+            console.warn(
               'There was an error connecting to the session:',
               error.code,
               error.message
@@ -593,6 +630,7 @@ export default {
       window.addEventListener('beforeunload', (e) => {
         e.preventDefault()
         this.leaveSession()
+        this.stompClient.disconnect()
       })
     },
     leaveSession() {
@@ -619,5 +657,7 @@ export default {
 .video-container {
   width: 500px;
   height: 375px;
+  overflow: hidden;
+  border-radius: 10px;
 }
 </style>

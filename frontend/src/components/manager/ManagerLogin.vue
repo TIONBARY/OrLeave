@@ -1,8 +1,13 @@
 <template>
   <div>
-    <br />
-    <br />
-    <h1>관리자 로그인</h1>
+    <div class="item row items-center justify-center" style="margin-top: 70px">
+      <q-img
+        class="q-ma-lg"
+        :src="require('../../assets/logo_manager.png')"
+        alt="image"
+        style="width: 100%; max-width: 300px"
+      />
+    </div>
     <!-- Content -->
     <!-- Login -->
     <div>

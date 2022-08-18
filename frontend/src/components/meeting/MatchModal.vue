@@ -14,22 +14,26 @@
           class="q-ma-md"
           animation-speed="1"
         />
-        <br /><q-img :src="require('../../assets/profile/' + imageNo + '.png')" width="30px" style="margin-right: 10px"/>{{ modalContent }}</q-card-section
+        <br /><q-img
+          :src="require('../../assets/profile/' + imageNo + '.png')"
+          width="30px"
+          style="margin-right: 10px"
+        />{{ modalContent }}</q-card-section
       >
       <div class="full-width row justify-evenly q-mb-lg">
         <q-btn
           class="primary"
           :disable="this.disable"
           @click="$emit('confirm'), $emit('changeDisable')"
-          >확인</q-btn
+          >수락</q-btn
         >
         <q-btn
           class="secondary"
           :disable="this.disable"
-          v-close-popup
-          @click="$emit('close')"
-          >취소</q-btn
+          @click="$emit('close'), $emit('changeDisable')"
         >
+          거절
+        </q-btn>
       </div>
     </q-card>
   </q-dialog>

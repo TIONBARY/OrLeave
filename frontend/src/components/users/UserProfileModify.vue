@@ -301,7 +301,12 @@
 
 <script>
 import { ref, reactive } from 'vue'
-import { checkPassword, requestProfile, requestModifyProfile, checkNicknameExist } from '@/api/user'
+import {
+  checkPassword,
+  requestProfile,
+  requestModifyProfile,
+  checkNicknameExist
+} from '@/api/user'
 import { mapState, mapActions } from 'vuex'
 import ConfirmModal from '../ConfirmModal.vue'
 const userStore = 'userStore'
@@ -506,34 +511,40 @@ export default {
       )
     },
     async onSubmit() {
-      requestModifyProfile({
-        imageNo: this.imageNo,
-        nickname: this.nickname,
-        drink: this.drinkSelected,
-        smoke: this.smokeSelected,
-        mbti: this.mbtiSelected,
-        religion: this.religionSelected,
-        interests: this.interestSelected,
-        personalities: this.personalitySelected
-      }, ({ data }) => {
-        if (data.statusCode === 200) {
-          this.showModal = true
-          this.modalContent = '프로필 수정을 완료했습니다.'
-          this.willPageMove = true
-          this.path = '/'
+      requestModifyProfile(
+        {
+          imageNo: this.imageNo,
+          nickname: this.nickname,
+          drink: this.drinkSelected,
+          smoke: this.smokeSelected,
+          mbti: this.mbtiSelected,
+          religion: this.religionSelected,
+          interests: this.interestSelected,
+          personalities: this.personalitySelected
+        },
+        ({ data }) => {
+          const token = data.authorization
+          if (data.statusCode === 200) {
+            this.showModal = true
+            this.modalContent = '프로필 수정을 완료했습니다.'
+            sessionStorage.setItem('Authorization', token)
+            this.willPageMove = true
+            this.path = '/'
+          }
+        },
+        ({ response }) => {
+          if (response.statusCode === 401) {
+            this.showModal = true
+            this.modalContent = '로그인이 만료되었습니다. 다시 로그인해주세요.'
+            this.willPageMove = true
+            this.path = '/user/login'
+          } else {
+            this.showModal = true
+            this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+            this.willPageMove = false
+          }
         }
-      }, ({ response }) => {
-        if (response.statusCode === 401) {
-          this.showModal = true
-          this.modalContent = '로그인이 만료되었습니다. 다시 로그인해주세요.'
-          this.willPageMove = true
-          this.path = '/user/login'
-        } else {
-          this.showModal = true
-          this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-          this.willPageMove = false
-        }
-      })
+      )
     },
     checkNickname(nickname) {
       if (nickname === null) {
@@ -579,27 +590,30 @@ export default {
     }
   },
   created() {
-    requestProfile(({ data: { profile } }) => {
-      this.imageNo = profile.imageNo
-      this.imageUrl = require('../../assets/profile/' + this.imageNo + '.png')
-      this.beforeNickname = profile.nickname
-      this.nickname = profile.nickname
-      this.drinkSelected = profile.drink
-      this.smokeSelected = profile.smoke
-      this.mbtiSelected = profile.mbti
-      this.religionSelected = profile.religion
-      profile.interests.forEach((interest) => {
-        this.interests[interest].value = true
-      })
-      profile.personalities.forEach((personality) => {
-        this.personalities[personality].value = true
-      })
-    }, () => {
-      this.showModal = true
-      this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
-      this.willPageMove = true
-      this.path = '/'
-    })
+    requestProfile(
+      ({ data: { profile } }) => {
+        this.imageNo = profile.imageNo
+        this.imageUrl = require('../../assets/profile/' + this.imageNo + '.png')
+        this.beforeNickname = profile.nickname
+        this.nickname = profile.nickname
+        this.drinkSelected = profile.drink
+        this.smokeSelected = profile.smoke
+        this.mbtiSelected = profile.mbti
+        this.religionSelected = profile.religion
+        profile.interests.forEach((interest) => {
+          this.interests[interest].value = true
+        })
+        profile.personalities.forEach((personality) => {
+          this.personalities[personality].value = true
+        })
+      },
+      () => {
+        this.showModal = true
+        this.modalContent = '에러가 발생했습니다. 다시 시도해주세요.'
+        this.willPageMove = true
+        this.path = '/'
+      }
+    )
   }
 }
 </script>
