@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.orleave.dto.InquiryDetailDto;
 import com.orleave.dto.InquiryListDto;
-import com.orleave.dto.NoticeDetailDto;
 import com.orleave.dto.ReportDetailDto;
 import com.orleave.dto.UserListDto;
 import com.orleave.dto.UserReportListDto;

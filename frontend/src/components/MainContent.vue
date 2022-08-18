@@ -5,7 +5,7 @@
         <q-img
           :src="require('../assets/logo_l.png')"
           spinner-color="white"
-          width="400px"
+          width="380px"
         />
 
         <div class="q-mt-sm">
@@ -121,7 +121,7 @@
                     label="OK"
                     color="primary"
                     v-close-popup
-                    @click="setMeetingSetting"
+                    @click="modifyMeetingSetting"
                   />
                 </q-card-actions>
               </q-card>
@@ -153,7 +153,7 @@
     <div class="item pageSection row">
       <div class="intro-title text-left">
         <h1>잡다,</h1>
-        <h2>마음이에 드는 상대를<br />쟁취하세요.</h2>
+        <h2>마음에 드는 상대를<br />쟁취하세요.</h2>
       </div>
       <q-img
         class="img-container intro-img"
@@ -163,7 +163,7 @@
 
     <div class="item">
       <div class="third">
-        <h1>개발자 소개</h1>
+        <h1>개발자소개</h1>
         <div class="q-mt-md row justify-center">
           <div class="img-container">
             <q-img
@@ -173,80 +173,44 @@
               height="400px"
             />
           </div>
-          <div class="column q-ma-xl q-gutter-sm text-left">
+          <div class="q-gutter-sm text-left">
             <div class="text-h5">Frontend</div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/10.png" />
               </q-avatar>
-              김시언:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              김시언
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/25.png" />
               </q-avatar>
-              정승욱:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              정승욱
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/2.png" />
               </q-avatar>
-              정지은:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              정지은
             </div>
             <div class="text-h5">Backend</div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/3.png" />
               </q-avatar>
-              박상수:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              박상수
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/5.png" />
               </q-avatar>
-              윤지환:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              윤지환
             </div>
             <div>
               <q-avatar size="25px">
                 <q-img src="../assets/profile/4.png" />
               </q-avatar>
-              허상:&nbsp;
-              <q-avatar class="q-mr-sm" size="20px">
-                <q-img src="../assets/main/github.png" />
-              </q-avatar>
-              <q-avatar size="20px">
-                <q-img src="../assets/main/instagram.png" />
-              </q-avatar>
+              허상
             </div>
           </div>
         </div>
@@ -292,11 +256,11 @@ export default {
     const meetingSetting = ref({
       religion: 0,
       smoke: 0,
-      drink_min: 0,
-      drink_max: 2,
+      drinkMin: 0,
+      drinkMax: 2,
       distance: 4,
-      age_min: 20,
-      age_max: 50
+      ageMin: 20,
+      ageMax: 50
     })
     return {
       index,
@@ -323,14 +287,14 @@ export default {
       getMeetingSetting(
         ({ data }) => {
           if (data.statusCode === 200) {
-            this.meetingSetting = data.meetingsetting
+            this.meetingSetting = data.meetingSetting
             this.age = {
-              min: this.meetingSetting.age_min,
-              max: this.meetingSetting.age_max
+              min: this.meetingSetting.ageMin,
+              max: this.meetingSetting.ageMax
             }
             this.drink = {
-              min: this.meetingSetting.drink_min,
-              max: this.meetingSetting.drink_max
+              min: this.meetingSetting.drinkMin,
+              max: this.meetingSetting.drinkMax
             }
           }
         },
@@ -347,7 +311,7 @@ export default {
         }
       )
     },
-    setMeetingSetting() {
+    modifyMeetingSetting() {
       this.meetingSetting.age_min = this.age.min
       this.meetingSetting.age_max = this.age.max
       this.meetingSetting.drink_min = this.drink.min
@@ -415,7 +379,7 @@ export default {
   position: absolute;
   right: 10%;
   bottom: 10%;
-  width: 400px;
+  width: 40vw;
   height: auto;
   min-width: 40%;
   min-height: auto;

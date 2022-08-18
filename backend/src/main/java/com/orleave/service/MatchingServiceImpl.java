@@ -3,6 +3,7 @@ package com.orleave.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,22 +44,20 @@ public class MatchingServiceImpl implements MatchingService {
 	@Autowired
 	MeetingLogRepository meetingLogRepository;
 	
-	private Map<Integer, WaitingUserDto> males;
-	private Map<Integer, WaitingUserDto> females;
+	private static Map<Integer, WaitingUserDto> males = new ConcurrentHashMap<>();
+	private static Map<Integer, WaitingUserDto> females = new ConcurrentHashMap<>();
 	private Map<Integer, Integer> distanceMap;
 	
 	@Autowired
 	public MatchingServiceImpl() {
-		males = new ConcurrentHashMap<>();
-		females = new ConcurrentHashMap<>();
-		distanceMap = new ConcurrentHashMap<>();
+		distanceMap = new HashMap<>();
 		distanceMap.put(0, 10); distanceMap.put(1, 20);
 		distanceMap.put(2, 50); distanceMap.put(3, 100);
 		distanceMap.put(4, Integer.MAX_VALUE);
 	}
 	
 	@Override
-	public void startMatching(int userNo, double lat, double lng) throws Exception {
+	public WaitingUserDto startMatching(int userNo, double lat, double lng) throws Exception {
 		Optional<User> usertemp = userRepository.findById(userNo);
 		if(!usertemp.isPresent()) throw new UserNotFoundException();
 		User user=usertemp.get();
@@ -84,6 +83,7 @@ public class MatchingServiceImpl implements MatchingService {
 		}
 		if (user.getGender().equals("M")) males.put(userNo, userDto);
 		else females.put(userNo, userDto);
+		return userDto;
 	}
 
 	@Override
@@ -93,11 +93,11 @@ public class MatchingServiceImpl implements MatchingService {
 		if (femaleDto == null) throw new MatchingUserNotFoundException();
 		MeetingSetting femaleMeetingSetting = meetingSettingRepository.findById(userNo).get();
 		outer: for (int maleNo : males.keySet()) {
-			List<Ban> femaleBan = banRepository.findByUserNo(userNo);
+			List<Ban> femaleBan = banRepository.findByUserNoOrderByNoDesc(userNo);
 			for (Ban ban : femaleBan) {
 				if (ban.getBannedNo() == maleNo) continue outer;
 			}
-			List<Ban> maleBan = banRepository.findByUserNo(maleNo);
+			List<Ban> maleBan = banRepository.findByUserNoOrderByNoDesc(maleNo);
 			for (Ban ban : maleBan) {
 				if (ban.getBannedNo() == userNo) continue outer;
 			}
@@ -121,11 +121,7 @@ public class MatchingServiceImpl implements MatchingService {
 	
 	@Override
 	@Transactional
-	public WaitingUserDto matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException {
-		WaitingUserDto femaleDto = females.get(femaleNo);
-		if (femaleDto == null) throw new MatchingUserNotFoundException();
-		males.remove(userNo);
-		females.remove(femaleNo);
+	public void matchingSuccess(int userNo, int femaleNo) throws MatchingUserNotFoundException {
 		MeetingLog meetingLog1 = MeetingLog.builder()
 				.user1(userRepository.findById(userNo).get())
 				.user2(femaleNo)
@@ -138,7 +134,6 @@ public class MatchingServiceImpl implements MatchingService {
 				.build();
 		meetingLogRepository.save(meetingLog1);
 		meetingLogRepository.save(meetingLog2);
-		return femaleDto;
 	}
 	
 	@Override

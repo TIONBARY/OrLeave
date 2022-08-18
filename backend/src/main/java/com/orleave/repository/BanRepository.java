@@ -10,6 +10,8 @@ import com.orleave.entity.Ban;
 
 @Repository
 public interface BanRepository extends JpaRepository<Ban, Integer> {
-	List<Ban> findByUserNo(int userNo);
+	List<Ban> findByUserNoOrderByNoDesc(int userNo);
 	Optional<Ban> findByUserNoAndBannedNo(int userNo, int bannedNo);
+	long deleteByUserNo(int userNo);
+	long deleteByBannedNo(int bannedNo);
 }

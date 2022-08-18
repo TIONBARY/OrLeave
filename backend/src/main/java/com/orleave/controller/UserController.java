@@ -29,6 +29,7 @@ import com.orleave.dto.request.SignupRequestDto;
 import com.orleave.dto.request.UserAccountRequestDto;
 import com.orleave.dto.response.BaseResponseDto;
 import com.orleave.dto.response.LoginResponseDto;
+import com.orleave.dto.response.ModifyResponseDto;
 import com.orleave.dto.response.ProfileResponseDto;
 import com.orleave.dto.response.UserResponseDto;
 import com.orleave.entity.User;
@@ -253,15 +254,15 @@ public class UserController {
         @ApiResponse(code = 404, message = "사용자 없음"),
         @ApiResponse(code = 500, message = "서버 오류")
     })
-    public ResponseEntity<? extends BaseResponseDto> modifyProfile(
+    public ResponseEntity<ModifyResponseDto> modifyProfile(
             @RequestBody @ApiParam(value="프로필", required = true) ProfileModifyRequestDto profileModifyRequestDto,
             @ApiIgnore Authentication authentication) throws Exception {
-		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
+		if (authentication == null) return ResponseEntity.status(401).body(ModifyResponseDto.of(401, "Unauthorized", null));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
 		String email = userDetails.getUsername();
 		User user = userService.getUserByEmail(email);
 		userService.modifyProfile(user.getNo(), profileModifyRequestDto);
-		return ResponseEntity.status(200).body(BaseResponseDto.of(200, "Modified"));
+		return ResponseEntity.status(200).body(ModifyResponseDto.of(200, "Modified", JwtTokenUtil.getToken(user)));
     }
 	
 	@PostMapping("/password")

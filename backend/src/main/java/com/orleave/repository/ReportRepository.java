@@ -11,4 +11,5 @@ import com.orleave.entity.Report;
 public interface ReportRepository extends JpaRepository<Report, Integer> {
 	long countByUserNo(int no);
 	Page<Report> findByReported(int no,Pageable pageable);
+	long deleteByUserNo(int userNo);
 }

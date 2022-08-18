@@ -44,9 +44,7 @@ const meetingStore = {
       commit('SET_OPPONENT_INFO', payload)
     },
     setIsMatched({ commit }, payload) {
-      console.log('hi')
       commit('SET_IS_MATCHED', payload)
-      console.log(this.isMatched)
     }
   }
 }

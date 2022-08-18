@@ -23,8 +23,6 @@ import com.orleave.repository.MeetingSettingRepository;
 import com.orleave.repository.ReportRepository;
 import com.orleave.repository.UserRepository;
 
-import io.swagger.annotations.ApiModelProperty;
-
 
 @Service("MeetingService")
 public class MeetingServiceImpl implements MeetingService{
@@ -65,6 +63,7 @@ public class MeetingServiceImpl implements MeetingService{
 		if(!meetingsettingtemp.isPresent()) throw new UserNotFoundException();
 		
 		MeetingSetting meetingSetting = MeetingSetting.builder()
+				.userNo(no)
 				.religion(dto.getReligion())
 				.smoke(dto.getSmoke())
 				.drinkMax(dto.getDrink_max())
@@ -80,7 +79,7 @@ public class MeetingServiceImpl implements MeetingService{
 	public List<MeetingLogListDto> getRecentMeetingLogs(int userNo) throws Exception{
 		Optional<User> user=userRepository.findById(userNo);
 		if(!user.isPresent()) throw new UserNotFoundException();
-		List<MeetingLog> list = meetingLogRepository.findByUser1NoAndCreatedTimeBetween(userNo, LocalDateTime.now().minusDays(7), LocalDateTime.now());
+		List<MeetingLog> list = meetingLogRepository.findTop5ByUser1NoAndCreatedTimeBetweenOrderByNoDesc(userNo, LocalDateTime.now().minusDays(7), LocalDateTime.now());
 		List<MeetingLogListDto> logs = new ArrayList<>();
 		
 		for (MeetingLog log : list) {

@@ -45,7 +45,7 @@ public class BanServiceImpl implements BanService {
 	@Override
 	@Transactional
 	public List<BanListDto> findByUserNo(int userNo) throws Exception {
-		List<Ban> bans = banRepository.findByUserNo(userNo);
+		List<Ban> bans = banRepository.findByUserNoOrderByNoDesc(userNo);
 		List<BanListDto> banDtos = new ArrayList<>();
 		
 		for (Ban ban : bans) {
