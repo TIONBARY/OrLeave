@@ -163,7 +163,7 @@
 
     <div class="item">
       <div class="third">
-        <h1>개발자 소개</h1>
+        <h1>개발자소개</h1>
         <div class="q-mt-md row justify-center">
           <div class="img-container">
             <q-img
