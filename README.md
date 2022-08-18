@@ -75,11 +75,11 @@
 
 ## 와이어 프레임
 
-![와이어 프레임](./mdImage/WireFrame.PNG)
+![WireFrame](/uploads/4f7604e3072d3c260a74d1a469f2c1ad/WireFrame.PNG)
 
 ## ERD 다이어그램
 
-![ERD](./mdImage/ERD.png)
+![ERD](/uploads/01b894e01d525c9e802bd3f56d58b071/ERD.png)
 
 ## 요구사항 정의서
 
@@ -138,7 +138,7 @@ gif 사용
 
 #### BurnDown Chart
 
-![번다운 차트](./mdImage/BurnDownChart.PNG)
+![BurnDownChart](/uploads/bb2a3855eceac642b46fbc85efe14a5f/BurnDownChart.PNG)
 
 ## 배포 방법
 
