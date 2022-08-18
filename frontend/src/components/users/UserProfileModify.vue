@@ -353,10 +353,10 @@ export default {
       { key: 4, name: '음악', value: false },
       { key: 5, name: '맛집탐방', value: false },
       { key: 6, name: '패션', value: false },
-      { key: 7, name: '채식', value: false },
+      { key: 7, name: '보드게임', value: false },
       { key: 8, name: '반려동물', value: false },
-      { key: 9, name: '재테크', value: false },
-      { key: 10, name: '자동차', value: false }
+      { key: 9, name: '요리', value: false },
+      { key: 10, name: '알고리즘', value: false }
     ])
     const personalities = reactive([
       { key: 0, name: '차분한', value: false },
@@ -365,11 +365,11 @@ export default {
       { key: 3, name: '배려많은', value: false },
       { key: 4, name: '당당한', value: false },
       { key: 5, name: '열정적인', value: false },
-      { key: 6, name: '개인적인', value: false },
+      { key: 6, name: '부지런한', value: false },
       { key: 7, name: '긍정적인', value: false },
-      { key: 8, name: '감각적인', value: false },
+      { key: 8, name: '세심한', value: false },
       { key: 9, name: '온화한', value: false },
-      { key: 10, name: '소박한', value: false }
+      { key: 10, name: '솔직한', value: false }
     ])
     const showModal = ref(false)
     const willPageMove = ref(false)

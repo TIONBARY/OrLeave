@@ -51,7 +51,6 @@
             </div>
             <div id="my-signin2" style="display: none"></div>
             <div id="naverIdLogin"></div>
-            <!-- <q-btn @click="kakaoLogin()"> -->
             <img
               class="kakao"
               :src="require('../../assets/main/kakao_login_large_narrow.png')"
@@ -59,7 +58,6 @@
               style="width: 277px"
               @click="kakaoLogin()"
             />
-            <!-- </q-btn> -->
           </div>
         </div>
       </section>

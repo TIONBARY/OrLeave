@@ -84,15 +84,6 @@
       </div>
       <div id="session-header">
         <div>
-          <!-- <q-img
-            id="skip_img"
-            src="../../assets/meeting/skip.png"
-            v-if="level < 3 && skipDisable === true"
-            width="130px"
-            no-spinner
-            class="absolute-bottom-left"
-            style="filter: grayscale(100%)"
-          /> -->
           <q-img
             id="skip_img"
             src="../../assets/meeting/skip.png"
@@ -103,11 +94,16 @@
             @click="levelUp()"
             v-if="this.level < 3"
           >
-            <q-tooltip v-if="skipDisable">
+            <q-tooltip
+              v-if="skipDisable"
+              style="width: 200px; text-align: center"
+            >
               <div>조금 더 대화를 나눠보세요.</div>
             </q-tooltip>
+            <q-tooltip v-if="mySkip" style="width: 200px; text-align: center">
+              <div>상대를 기다리는 중...</div>
+            </q-tooltip>
           </q-img>
-          <!-- <q-btn  flat :ripple="false" /> -->
 
           <q-img
             src="../../assets/meeting/leave.png"
