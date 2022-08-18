@@ -270,7 +270,6 @@ public class ManagerController {
 			@ApiIgnore Authentication authentication, @PathVariable("no") int no) throws Exception {
 		if (authentication == null) return ResponseEntity.status(401).body(BaseResponseDto.of(401, "Unauthorized"));
 		SsafyUserDetails userDetails = (SsafyUserDetails)authentication.getDetails();
-		int userNo = userDetails.getUserNo();
 		InquiryDetailDto inquiry = managerService.getInquiryDetail(no);
 		return ResponseEntity.status(200).body(InquiryDetailResponseDto.of(200, "Success", inquiry));
 	}

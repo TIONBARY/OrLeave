@@ -92,10 +92,8 @@
 
 <script>
 import { ref } from 'vue'
-import { mapActions } from 'vuex'
 import { answerInquiry, inquiryDetail } from '@/api/manager'
 import ConfirmModal from '../ConfirmModal.vue'
-const inquiryStore = 'inquiryStore'
 
 export default {
   setup() {
@@ -148,7 +146,6 @@ export default {
     )
   },
   methods: {
-    ...mapActions(inquiryStore, ['inquiryDetail', 'inquiryDelete']),
     modifyAnswer(no, newAnswer) {
       answerInquiry(
         {
