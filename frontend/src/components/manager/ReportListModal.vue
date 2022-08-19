@@ -49,7 +49,7 @@
                 class="cursor-pointer"
               >
                 <td class="text-center">{{ report.no }}</td>
-                <td class="text-left">{{ report.user_email }}</td>
+                <td class="text-left">{{ report.userEmail }}</td>
                 <td class="text-center">
                   {{ this.categoryList[report.category] }}
                 </td>
@@ -117,7 +117,6 @@ export default {
     const reportNo = ref(0)
     const email = ref(null)
     const categoryList = ref([
-      '',
       '욕설 및 폭언',
       '부적절한 닉네임',
       '부적절한 언행',
