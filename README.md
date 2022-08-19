@@ -4,8 +4,12 @@
 
 ## 팀원소개
 
-대충 팀원 소개하는 이미지
-누군가 만들어주겠지
+![김시언](/uploads/fbc47c2a028dba2a0d89eca7efe777ed/김시언.png)
+![정승욱](/uploads/700409307f8b7fdf0b2ff2dfd775e3a2/정승욱.png)
+![정지은](/uploads/f9d61b3885347437ff16ea6b6b3e5058/정지은.png)<br />
+![박상수](/uploads/c8bc7d144e4736aad74eefd27b8e2107/박상수.png)
+![윤지환](/uploads/cefeab358a9b4ec2722e60805dca4255/윤지환.png)
+![허상](/uploads/612f72586851902c1e19b69ccc4e26ac/허상.png)
 
 ## 기술 스택
 
@@ -96,7 +100,20 @@
 
 ## 세부기능
 
-gif 사용
+### 매칭옵션
+![매칭옵션](/uploads/04238d2a81bf88d88d682f3a7679ea77/매칭옵션.gif)
+
+### 미팅로비
+![미팅로비](/uploads/525bf2bdcd417006386fcb4bfeea157f/미팅로비.gif)
+
+### 미팅룸
+![1단계](/uploads/1bde4d80149ba5311c949ca227f86a40/1단계.gif)
+
+### 신고기능
+![신고](/uploads/35811958a84e4c7e0ae731d85d29fb5e/신고.gif)
+
+### 차단리스트
+![차단리스트](/uploads/e662157cd58dbd46d738e1b10b1e56bc/차단리스트.gif)
 
 ## 아키텍처
 ![아키텍처](/uploads/246a7f941b5b016dd92b801780cfe331/아키텍처.png)
@@ -278,20 +295,71 @@ server {
 <div markdown="1">
 
 ```
-#mysql 실행
-docker run –name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=cityview1202502 \
--d mysql:5.7 –character-set-server=utf8 –collation-server=utf8_unicode_ci
+#nginx 설치
+sudo apt-get update
+sudo apt-get install nginx
+sudo systemctl start nginx
+sudo systemctl status nginx
 
-#mysql 컨테이너 접속
-docker exec -it mysql /bin/sh
-sh-4.2# mysql -u root -p
-Enter password: cityview1202502
+#active면 동작중
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2022-08-05 23:07:26 KST; 1 weeks 4 days ago
+		 ...
+		 ...
 
-#루트 계정 이름 변경
-mysql> use mysql
-mysql> update user set user='ssafy502' where user='root';
-mysql> flush privileges;
-mysql> exit
+#SSL 설정
+#https://certbot.eff.org/instructions?ws=apache&os=ubuntufocal 참고
+
+#snap 패키지 관리 툴 설지
+apt-get install snapd
+
+#snap 최신화
+sudo snap install core
+sudo snap refresh core
+
+#certbot 설치
+sudo snap install --classic certbot
+
+#ln 명령어로 cli에서 certbot 커맨드 사용가능하게 설정
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+#ssl 인증서 발급
+sudo certbot certonly --nginx -d i7a502.p.ssafy.io
+
+#프록시 설정
+cd /etc/nginx/sites-available
+sudo vi orleave
+
+server {
+        location /{ # /로 시작하는 url은 http://localhost:3000으로 중계(프론트엔드)
+                proxy_pass http://localhost:3000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+                proxy_set_header Host $host;
+        }
+
+        location /api { # /api로 시작하는 url은 http://localhost:8181/api으로 중계(백엔드)
+                proxy_pass http://localhost:8181/api;
+        }
+
+        listen 443 ssl;
+        ssl_certificate /etc/letsencrypt/live/i7a502.p.ssafy.io/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/i7a502.p.ssafy.io/privkey.pem;
+				# include /etc/letsencrypt/options-ssl-nginx.conf;
+        # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+        if ($host = i7a502.p.ssafy.io) {
+                return 301 https://$host$request_uri;
+        }
+
+                listen 80;
+                server_name i7a502.p.ssafy.io;
+        return 404;
+}
 ```
 
 </div>
@@ -346,6 +414,19 @@ HTTPS_PORT=8443
 ...
 
 
+# openvidu 시작
+./openvidu start
+
+
+#실행 확인
+docker ps
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED       STATUS                 PORTS                                                                                                      NAMES
+...
+536b9d2aa576   openvidu/openvidu-call:2.22.0         "docker-entrypoint.s…"   12 days ago   Up 12 days                                                                                                                        openvidu_app_1
+9c545ec31f46   openvidu/openvidu-proxy:2.22.0        "/docker-entrypoint.…"   12 days ago   Up 12 days                                                                                                                        openvidu_nginx_1
+e8b8f6b32376   kurento/kurento-media-server:6.16.0   "/entrypoint.sh"         12 days ago   Up 12 days (healthy)                                                                                                              openvidu_kms_1
+2d628a6220df   openvidu/openvidu-coturn:2.22.0       "docker-entrypoint.s…"   12 days ago   Up 12 days             0.0.0.0:3478->3478/tcp, 0.0.0.0:3478->3478/udp, :::3478->3478/tcp, :::3478->3478/udp, 5349/tcp, 5349/udp   openvidu_coturn_1
+9c39965ecd39   openvidu/openvidu-server:2.22.0       "/usr/local/bin/entr…"   12 days ago   Up 12 days                                                                                                                        openvidu_openvidu-server_1
 ```
 
 </div>
@@ -375,20 +456,6 @@ docker run --rm --name nginx_vue -d -p 3000:80 nginx-vue:0.
 #openvidu 배포
 cd /opt/openvidu
 ./openvidu start
-
-#실행 확인
-docker ps
-CONTAINER ID   IMAGE                                 COMMAND                  CREATED        STATUS                 PORTS                                                                                                      NAMES
-e130acdb276a   orleave_backend:0.1                   "java -jar /app.jar"     18 hours ago   Up 18 hours            0.0.0.0:8181->8181/tcp, :::8181->8181/tcp                                                                  orleave
-68a445d32fd2   nginx-vue:0.1                         "/docker-entrypoint.…"   18 hours ago   Up 18 hours            0.0.0.0:3000->80/tcp, :::3000->80/tcp                                                                      nginx_vue
-74ab30a2daa4   mysql:5.7                             "docker-entrypoint.s…"   13 days ago    Up 13 days             0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp                                                       mysql
-536b9d2aa576   openvidu/openvidu-call:2.22.0         "docker-entrypoint.s…"   2 weeks ago    Up 2 weeks                                                                                                                        openvidu_app_1
-9c545ec31f46   openvidu/openvidu-proxy:2.22.0        "/docker-entrypoint.…"   2 weeks ago    Up 2 weeks                                                                                                                        openvidu_nginx_1
-e8b8f6b32376   kurento/kurento-media-server:6.16.0   "/entrypoint.sh"         2 weeks ago    Up 2 weeks (healthy)                                                                                                              openvidu_kms_1
-2d628a6220df   openvidu/openvidu-coturn:2.22.0       "docker-entrypoint.s…"   2 weeks ago    Up 2 weeks             0.0.0.0:3478->3478/tcp, 0.0.0.0:3478->3478/udp, :::3478->3478/tcp, :::3478->3478/udp, 5349/tcp, 5349/udp   openvidu_coturn_1
-9c39965ecd39   openvidu/openvidu-server:2.22.0       "/usr/local/bin/entr…"   2 weeks ago    Up 2 weeks                                                                                                                        openvidu_openvidu-server_1
-
-
 ```
 
 </div>
