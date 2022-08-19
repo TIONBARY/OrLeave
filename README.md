@@ -1,15 +1,14 @@
 # OrLeave 올리브
 
-비대면 소개팅 서비스
+> 비대면 소개팅 서비스
+
+## 로고
+
+![Logo](README.assets/Logo.png)
 
 ## 팀원소개
 
-![김시언](/uploads/fbc47c2a028dba2a0d89eca7efe777ed/김시언.png)
-![정승욱](/uploads/700409307f8b7fdf0b2ff2dfd775e3a2/정승욱.png)
-![정지은](/uploads/f9d61b3885347437ff16ea6b6b3e5058/정지은.png)<br />
-![박상수](/uploads/c8bc7d144e4736aad74eefd27b8e2107/박상수.png)
-![윤지환](/uploads/cefeab358a9b4ec2722e60805dca4255/윤지환.png)
-![허상](/uploads/612f72586851902c1e19b69ccc4e26ac/허상.png)
+![팀원소개](README.assets/팀원소개.png)
 
 ## 기술 스택
 
@@ -37,7 +36,7 @@
 <img src="https://img.shields.io/badge/nodejs-339933?style=for-the-badge&logo=node.js&logoColor=white">
 <img src="https://img.shields.io/badge/quasar-1976D2?style=for-the-badge&logo=quasar&logoColor=white">
 
-#### 서버
+### 서버
 
 <img src="https://img.shields.io/badge/ubuntu-E95420?style=for-the-badge&logo=Ubuntu&logoColor=white"> 
 <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"> 
@@ -45,7 +44,7 @@
 <img src="https://img.shields.io/badge/Openvidu-ffcd00?style=for-the-badge&logo=&logoColor=black">
 <img src="https://img.shields.io/badge/kurento-ffcd00?style=for-the-badge&logo=&logoColor=black">
 
-#### Architecture
+
 
 1. 작업관리 : Jira
 2. 형상관리 : Gitlab
@@ -77,46 +76,58 @@
    - Openvidu : 2.22.0
    - Kurento-media-server : 6.16.0
 
-## 와이어 프레임
 
-![WireFrame](/uploads/4f7604e3072d3c260a74d1a469f2c1ad/WireFrame.PNG)
+
+## [와이어 프레임](https://www.figma.com/file/j5OzZBpbjejXIw18JQomRB/OrLeave?node-id=0%3A1)
+
+![wire_frame](README.assets/wire_frame.png)
+
+## Style Guide
+
+![style_guide](README.assets/style_guide.png)
 
 ## ERD 다이어그램
 
-![ERD](/uploads/01b894e01d525c9e802bd3f56d58b071/ERD.png)
+![ERD](README.assets/ERD.png)
 
-## 요구사항 정의서
-[요구사항정의서](https://docs.google.com/spreadsheets/d/1iBTKCzx7lzYH7YWYYFgMEQgo3bqs2lh0LCCXyjAavOA/edit#gid=0)
+## [기능명세서](https://docs.google.com/spreadsheets/d/1iBTKCzx7lzYH7YWYYFgMEQgo3bqs2lh0LCCXyjAavOA/edit#gid=0)
 
-## api 명세서
-[API명세서](https://docs.google.com/spreadsheets/d/1ihB1o0xKKdK35dzXh3goaO711LWoWAnFTGnUXBgJTcc/edit#gid=0)
+![기능명세서.png](README.assets/기능명세서.png)
+
+
+
+## [API명세서](https://docs.google.com/spreadsheets/d/1ihB1o0xKKdK35dzXh3goaO711LWoWAnFTGnUXBgJTcc/edit#gid=0)
+![API명세서](README.assets/API명세서.png)
+
+
 
 ## 기획배경
+
 최근 국내 데이팅 앱 시장 규모는 점점 커지고 있다. 약 10개 가량의 소개팅 서비스를 조사한 결과,<br /> 
-대부분의 서비스에서 외모, 나이, 직업 등 외형적인 기준을 첫인상으로 간주하게 되는 환경을 가지고 있었다. <br />
-하지만 현실에서는 외형적인 기준으로 판단한 첫인상은 부정확한 경우가 많다. <br />
-외모뿐만 아니라 성격, 대화, 말투 등 다른 매력 요소 역시 상대방을 파악하는데 중요하기 때문이다.<br />
-따라서 모두가 쉽게 이용할 수 있고, 외모로 상대방을 먼저 인지하지 않고 **대화를 통해 상대방을 천천히 알아갈 수 있는 서비스**를 기획했다.
+대부분의 서비스에서 외모, 나이, 직업 등 외형적인 기준을 첫인상으로 간주하게 되는 환경을 가지고 있었습니다. <br />
+하지만 현실에서는 외형적인 기준으로 판단한 첫인상은 부정확한 경우가 많습니다. <br />
+외모뿐만 아니라 성격, 대화, 말투 등 다른 매력 요소 역시 상대방을 파악하는데 중요하기 때문입니다.<br />
+따라서 모두가 쉽게 이용할 수 있고, 외모로 상대방을 먼저 인지하지 않고 **대화를 통해 상대방을 천천히 알아갈 수 있는 서비스**를 기획했습니다.
 
 ## 세부기능
 
 ### 매칭옵션
-![매칭옵션](/uploads/04238d2a81bf88d88d682f3a7679ea77/매칭옵션.gif)
+![매칭설정](README.assets/매칭설정.gif)
 
 ### 미팅로비
-![미팅로비](/uploads/525bf2bdcd417006386fcb4bfeea157f/미팅로비.gif)
+![매칭대기화면](README.assets/매칭대기화면.gif)
 
 ### 미팅룸
-![1단계](/uploads/1bde4d80149ba5311c949ca227f86a40/1단계.gif)
+![단계별소개팅](README.assets/단계별소개팅.gif)
 
 ### 신고기능
-![신고](/uploads/35811958a84e4c7e0ae731d85d29fb5e/신고.gif)
+![신고](README.assets/신고.gif)
 
 ### 차단리스트
-![차단리스트](/uploads/e662157cd58dbd46d738e1b10b1e56bc/차단리스트.gif)
+![최근통화목록 _차단관리](README.assets/최근통화목록 _차단관리.gif)
 
 ## 아키텍처
-![아키텍처](/uploads/246a7f941b5b016dd92b801780cfe331/아키텍처.png)
+![아키텍처](README.assets/아키텍처.png)
 
 ## git 컨벤션
 
@@ -137,7 +148,10 @@
 
 #### Git Message Rule
 
-"Xxx: xxx xxx"(바디는 한글만, 태그의 첫글자는 대문자)
+> Xxx: xxx xxx
+
+- Tag의 첫 글자는 대문자로, Body는 한글로 작성
+  - ex) Feat: 오픈비두 백엔드 연결
 
 #### Git Flow
 
@@ -145,7 +159,7 @@
 2. FE/BE 구분하여 구현한 내용을 Develop 브랜치로 머지 후 테스트
 3. Develop 브랜치에서 구동 확인 후 Master 브랜치로 머지
 
-## jira
+## Jira
 
 #### Jira Convention
 
@@ -163,7 +177,7 @@
 
 #### BurnDown Chart
 
-![BurnDownChart](/uploads/bb2a3855eceac642b46fbc85efe14a5f/BurnDownChart.PNG)
+![Burn_down_chart](README.assets/Burn_down_chart.png)
 
 ## 배포 방법
 
@@ -408,3 +422,34 @@ e8b8f6b32376   kurento/kurento-media-server:6.16.0   "/entrypoint.sh"         2 
 
 </div>
 </detail>
+
+
+
+## 소감
+
+### Frontend
+
+- [김시언](https://github.com/TIONBARY)
+
+  FE를 담당해 많이 배웠고, SpringBoot와 배포에서도 많이 배울 수 있었다. 
+  개발 중 막힐 때, 좌절하지 않고 깊게 파고들어 문제를 해결하는 방법을 꺠달았습니다.
+
+- [정승욱](https://github.com/tmddnrdl333)
+  vue3를 더 잘 다룰 수 있게 된 좋은 계기였다. 매칭 로직이 어려웠지만, 결국 날 죽이진 못했다.
+  "날 죽이지 못하는 고통은 나를 더 강하게 해줄 뿐이다." - 프리드리히 니체
+
+- [정지은](https://github.com/zzz0105)
+  하루의 시작과 끝에 진행하는 스크럼 미팅 및 일일결산을 통한 소통과 팀워크 덕분에 프로젝트를 잘 마무리할 수 있었다. 기획부터 배포까지 모두 우리 손으로 만들고, 에러를 해결하다 보니 모든 기능이 주요 기능처럼 느껴진다. 
+
+### Backend
+
+- [박상수](https://github.com/qkftkftnf)
+  기획부터 제작까지 직접 해본 경험은 처음이여서 매우 신선하고 유익한 시간이였다. 이 기회로 개발자로서 한걸음 나아간 기분이다.
+
+- [윤지환](https://github.com/yjh2569)
+  팀원과의 페이스를 맞춰가며 개발을 하지 않고 독단적으로 작업을 하는 경우가 많았는데 이러한 경우 코드가 충돌되는 경우가 많았습니다. 이를 통해 팀 프로젝트를 할 때 스크럼 회의와 일일결산, 프로젝트 관리 툴 등으로 팀원과의 소통을 통해 프로젝트 진행 상황을 공유하는 것이 매우 중요하다는 것을 깨달았습니다.
+
+- [허상](https://github.com/heosang/)
+  다섯명이 모이면 한명은 쓰레기라는 말이있다
+
+  항상 내가 그 사람이라고 다짐하며 더 나은 사람이 되기 위해 노력했다. 아니나다를까 치명적인 전염병에 걸려 중요한 시간에 팀원들에게 부담을 줬다. 그럼에도 주어진 상황에서 서로의 작업을 도와 성공적으로 프로젝트를 완수할 수 있었다 역시 팀워크가 가장 중요하다는것을 다시금 느낄 수 있었다
