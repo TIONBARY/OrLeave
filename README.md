@@ -124,7 +124,7 @@
 ![신고](README.assets/신고.gif)
 
 ### 차단리스트
-![최근통화목록 _차단관리](README.assets/최근통화목록 _차단관리.gif)
+![최근통화목록_차단관리](README.assets/최근통화목록_차단관리.gif)
 
 ## 아키텍처
 ![아키텍처](README.assets/아키텍처.png)
